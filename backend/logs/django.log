@@ -196,3 +196,239 @@ WARNING 2025-06-07 02:27:15,255 log 59076 8380145408 Forbidden: /api/reports/inv
 WARNING 2025-06-07 02:27:15,877 log 59076 8380145408 Bad Request: /api/sales/
 WARNING 2025-06-07 02:27:16,188 log 59076 8380145408 Bad Request: /api/sales/
 WARNING 2025-06-07 02:27:17,577 log 59076 8380145408 Forbidden: /api/users/
+WARNING 2025-06-07 02:32:24,553 log 58651 6197424128 Not Found: /
+WARNING 2025-06-07 02:32:24,553 basehttp 58651 6197424128 "GET / HTTP/1.1" 404 2559
+WARNING 2025-06-07 02:32:24,613 log 58651 6197424128 Not Found: /favicon.ico
+WARNING 2025-06-07 02:32:24,613 basehttp 58651 6197424128 "GET /favicon.ico HTTP/1.1" 404 2610
+INFO 2025-06-07 02:32:30,817 basehttp 58651 6197424128 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-06-07 02:32:30,839 basehttp 58651 6197424128 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4178
+INFO 2025-06-07 02:32:30,856 basehttp 58651 6197424128 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2808
+INFO 2025-06-07 02:32:30,857 basehttp 58651 6281555968 "GET /static/admin/css/login.css HTTP/1.1" 200 951
+INFO 2025-06-07 02:32:30,857 basehttp 58651 6247903232 "GET /static/admin/js/theme.js HTTP/1.1" 200 1653
+INFO 2025-06-07 02:32:30,857 basehttp 58651 6264729600 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2025-06-07 02:32:30,858 basehttp 58651 6214250496 "GET /static/admin/css/base.css HTTP/1.1" 200 22120
+INFO 2025-06-07 02:32:30,858 basehttp 58651 6231076864 "GET /static/admin/css/responsive.css HTTP/1.1" 200 16565
+INFO 2025-06-07 02:32:30,861 basehttp 58651 6231076864 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2025-06-07 02:32:34,149 basehttp 58651 6231076864 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4351
+WARNING 2025-06-07 02:40:29,593 log 61559 8380145408 Bad Request: /api/auth/login/
+WARNING 2025-06-07 02:40:31,613 log 61559 8380145408 Forbidden: /api/payments/
+WARNING 2025-06-07 02:40:31,927 log 61559 8380145408 Bad Request: /api/payments/
+WARNING 2025-06-07 02:40:32,553 log 61559 8380145408 Forbidden: /api/products/
+WARNING 2025-06-07 02:40:33,173 log 61559 8380145408 Unauthorized: /api/products/
+WARNING 2025-06-07 02:40:34,422 log 61559 8380145408 Forbidden: /api/reports/inventory/
+ERROR 2025-06-07 02:40:35,045 log 61559 8380145408 Internal Server Error: /api/sales/
+Traceback (most recent call last):
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/generics.py", line 246, in post
+    return self.create(request, *args, **kwargs)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "/Users/evidenceejimone/daddy/backend/salesperson/api_views.py", line 186, in perform_create
+    serializer.save()
+    ~~~~~~~~~~~~~~~^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/serializers.py", line 135, in create
+    sale = Sale.objects.create(**validated_data)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/models.py", line 308, in save
+    self.update_payment_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/models.py", line 290, in update_payment_status
+    remaining = self.remaining_balance
+                ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/models.py", line 286, in remaining_balance
+    return self.total_amount - self.amount_paid
+           ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~
+TypeError: unsupported operand type(s) for -: 'NoneType' and 'decimal.Decimal'
+ERROR 2025-06-07 02:40:35,362 log 61559 8380145408 Internal Server Error: /api/sales/
+Traceback (most recent call last):
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/generics.py", line 246, in post
+    return self.create(request, *args, **kwargs)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "/Users/evidenceejimone/daddy/backend/salesperson/api_views.py", line 186, in perform_create
+    serializer.save()
+    ~~~~~~~~~~~~~~~^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/serializers.py", line 135, in create
+    sale = Sale.objects.create(**validated_data)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/models.py", line 308, in save
+    self.update_payment_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/models.py", line 290, in update_payment_status
+    remaining = self.remaining_balance
+                ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/models.py", line 286, in remaining_balance
+    return self.total_amount - self.amount_paid
+           ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~
+TypeError: unsupported operand type(s) for -: 'NoneType' and 'decimal.Decimal'
+WARNING 2025-06-07 02:40:36,762 log 61559 8380145408 Forbidden: /api/users/
+WARNING 2025-06-07 02:41:22,560 log 61803 8380145408 Bad Request: /api/auth/login/
+WARNING 2025-06-07 02:41:24,567 log 61803 8380145408 Forbidden: /api/payments/
+WARNING 2025-06-07 02:41:24,875 log 61803 8380145408 Bad Request: /api/payments/
+WARNING 2025-06-07 02:41:25,493 log 61803 8380145408 Forbidden: /api/products/
+WARNING 2025-06-07 02:41:26,115 log 61803 8380145408 Unauthorized: /api/products/
+WARNING 2025-06-07 02:41:27,355 log 61803 8380145408 Forbidden: /api/reports/inventory/
+ERROR 2025-06-07 02:41:27,981 log 61803 8380145408 Internal Server Error: /api/sales/
+Traceback (most recent call last):
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/generics.py", line 246, in post
+    return self.create(request, *args, **kwargs)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "/Users/evidenceejimone/daddy/backend/salesperson/api_views.py", line 186, in perform_create
+    serializer.save()
+    ~~~~~~~~~~~~~~~^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/serializers.py", line 135, in create
+    sale = Sale.objects.create(**validated_data)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/models.py", line 308, in save
+    self.update_payment_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/models.py", line 290, in update_payment_status
+    remaining = self.remaining_balance
+                ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/models.py", line 286, in remaining_balance
+    return self.total_amount - self.amount_paid
+           ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~
+TypeError: unsupported operand type(s) for -: 'NoneType' and 'decimal.Decimal'
+ERROR 2025-06-07 02:41:28,342 log 61803 8380145408 Internal Server Error: /api/sales/
+Traceback (most recent call last):
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/generics.py", line 246, in post
+    return self.create(request, *args, **kwargs)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "/Users/evidenceejimone/daddy/backend/salesperson/api_views.py", line 186, in perform_create
+    serializer.save()
+    ~~~~~~~~~~~~~~~^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/serializers.py", line 135, in create
+    sale = Sale.objects.create(**validated_data)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/models.py", line 308, in save
+    self.update_payment_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/models.py", line 290, in update_payment_status
+    remaining = self.remaining_balance
+                ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/backend/salesperson/models.py", line 286, in remaining_balance
+    return self.total_amount - self.amount_paid
+           ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~
+TypeError: unsupported operand type(s) for -: 'NoneType' and 'decimal.Decimal'
+WARNING 2025-06-07 02:41:29,753 log 61803 8380145408 Forbidden: /api/users/

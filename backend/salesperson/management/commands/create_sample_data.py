@@ -33,24 +33,17 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('Creating sample data...'))
 
-        # Create Admin user
-        admin_user, created = User.objects.get_or_create(
-            email='admin@jonkech.com',
-            defaults={
-                'username': 'admin',
-                'first_name': 'Admin',
-                'last_name': 'User',
-                'role': User.ROLE_ADMIN,
-                'is_staff': True,
-                'is_superuser': True,
-            }
-        )
-        if created:
-            admin_user.set_password('admin123')
-            admin_user.save()
+        # Check if we have at least one admin user
+        admin_exists = User.objects.filter(role=User.ROLE_ADMIN).exists()
+        if not admin_exists:
             self.stdout.write(
-                self.style.SUCCESS(f'Created admin user: {admin_user.email}')
+                self.style.WARNING('No admin user found. Please create a superuser first:')
             )
+            self.stdout.write('python manage.py setup_system --create-superuser')
+            return
+            
+        # Get the first admin user for creating payments
+        admin_user = User.objects.filter(role=User.ROLE_ADMIN).first()
 
         # Create sample salespersons
         salesperson_names = [
