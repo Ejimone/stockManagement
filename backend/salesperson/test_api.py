@@ -182,8 +182,8 @@ class SaleAPITestCase(APITestCase):
         url = reverse('api_sale_list')
         data = {
             'customer_name': 'Test Customer',
-            'customer_contact': 'test@customer.com',
-            'payment_method': 'cash',
+            'customer_phone': '1234567890',
+            'payment_method': 'Cash',
             'amount_paid': '125.00',
             'products_sold_data': [
                 {'product_id': self.product1.id, 'quantity': 1},
@@ -207,7 +207,7 @@ class SaleAPITestCase(APITestCase):
         url = reverse('api_sale_list')
         data = {
             'customer_name': 'Test Customer',
-            'payment_method': 'cash',
+            'payment_method': 'Cash',
             'amount_paid': '50.00',
             'products_sold_data': [
                 {'product_id': self.product1.id, 'quantity': 101}  # More than available
@@ -276,7 +276,7 @@ class PaymentAPITestCase(APITestCase):
             payment_method='credit',
             amount_paid=Decimal('100.00'),
             balance=Decimal('100.00'),
-            payment_status='partial'
+            payment_status='Partial'
         )
     
     def test_create_payment_admin(self):
@@ -286,7 +286,7 @@ class PaymentAPITestCase(APITestCase):
         data = {
             'sale': self.sale.id,
             'amount': '50.00',
-            'payment_method': 'cash',
+            'payment_method': 'Cash',
             'reference_number': 'REF123'
         }
         response = self.client.post(url, data, format='json')
@@ -517,7 +517,7 @@ class ModelTestCase(TestCase):
             payment_method='credit',
             amount_paid=Decimal('0.00')
         )
-        self.assertEqual(sale_unpaid.payment_status, 'unpaid')
+        self.assertEqual(sale_unpaid.payment_status, 'Unpaid')
     
     def test_sale_item_subtotal(self):
         """Test sale item subtotal calculation"""

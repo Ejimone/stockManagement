@@ -187,3 +187,12 @@ INFO 2025-06-07 02:24:28,784 autoreload 58528 8380145408 /Users/evidenceejimone/
 INFO 2025-06-07 02:24:28,969 autoreload 58549 8380145408 Watching for file changes with StatReloader
 INFO 2025-06-07 02:25:04,743 autoreload 58549 8380145408 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
 INFO 2025-06-07 02:25:05,029 autoreload 58651 8380145408 Watching for file changes with StatReloader
+WARNING 2025-06-07 02:27:10,451 log 59076 8380145408 Bad Request: /api/auth/login/
+WARNING 2025-06-07 02:27:12,468 log 59076 8380145408 Forbidden: /api/payments/
+WARNING 2025-06-07 02:27:12,781 log 59076 8380145408 Bad Request: /api/payments/
+WARNING 2025-06-07 02:27:13,400 log 59076 8380145408 Forbidden: /api/products/
+WARNING 2025-06-07 02:27:14,017 log 59076 8380145408 Unauthorized: /api/products/
+WARNING 2025-06-07 02:27:15,255 log 59076 8380145408 Forbidden: /api/reports/inventory/
+WARNING 2025-06-07 02:27:15,877 log 59076 8380145408 Bad Request: /api/sales/
+WARNING 2025-06-07 02:27:16,188 log 59076 8380145408 Bad Request: /api/sales/
+WARNING 2025-06-07 02:27:17,577 log 59076 8380145408 Forbidden: /api/users/
