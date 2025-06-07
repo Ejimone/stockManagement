@@ -222,6 +222,7 @@ class Sale(models.Model):
     total_amount = models.DecimalField(
         max_digits=12, 
         decimal_places=2,
+        default=Decimal('0.00'),
         validators=[MinValueValidator(Decimal('0.01'))],
         help_text=_("Total sale amount")
     )
@@ -283,10 +284,16 @@ class Sale(models.Model):
     @property
     def remaining_balance(self):
         """Calculate remaining balance."""
+        if self.total_amount is None:
+            return Decimal('0.00')
         return self.total_amount - self.amount_paid
     
     def update_payment_status(self):
         """Update payment status based on amount paid."""
+        # Skip payment status update if total_amount is not set yet
+        if self.total_amount is None:
+            return
+            
         remaining = self.remaining_balance
         if remaining <= 0:
             self.payment_status = self.PAYMENT_STATUS_PAID
@@ -389,15 +396,13 @@ class Payment(models.Model):
     
     def save(self, *args, **kwargs):
         """Override save to update the related sale's payment information."""
+        is_new = self.pk is None
         super().save(*args, **kwargs)
         
         # Update the sale's total amount paid and payment status
-        if self.status == self.PAYMENT_STATUS_COMPLETED:
-            self.sale.amount_paid = sum(
-                payment.amount for payment in self.sale.payments.filter(
-                    status=self.PAYMENT_STATUS_COMPLETED
-                )
-            )
+        if self.status == self.PAYMENT_STATUS_COMPLETED and is_new:
+            # Add this payment to the existing amount_paid
+            self.sale.amount_paid += self.amount
             self.sale.save()
     
     def __str__(self):
