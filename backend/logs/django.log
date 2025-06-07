@@ -672,3 +672,13 @@ Traceback (most recent call last):
 django.db.utils.IntegrityError: NOT NULL constraint failed: salesperson_sale.total_amount
 INFO 2025-06-07 02:44:33,400 autoreload 62495 8380145408 /Users/evidenceejimone/daddy/backend/salesperson/models.py changed, reloading.
 INFO 2025-06-07 02:44:33,577 autoreload 62913 8380145408 Watching for file changes with StatReloader
+INFO 2025-06-07 02:45:04,028 basehttp 62913 6199029760 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4351
+WARNING 2025-06-07 02:45:05,994 log 63604 8380145408 Bad Request: /api/sales/
+WARNING 2025-06-07 02:45:29,506 log 63830 8380145408 Bad Request: /api/auth/login/
+WARNING 2025-06-07 02:45:31,501 log 63830 8380145408 Forbidden: /api/payments/
+WARNING 2025-06-07 02:45:31,810 log 63830 8380145408 Bad Request: /api/payments/
+WARNING 2025-06-07 02:45:32,427 log 63830 8380145408 Forbidden: /api/products/
+WARNING 2025-06-07 02:45:33,064 log 63830 8380145408 Unauthorized: /api/products/
+WARNING 2025-06-07 02:45:34,301 log 63830 8380145408 Forbidden: /api/reports/inventory/
+WARNING 2025-06-07 02:45:34,921 log 63830 8380145408 Bad Request: /api/sales/
+WARNING 2025-06-07 02:45:36,635 log 63830 8380145408 Forbidden: /api/users/
