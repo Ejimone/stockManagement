@@ -15,8 +15,51 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+
+
+@require_http_methods(["GET"])
+def api_root(request):
+    """API root endpoint with available endpoints"""
+    return JsonResponse({
+        "message": "Stock Management System API",
+        "version": "1.0.0",
+        "endpoints": {
+            "authentication": {
+                "login": "/api/auth/login/",
+                "refresh": "/api/auth/refresh/",
+                "current_user": "/api/auth/me/"
+            },
+            "users": {
+                "list_create": "/api/users/",
+                "detail": "/api/users/{id}/"
+            },
+            "products": {
+                "list_create": "/api/products/",
+                "detail": "/api/products/{id}/"
+            },
+            "sales": {
+                "list_create": "/api/sales/",
+                "detail": "/api/sales/{id}/"
+            },
+            "payments": {
+                "list_create": "/api/payments/",
+                "detail": "/api/payments/{id}/"
+            },
+            "reports": {
+                "dashboard": "/api/dashboard/",
+                "sales": "/api/reports/sales/",
+                "inventory": "/api/reports/inventory/"
+            },
+            "admin": "/admin/"
+        }
+    })
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', api_root, name='api_root'),
+    path('', include('salesperson.urls')),
 ]
