@@ -121,3 +121,5 @@ All test cases pass including:
 6. Set up monitoring and logging
 
 The stock management system is now secure, functional, and ready for development/testing use.
+
+The frontend will be a react-native app
