@@ -1,22 +1,80 @@
-import { useFonts } from "expo-font";
-import { Slot } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import "react-native-reanimated";
+import { SplashScreen, Stack, useRouter, useSegments } from 'expo-router';
+import { AuthProvider, useAuth } from '../contexts/AuthContext'; // Adjusted path
+import React, { useEffect } from 'react';
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
 
-export default function RootLayout() {
-  const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
+const InitialLayout = () => {
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const router = useRouter();
+  const segments = useSegments(); // Gives an array of the current route segments
+
+  useEffect(() => {
+    if (isLoading) {
+      // Still loading auth state, do nothing regarding navigation yet.
+      // Splash screen is visible.
+      return;
+    }
+
+    SplashScreen.hideAsync(); // Hide splash screen once auth state is determined and not loading.
+
+    const inAuthGroup = segments[0] === '(auth)';
+
+    if (isAuthenticated) {
+      // User is authenticated
+      const targetGroup = user?.role === 'Admin' ? '(admin)' : '(sales)';
+      const targetDashboard = `/${targetGroup}/dashboard`;
+
+      // Check if already in the correct group and screen to prevent loop
+      // segments[0] is the group, segments[1] would be the screen in that group
+      if (segments[0] !== targetGroup || segments[1] !== 'dashboard') {
+        router.replace(targetDashboard);
+      }
+    } else {
+      // User is not authenticated
+      if (!inAuthGroup) {
+        router.replace('/(auth)/login');
+      }
+    }
+  }, [isAuthenticated, isLoading, user, segments, router]);
+
+  if (isLoading) {
+    // This will be shown after splash screen hides if still loading,
+    // or if AuthProvider finishes loading before this component mounts.
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
   }
 
+  // Render the appropriate navigator based on authentication state
+  // The router.replace in useEffect will handle directing to the correct initial screen.
+  // Slot will render the child route (either (auth), (admin), or (sales) stack)
   return (
-    <>
-      <Slot />
-      <StatusBar hidden={true} />
-    </>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="(admin)" />
+      <Stack.Screen name="(sales)" />
+      {/* +not-found is automatically handled by Expo Router if a screen exists */}
+    </Stack>
+  );
+};
+
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <InitialLayout />
+    </AuthProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
