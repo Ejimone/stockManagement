@@ -13,9 +13,7 @@ import {
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import {
   getSaleDetails,
-  deleteSale,
   updateSale,
-  getSalePdfReceipt,
   getSalePdfReceiptUrl,
   Sale,
   SaleItem,
@@ -23,14 +21,13 @@ import {
 import { useAuth } from "../../../contexts/AuthContext";
 import { formatPrice } from "../../../utils/formatters";
 
-export default function AdminSaleDetailScreen() {
+export default function SalesSaleDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { user } = useAuth();
 
   const [sale, setSale] = useState<Sale | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -51,54 +48,17 @@ export default function AdminSaleDetailScreen() {
     }
   };
 
-  const handleDeleteSale = () => {
-    if (!sale) return;
-
-    Alert.alert(
-      "Confirm Delete",
-      `Are you sure you want to delete Sale #${sale.id}? This action cannot be undone.`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            setIsDeleting(true);
-            try {
-              await deleteSale(sale.id);
-              Alert.alert("Success", "Sale deleted successfully.", [
-                { text: "OK", onPress: () => router.back() },
-              ]);
-            } catch (err: any) {
-              console.error("Failed to delete sale:", err);
-              Alert.alert(
-                "Error",
-                err.response?.data?.detail ||
-                  err.message ||
-                  "Failed to delete sale."
-              );
-            } finally {
-              setIsDeleting(false);
-            }
-          },
-        },
-      ]
-    );
-  };
-
   const handleUpdatePaymentStatus = (newStatus: string) => {
-    if (!sale || user?.role !== "Admin") return;
-
     Alert.alert(
       "Update Payment Status",
-      `Change payment status to "${newStatus}"?`,
+      `Are you sure you want to mark this sale as ${newStatus}?`,
       [
         { text: "Cancel", style: "cancel" },
         {
-          text: "Update",
+          text: "Confirm",
           onPress: async () => {
             try {
-              const updatedSale = await updateSale(sale.id, {
+              const updatedSale = await updateSale(sale!.id, {
                 payment_status: newStatus,
               });
               setSale(updatedSale);
@@ -178,9 +138,6 @@ export default function AdminSaleDetailScreen() {
     );
   }
 
-  const saleDate = sale.created_at ? new Date(sale.created_at) : null;
-  const saleItems = sale.items || sale.products_sold || [];
-
   return (
     <ScrollView style={styles.container}>
       <Stack.Screen options={{ title: `Sale #${sale.id}` }} />
@@ -189,44 +146,48 @@ export default function AdminSaleDetailScreen() {
       <View style={styles.saleHeader}>
         <Text style={styles.saleId}>Sale #{sale.id}</Text>
         <Text style={styles.saleDate}>
-          {saleDate
-            ? saleDate.toLocaleDateString() +
-              " " +
-              saleDate.toLocaleTimeString()
-            : "N/A"}
+          {sale.created_at
+            ? new Date(sale.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : "Unknown date"}
         </Text>
-      </View>
-
-      {/* Customer Information */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Customer Information</Text>
-        <Text style={styles.infoText}>
-          Name: {sale.customer_name || "Walk-in Customer"}
-        </Text>
-        {sale.customer_phone && (
-          <Text style={styles.infoText}>Phone: {sale.customer_phone}</Text>
-        )}
       </View>
 
       {/* Salesperson Information */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Salesperson</Text>
-        <Text style={styles.infoText}>{sale.salesperson_name}</Text>
+        <Text style={styles.infoText}>
+          {sale.salesperson_name || `User ID: ${sale.salesperson}`}
+        </Text>
       </View>
+
+      {/* Customer Information */}
+      {(sale.customer_name || sale.customer_phone) && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Customer Information</Text>
+          {sale.customer_name && (
+            <Text style={styles.infoText}>Name: {sale.customer_name}</Text>
+          )}
+          {sale.customer_phone && (
+            <Text style={styles.infoText}>Phone: {sale.customer_phone}</Text>
+          )}
+        </View>
+      )}
 
       {/* Products Sold */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Products Sold</Text>
-        {saleItems.length > 0 ? (
-          <FlatList
-            data={saleItems}
-            renderItem={renderSaleItem}
-            keyExtractor={(item, index) => `item-${index}`}
-            scrollEnabled={false}
-          />
-        ) : (
-          <Text style={styles.infoText}>No items found</Text>
-        )}
+        <FlatList
+          data={sale.items}
+          renderItem={renderSaleItem}
+          keyExtractor={(item, index) => `${item.product || "item"}-${index}`}
+          scrollEnabled={false}
+        />
       </View>
 
       {/* Payment Information */}
@@ -245,29 +206,6 @@ export default function AdminSaleDetailScreen() {
             Balance: {formatPrice(sale.balance)}
           </Text>
         )}
-
-        {/* Payment Status Update Buttons (Admin Only) */}
-        {user?.role === "Admin" && sale.payment_status !== "Paid" && (
-          <View style={styles.paymentActions}>
-            <Text style={styles.actionLabel}>Update Payment Status:</Text>
-            <View style={styles.statusButtons}>
-              {sale.payment_status !== "Partial" && (
-                <TouchableOpacity
-                  style={[styles.statusButton, styles.partialButton]}
-                  onPress={() => handleUpdatePaymentStatus("Partial")}
-                >
-                  <Text style={styles.statusButtonText}>Mark as Partial</Text>
-                </TouchableOpacity>
-              )}
-              <TouchableOpacity
-                style={[styles.statusButton, styles.paidButton]}
-                onPress={() => handleUpdatePaymentStatus("Paid")}
-              >
-                <Text style={styles.statusButtonText}>Mark as Paid</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
       </View>
 
       {/* Notes */}
@@ -283,7 +221,6 @@ export default function AdminSaleDetailScreen() {
         <TouchableOpacity
           style={[styles.button, styles.backButton]}
           onPress={() => router.back()}
-          disabled={isDeleting}
         >
           <Text style={styles.backButtonText}>Back to Sales</Text>
         </TouchableOpacity>
@@ -292,28 +229,9 @@ export default function AdminSaleDetailScreen() {
         <TouchableOpacity
           style={[styles.button, styles.pdfButton]}
           onPress={handleDownloadReceipt}
-          disabled={isDeleting}
         >
           <Text style={styles.pdfButtonText}>Download Receipt</Text>
         </TouchableOpacity>
-
-        {user?.role === "Admin" && (
-          <TouchableOpacity
-            style={[
-              styles.button,
-              styles.deleteButton,
-              isDeleting && styles.disabledButton,
-            ]}
-            onPress={handleDeleteSale}
-            disabled={isDeleting}
-          >
-            {isDeleting ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={styles.deleteButtonText}>Delete Sale</Text>
-            )}
-          </TouchableOpacity>
-        )}
       </View>
     </ScrollView>
   );
@@ -393,39 +311,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666666",
   },
-  paymentActions: {
-    marginTop: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: "#e1e1e1",
-  },
-  actionLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333333",
-    marginBottom: 12,
-  },
-  statusButtons: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  statusButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
-    alignItems: "center",
-  },
-  partialButton: {
-    backgroundColor: "#fd7e14",
-  },
-  paidButton: {
-    backgroundColor: "#28a745",
-  },
-  statusButtonText: {
-    color: "#ffffff",
-    fontWeight: "600",
-    fontSize: 14,
-  },
   actions: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -446,21 +331,10 @@ const styles = StyleSheet.create({
   backButton: {
     backgroundColor: "#6c757d",
   },
-  deleteButton: {
-    backgroundColor: "#dc3545",
-  },
   pdfButton: {
     backgroundColor: "#17a2b8",
   },
-  disabledButton: {
-    opacity: 0.6,
-  },
   backButtonText: {
-    color: "#ffffff",
-    fontWeight: "600",
-    fontSize: 16,
-  },
-  deleteButtonText: {
     color: "#ffffff",
     fontWeight: "600",
     fontSize: 16,

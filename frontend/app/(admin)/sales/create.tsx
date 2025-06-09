@@ -9,9 +9,15 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Linking,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
-import { createSale, getProducts, Product } from "../../../services/api";
+import {
+  createSale,
+  getProducts,
+  getSalePdfReceiptUrl,
+  Product,
+} from "../../../services/api";
 import { useAuth } from "../../../contexts/AuthContext";
 import { formatPrice } from "../../../utils/formatters";
 
@@ -123,9 +129,53 @@ export default function AdminCreateSaleScreen() {
       };
 
       const newSale = await createSale(saleData);
-      Alert.alert("Success", "Sale created successfully!", [
-        { text: "OK", onPress: () => router.back() },
-      ]);
+
+      // Show success with PDF receipt options
+      Alert.alert(
+        "Sale Created Successfully!",
+        "Would you like to download the receipt?",
+        [
+          {
+            text: "Later",
+            style: "cancel",
+            onPress: () => router.back(),
+          },
+          {
+            text: "Download Receipt",
+            onPress: async () => {
+              try {
+                const receiptUrl = getSalePdfReceiptUrl(newSale.id);
+
+                if (typeof window !== "undefined") {
+                  // Web: direct download
+                  const link = document.createElement("a");
+                  link.href = receiptUrl;
+                  link.download = `receipt_sale_${newSale.id}.pdf`;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                } else {
+                  // Mobile: open in browser
+                  const canOpen = await Linking.canOpenURL(receiptUrl);
+                  if (canOpen) {
+                    await Linking.openURL(receiptUrl);
+                  } else {
+                    Alert.alert("Error", "Cannot open PDF receipt");
+                  }
+                }
+                router.back();
+              } catch (error) {
+                console.error("Failed to download receipt:", error);
+                Alert.alert(
+                  "Error",
+                  "Failed to download receipt, but sale was created successfully"
+                );
+                router.back();
+              }
+            },
+          },
+        ]
+      );
     } catch (err: any) {
       console.error("Failed to create sale:", err);
       let errorMessage = "Failed to create sale.";

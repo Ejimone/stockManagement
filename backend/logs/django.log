@@ -1603,3 +1603,20 @@ INFO 2025-06-09 21:49:17,651 basehttp 52240 6175682560 "GET /api/products/?activ
 INFO 2025-06-09 21:49:38,459 basehttp 52240 6175682560 "POST /api/sales/ HTTP/1.1" 201 575
 INFO 2025-06-09 21:49:40,142 basehttp 52240 6175682560 "GET /api/sales/ HTTP/1.1" 200 15162
 INFO 2025-06-09 21:49:48,034 basehttp 52240 6175682560 "GET /api/sales/24/ HTTP/1.1" 200 575
+INFO 2025-06-09 21:53:05,223 autoreload 52240 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-09 21:53:05,514 autoreload 52994 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 21:53:45,770 autoreload 53322 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 21:53:59,155 basehttp 53322 6188806144 "GET /api/sales/24/ HTTP/1.1" 200 575
+INFO 2025-06-09 21:53:59,337 basehttp 53322 6188806144 "GET /api/dashboard/ HTTP/1.1" 200 236
+INFO 2025-06-09 21:53:59,350 basehttp 53322 6188806144 "GET /api/dashboard/ HTTP/1.1" 200 236
+INFO 2025-06-09 21:58:18,191 basehttp 53322 6205632512 "GET /api/dashboard/ HTTP/1.1" 200 236
+INFO 2025-06-09 21:58:18,191 basehttp 53322 6188806144 "GET /api/dashboard/ HTTP/1.1" 200 236
+INFO 2025-06-09 21:59:44,593 autoreload 53322 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/pdf_utils.py changed, reloading.
+INFO 2025-06-09 21:59:44,859 autoreload 57547 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 22:00:45,252 autoreload 57547 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/pdf_utils.py changed, reloading.
+INFO 2025-06-09 22:00:45,668 autoreload 57677 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 22:01:46,445 basehttp 57677 6164836352 "GET /api/sales/ HTTP/1.1" 200 15162
+INFO 2025-06-09 22:01:46,580 basehttp 57677 6164836352 "GET /api/dashboard/ HTTP/1.1" 200 236
+INFO 2025-06-09 22:01:46,582 basehttp 57677 6325039104 "GET /api/dashboard/ HTTP/1.1" 200 236
+INFO 2025-06-09 22:01:51,392 basehttp 57677 6164836352 "GET /api/sales/ HTTP/1.1" 200 15162
+INFO 2025-06-09 22:01:53,121 basehttp 57677 6164836352 "GET /api/sales/22/ HTTP/1.1" 200 602

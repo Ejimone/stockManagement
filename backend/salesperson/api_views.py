@@ -20,6 +20,7 @@ from .serializers import (
     InventoryReportSerializer
 )
 from .permissions import IsAdminUser, IsAdminOrReadOnly, IsOwnerOrAdmin
+from .pdf_utils import generate_sale_receipt_pdf
 
 logger = logging.getLogger(__name__)
 
@@ -584,3 +585,37 @@ def dashboard_stats(request):
         }
     
     return Response(stats)
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def generate_receipt_pdf(request, sale_id):
+    """
+    Generate PDF receipt for a sale
+    Only allows users to generate receipts for sales they can view
+    """
+    try:
+        # Check if sale exists and user has permission to view it
+        sale = Sale.objects.get(id=sale_id)
+        
+        # Permission check: Admin can view all, Salesperson can view only their own
+        if request.user.role != 'admin' and sale.salesperson != request.user:
+            return Response(
+                {'error': 'You do not have permission to generate receipt for this sale'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Generate and return PDF
+        pdf_response = generate_sale_receipt_pdf(sale_id)
+        return pdf_response
+        
+    except Sale.DoesNotExist:
+        return Response(
+            {'error': 'Sale not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        logger.error(f"Error generating PDF receipt for sale {sale_id}: {str(e)}")
+        return Response(
+            {'error': 'Failed to generate receipt'}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

@@ -5,8 +5,8 @@ import { User } from "../contexts/AuthContext"; // For User type
 // Use either localhost for development on same machine, or device's local IP address
 // for testing on real devices, or your production backend URL
 const API_BASE_URL = "http://10.0.2.2:8000/api/"; // For Android emulator (points to host machine's localhost)
-// const API_BASE_URL = "http://localhost:8000/api/"; // For web/iOS simulator
-// const API_BASE_URL = "http://<your-computer-ip>:8000/api/"; // Use your computer's IP when testing on real devices
+// const API_BASE_URL = "http://localhost:8001/api/"; // For web/iOS simulator
+// const API_BASE_URL = "http://<your-computer-ip>:8001/api/"; // Use your computer's IP when testing on real devices
 
 // Error response type from backend (adjust if needed)
 export interface ApiErrorResponse {
@@ -560,6 +560,26 @@ export const getInventoryReport = async (params?: {
   // Replace 'any' with specific InventoryReport type
   const response = await apiClient.get<any>("/reports/inventory/", { params });
   return response.data;
+};
+
+// --- PDF Receipt Functions ---
+/**
+ * Generate and download PDF receipt for a sale
+ */
+export const getSalePdfReceipt = async (
+  saleId: string | number
+): Promise<Blob> => {
+  const response = await apiClient.get(`/sales/${saleId}/pdf/`, {
+    responseType: "blob", // Important: tells axios to expect binary data
+  });
+  return response.data;
+};
+
+/**
+ * Generate PDF receipt URL for a sale
+ */
+export const getSalePdfReceiptUrl = (saleId: string | number): string => {
+  return `${API_BASE_URL}sales/${saleId}/pdf/`;
 };
 
 // Export the configured apiClient if other parts of the app need to make calls with it directly
