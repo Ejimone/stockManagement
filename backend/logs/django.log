@@ -1515,3 +1515,43 @@ INFO 2025-06-09 21:30:55,671 basehttp 36067 6191493120 "GET /api/users/?role=Sal
 INFO 2025-06-09 21:30:56,639 basehttp 36067 6191493120 "GET /api/sales/ HTTP/1.1" 200 15527
 INFO 2025-06-09 21:31:08,106 autoreload 36067 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
 INFO 2025-06-09 21:31:08,423 autoreload 38614 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 21:32:38,909 basehttp 38614 6214676480 "GET /api/dashboard/ HTTP/1.1" 200 233
+INFO 2025-06-09 21:32:38,911 basehttp 38614 6197850112 "GET /api/dashboard/ HTTP/1.1" 200 233
+INFO 2025-06-09 21:32:41,174 basehttp 38614 6197850112 "GET /api/sales/ HTTP/1.1" 200 15527
+INFO 2025-06-09 21:32:43,537 basehttp 38614 6197850112 "GET /api/sales/20/ HTTP/1.1" 200 793
+INFO 2025-06-09 21:32:51,222 basehttp 38614 6197850112 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-09 21:32:52,719 basehttp 38614 6197850112 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-09 21:32:53,424 basehttp 38614 6197850112 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-09 21:32:53,938 basehttp 38614 6197850112 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-09 21:32:55,390 basehttp 38614 6197850112 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-09 21:32:57,075 basehttp 38614 6197850112 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-09 21:33:02,139 basehttp 38614 6197850112 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-09 21:33:07,291 basehttp 38614 6197850112 "GET /api/dashboard/ HTTP/1.1" 200 233
+INFO 2025-06-09 21:33:11,459 basehttp 38614 6197850112 "GET /api/sales/ HTTP/1.1" 200 15527
+INFO 2025-06-09 21:33:15,908 basehttp 38614 6197850112 "GET /api/sales/ HTTP/1.1" 200 15527
+INFO 2025-06-09 21:33:17,157 basehttp 38614 6197850112 "GET /api/sales/ HTTP/1.1" 200 15527
+INFO 2025-06-09 21:33:17,955 basehttp 38614 6197850112 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-09 21:33:20,691 basehttp 38614 6197850112 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-09 21:33:21,597 basehttp 38614 6197850112 "GET /api/sales/ HTTP/1.1" 200 15527
+INFO 2025-06-09 21:33:22,902 basehttp 38614 6197850112 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-09 21:33:25,822 basehttp 38614 6197850112 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-09 21:33:26,595 basehttp 38614 6197850112 "GET /api/sales/ HTTP/1.1" 200 15527
+INFO 2025-06-09 21:33:27,315 basehttp 38614 6197850112 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-09 21:33:31,016 basehttp 38614 6197850112 "GET /api/sales/ HTTP/1.1" 200 15527
+WARNING 2025-06-09 21:33:46,519 log 38614 6197850112 Method Not Allowed: /api/sales/21/
+WARNING 2025-06-09 21:33:46,520 basehttp 38614 6197850112 "DELETE /api/sales/21/ HTTP/1.1" 405 43
+INFO 2025-06-09 21:33:46,695 basehttp 38614 6197850112 "GET /api/sales/ HTTP/1.1" 200 15527
+INFO 2025-06-09 21:35:34,449 autoreload 38614 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-09 21:35:34,759 autoreload 39339 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 21:35:57,199 autoreload 39339 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-09 21:35:57,419 autoreload 40550 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 21:36:07,367 basehttp 40550 6204878848 "GET /api/sales/ HTTP/1.1" 200 15527
+INFO 2025-06-09 21:36:11,631 api_views 40550 6204878848 Restored 5 units to product AirPods Pro
+INFO 2025-06-09 21:36:11,632 api_views 40550 6204878848 Restored 1 units to product Phone
+INFO 2025-06-09 21:36:11,632 api_views 40550 6204878848 Restored 1 units to product Phone
+INFO 2025-06-09 21:36:11,633 api_views 40550 6204878848 Sale None deleted by admin generalbanx@gmail.com
+INFO 2025-06-09 21:36:11,634 basehttp 40550 6204878848 "DELETE /api/sales/21/ HTTP/1.1" 204 0
+INFO 2025-06-09 21:36:16,914 api_views 40550 6204878848 Restored 2 units to product Power Bank
+INFO 2025-06-09 21:36:16,914 api_views 40550 6204878848 Restored 1 units to product AirPods Pro
+INFO 2025-06-09 21:36:16,914 api_views 40550 6204878848 Sale None deleted by admin generalbanx@gmail.com
+INFO 2025-06-09 21:36:16,915 basehttp 40550 6204878848 "DELETE /api/sales/20/ HTTP/1.1" 204 0

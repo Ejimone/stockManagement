@@ -213,8 +213,8 @@ class SaleListCreateView(generics.ListCreateAPIView):
         serializer.save()
 
 
-class SaleDetailView(generics.RetrieveUpdateAPIView):
-    """Retrieve or update a sale"""
+class SaleDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Retrieve, update, or delete a sale"""
     queryset = Sale.objects.all()
     serializer_class = SaleSerializer
     permission_classes = [IsOwnerOrAdmin]
@@ -228,6 +228,42 @@ class SaleDetailView(generics.RetrieveUpdateAPIView):
             queryset = queryset.filter(salesperson=user)
         
         return queryset
+    
+    def destroy(self, request, *args, **kwargs):
+        """Delete a sale (Admin only)"""
+        # Only admins can delete sales
+        if request.user.role != 'Admin':
+            return Response(
+                {'error': 'Only administrators can delete sales'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        sale = self.get_object()
+        
+        # Restore stock quantities when deleting a sale
+        with transaction.atomic():
+            for item in sale.items.all():
+                product = item.product
+                product.stock_quantity += item.quantity
+                product.save()
+                logger.info(f"Restored {item.quantity} units to product {product.name}")
+            
+            # Delete the sale
+            sale.delete()
+            logger.info(f"Sale {sale.id} deleted by admin {request.user.email}")
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def update(self, request, *args, **kwargs):
+        """Update a sale (Admin only)"""
+        # Only admins can update sales
+        if request.user.role != 'Admin':
+            return Response(
+                {'error': 'Only administrators can update sales'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().update(request, *args, **kwargs)
 
 
 class PaymentListCreateView(generics.ListCreateAPIView):
