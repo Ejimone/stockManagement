@@ -1,11 +1,14 @@
 """
 Serializers for the Stock Management System API
 """
+import logging
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import User, Product, Sale, Payment, SaleItem
+
+logger = logging.getLogger(__name__)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -14,15 +17,21 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'email', 'password', 'first_name', 'last_name', 'role', 'is_active', 'date_joined']
+        fields = ['id', 'email', 'username', 'password', 'first_name', 'last_name', 'role', 'is_active', 'date_joined']
         extra_kwargs = {
             'password': {'write_only': True},
+            'username': {'required': False},  # Make username optional since we'll set it automatically
             'date_joined': {'read_only': True}
         }
     
     def create(self, validated_data):
         """Create user with hashed password"""
         password = validated_data.pop('password')
+        
+        # Ensure username is set to email if not provided
+        if 'username' not in validated_data or not validated_data['username']:
+            validated_data['username'] = validated_data['email']
+            
         user = User.objects.create_user(**validated_data)
         user.set_password(password)
         user.save()
@@ -30,14 +39,31 @@ class UserSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         """Update user, handle password separately"""
-        password = validated_data.pop('password', None)
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
+        logger.debug(f"UserSerializer.update called with data: {validated_data}")
+        logger.debug(f"Current instance: email={instance.email}, username={instance.username}")
         
-        if password:
-            instance.set_password(password)
-        instance.save()
-        return instance
+        password = validated_data.pop('password', None)
+        
+        # Ensure username matches email if email is being updated
+        if 'email' in validated_data:
+            validated_data['username'] = validated_data['email']
+            logger.debug(f"Setting username to: {validated_data['username']}")
+        
+        try:
+            for attr, value in validated_data.items():
+                logger.debug(f"Setting {attr} = {value}")
+                setattr(instance, attr, value)
+            
+            if password:
+                logger.debug("Setting new password")
+                instance.set_password(password)
+                
+            instance.save()
+            logger.debug("User updated successfully")
+            return instance
+        except Exception as e:
+            logger.error(f"Error updating user: {e}")
+            raise
 
 
 class LoginSerializer(serializers.Serializer):

@@ -53,6 +53,8 @@ export default function AdminUserDetailScreen() {
   const validate = () => {
     const errs: { [key: string]: string } = {};
     if (!email.trim()) errs.email = "Email is required.";
+    if (!firstName.trim()) errs.firstName = "First name is required.";
+    if (!lastName.trim()) errs.lastName = "Last name is required.";
     return errs;
   };
 
@@ -68,6 +70,7 @@ export default function AdminUserDetailScreen() {
     try {
       const updateData: any = {
         email: email.trim(),
+        username: email.trim(), // Set username to email since that's how the model works
         first_name: firstName.trim(),
         last_name: lastName.trim(),
         is_active: isActive,
@@ -78,16 +81,38 @@ export default function AdminUserDetailScreen() {
         updateData.password = password;
       }
 
+      console.log("Sending update data:", updateData);
       await updateUser(id as string, updateData);
       Alert.alert("Success", "User updated successfully.", [
         { text: "OK", onPress: () => router.back() },
       ]);
     } catch (err: any) {
       console.error("Failed to update user:", err);
-      Alert.alert(
-        "Error",
-        err.response?.data?.detail || err.message || "Failed to update user."
-      );
+      console.error("Error response:", err.response?.data);
+
+      let errorMessage = "Failed to update user.";
+      if (err.response?.data) {
+        // Handle field-specific errors
+        if (typeof err.response.data === "object") {
+          const fieldErrors = [];
+          for (const [field, messages] of Object.entries(err.response.data)) {
+            if (Array.isArray(messages)) {
+              fieldErrors.push(`${field}: ${messages.join(", ")}`);
+            } else {
+              fieldErrors.push(`${field}: ${messages}`);
+            }
+          }
+          if (fieldErrors.length > 0) {
+            errorMessage = fieldErrors.join("\n");
+          }
+        } else if (err.response.data.detail) {
+          errorMessage = err.response.data.detail;
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+
+      Alert.alert("Error", errorMessage);
     } finally {
       setIsSaving(false);
     }
@@ -173,25 +198,31 @@ export default function AdminUserDetailScreen() {
       </View>
 
       <View style={styles.field}>
-        <Text style={styles.label}>First Name</Text>
+        <Text style={styles.label}>First Name *</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, errors.firstName && styles.inputError]}
           placeholder="John"
           value={firstName}
           onChangeText={setFirstName}
           editable={!isSaving && !isDeleting}
         />
+        {errors.firstName && (
+          <Text style={styles.errorText}>{errors.firstName}</Text>
+        )}
       </View>
 
       <View style={styles.field}>
-        <Text style={styles.label}>Last Name</Text>
+        <Text style={styles.label}>Last Name *</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, errors.lastName && styles.inputError]}
           placeholder="Doe"
           value={lastName}
           onChangeText={setLastName}
           editable={!isSaving && !isDeleting}
         />
+        {errors.lastName && (
+          <Text style={styles.errorText}>{errors.lastName}</Text>
+        )}
       </View>
 
       <View style={styles.field}>

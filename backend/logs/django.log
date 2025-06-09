@@ -1362,3 +1362,61 @@ INFO 2025-06-09 19:28:24,608 basehttp 26867 6157266944 "GET /api/users/?role=Sal
 INFO 2025-06-09 19:28:38,374 basehttp 26867 6157266944 "GET /api/users/12/ HTTP/1.1" 200 156
 WARNING 2025-06-09 19:28:42,134 log 26867 6157266944 Bad Request: /api/users/12/
 WARNING 2025-06-09 19:28:42,134 basehttp 26867 6157266944 "PUT /api/users/12/ HTTP/1.1" 400 40
+WARNING 2025-06-09 19:29:25,894 log 26867 6157266944 Bad Request: /api/users/12/
+WARNING 2025-06-09 19:29:25,895 basehttp 26867 6157266944 "PUT /api/users/12/ HTTP/1.1" 400 40
+INFO 2025-06-09 19:30:58,323 basehttp 26867 6157266944 "GET /api/users/12/ HTTP/1.1" 200 156
+INFO 2025-06-09 19:31:16,250 basehttp 26867 6157266944 "GET /api/users/12/ HTTP/1.1" 200 156
+INFO 2025-06-09 19:31:40,067 basehttp 26867 6157266944 "GET /api/users/12/ HTTP/1.1" 200 156
+INFO 2025-06-09 19:31:51,639 autoreload 26867 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/serializers.py changed, reloading.
+INFO 2025-06-09 19:31:51,965 autoreload 28399 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 19:32:02,220 autoreload 28399 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/serializers.py changed, reloading.
+INFO 2025-06-09 19:32:02,471 autoreload 28431 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 19:32:11,704 autoreload 28431 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/serializers.py changed, reloading.
+INFO 2025-06-09 19:32:11,926 autoreload 28460 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 19:32:27,483 autoreload 29560 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 19:32:31,762 basehttp 28460 6132281344 "GET /api/users/12/ HTTP/1.1" 200 185
+INFO 2025-06-09 19:32:32,366 autoreload 28460 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/serializers.py changed, reloading.
+INFO 2025-06-09 19:32:32,582 autoreload 29573 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 19:32:38,216 basehttp 29573 6159183872 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:32:38,216 basehttp 29573 6176010240 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:32:40,987 basehttp 29573 6176010240 "GET /api/users/?role=Salesperson HTTP/1.1" 200 982
+INFO 2025-06-09 19:32:45,360 basehttp 29573 6176010240 "GET /api/users/12/ HTTP/1.1" 200 185
+WARNING 2025-06-09 19:32:48,242 log 29573 6176010240 Bad Request: /api/users/12/
+WARNING 2025-06-09 19:32:48,242 basehttp 29573 6176010240 "PUT /api/users/12/ HTTP/1.1" 400 40
+INFO 2025-06-09 19:33:04,122 basehttp 29573 6176010240 "PUT /api/users/12/ HTTP/1.1" 200 186
+INFO 2025-06-09 19:33:05,714 basehttp 29573 6176010240 "GET /api/users/?role=Salesperson HTTP/1.1" 200 796
+INFO 2025-06-09 19:34:27,782 basehttp 29573 6192836608 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:34:27,782 basehttp 29573 6209662976 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:34:42,865 basehttp 29573 6192836608 "GET /api/products/?search= HTTP/1.1" 200 5731
+INFO 2025-06-09 19:34:43,393 basehttp 29573 6192836608 "GET /api/products/?search= HTTP/1.1" 200 5731
+INFO 2025-06-09 19:34:44,975 basehttp 29573 6192836608 "GET /api/users/?role=Salesperson HTTP/1.1" 200 796
+INFO 2025-06-09 19:34:48,975 basehttp 29573 6192836608 "GET /api/users/?role=Salesperson HTTP/1.1" 200 796
+INFO 2025-06-09 19:35:08,344 basehttp 29573 6192836608 "GET /api/users/9/ HTTP/1.1" 200 183
+WARNING 2025-06-09 19:35:11,167 log 29573 6192836608 Bad Request: /api/users/9/
+WARNING 2025-06-09 19:35:11,168 basehttp 29573 6192836608 "PUT /api/users/9/ HTTP/1.1" 400 40
+INFO 2025-06-09 19:35:23,729 autoreload 29573 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-09 19:35:23,968 autoreload 29981 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 19:35:25,791 basehttp 29981 6191214592 "PUT /api/users/9/ HTTP/1.1" 200 184
+INFO 2025-06-09 19:35:27,414 basehttp 29981 6191214592 "GET /api/users/?role=Salesperson HTTP/1.1" 200 612
+INFO 2025-06-09 19:35:36,270 autoreload 29981 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-09 19:35:36,517 autoreload 30023 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 19:35:38,907 basehttp 30023 6156922880 "GET /api/users/11/ HTTP/1.1" 200 185
+INFO 2025-06-09 19:35:46,808 autoreload 30023 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/serializers.py changed, reloading.
+INFO 2025-06-09 19:35:47,047 autoreload 30048 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 19:35:49,221 basehttp 30048 6170374144 "PUT /api/users/11/ HTTP/1.1" 200 186
+INFO 2025-06-09 19:35:50,628 basehttp 30048 6170374144 "GET /api/users/?role=Salesperson HTTP/1.1" 200 426
+INFO 2025-06-09 19:35:59,365 autoreload 30048 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/serializers.py changed, reloading.
+INFO 2025-06-09 19:35:59,593 autoreload 30088 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 19:36:03,169 basehttp 30088 6128005120 "GET /api/users/?role=Salesperson HTTP/1.1" 200 426
+INFO 2025-06-09 19:36:12,911 autoreload 30088 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-09 19:36:13,226 autoreload 30130 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 19:36:23,033 basehttp 30130 6124023808 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:36:23,033 basehttp 30130 6140850176 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:36:27,294 basehttp 30130 6140850176 "GET /api/users/?role=Salesperson HTTP/1.1" 200 426
+INFO 2025-06-09 19:36:28,348 basehttp 30130 6140850176 "GET /api/products/?search= HTTP/1.1" 200 5731
+INFO 2025-06-09 19:36:28,874 basehttp 30130 6140850176 "GET /api/products/?search= HTTP/1.1" 200 5731
+INFO 2025-06-09 19:36:34,818 basehttp 30130 6140850176 "GET /api/users/?role=Salesperson HTTP/1.1" 200 426
+INFO 2025-06-09 19:37:05,860 basehttp 30130 6140850176 "POST /api/users/ HTTP/1.1" 201 188
+INFO 2025-06-09 19:37:07,815 basehttp 30130 6140850176 "GET /api/users/?role=Salesperson HTTP/1.1" 200 615
+INFO 2025-06-09 19:37:13,374 basehttp 30130 6140850176 "GET /api/users/?role=Salesperson HTTP/1.1" 200 615
+INFO 2025-06-09 19:37:16,197 basehttp 30130 6140850176 "GET /api/users/?role=Salesperson HTTP/1.1" 200 615

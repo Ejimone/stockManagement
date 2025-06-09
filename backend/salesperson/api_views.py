@@ -1,6 +1,7 @@
 """
 API Views for the Stock Management System
 """
+import logging
 from django.db import transaction
 from django.db.models import Q, Sum, Count
 from django.utils import timezone
@@ -18,6 +19,8 @@ from .serializers import (
     InventoryReportSerializer
 )
 from .permissions import IsAdminUser, IsAdminOrReadOnly, IsOwnerOrAdmin
+
+logger = logging.getLogger(__name__)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -63,6 +66,22 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAdminUser]
+    
+    def update(self, request, *args, **kwargs):
+        """Override update method to add debug logging"""
+        logger.debug(f"Update request data: {request.data}")
+        user = self.get_object()
+        logger.debug(f"Current user data: email={user.email}, username={user.username}, first_name={user.first_name}, last_name={user.last_name}")
+        
+        partial = kwargs.pop('partial', False)
+        serializer = self.get_serializer(user, data=request.data, partial=partial)
+        
+        if not serializer.is_valid():
+            logger.error(f"Serializer validation errors: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        self.perform_update(serializer)
+        return Response(serializer.data)
     
     def destroy(self, request, *args, **kwargs):
         """Soft delete by deactivating user instead of hard delete"""

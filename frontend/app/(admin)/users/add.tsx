@@ -158,4 +158,5 @@ const styles = StyleSheet.create({
   cancelText: { color: "#333", fontSize: 16 },
   saveText: { color: "#fff", fontSize: 16 },
   loader: { alignSelf: "center" },
+  errorText: { color: "red", fontSize: 12, marginTop: 4 },
 });
