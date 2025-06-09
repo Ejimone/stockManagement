@@ -51,7 +51,7 @@ class UserListCreateView(generics.ListCreateAPIView):
     
     def get_queryset(self):
         """Filter users based on role if specified"""
-        queryset = User.objects.all()
+        queryset = User.objects.filter(is_active=True)  # Only return active users
         role = self.request.query_params.get('role', None)
         if role:
             queryset = queryset.filter(role=role)
@@ -67,9 +67,17 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         """Soft delete by deactivating user instead of hard delete"""
         user = self.get_object()
+        if not user.is_active:
+            return Response(
+                {"detail": "User is already deactivated"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
         user.is_active = False
         user.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            {"detail": "User deactivated successfully"}, 
+            status=status.HTTP_204_NO_CONTENT
+        )
 
 
 class CurrentUserView(generics.RetrieveUpdateAPIView):

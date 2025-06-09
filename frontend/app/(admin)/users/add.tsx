@@ -25,6 +25,8 @@ export default function AdminAddUserScreen() {
   const validate = () => {
     const errs: { [key: string]: string } = {};
     if (!email.trim()) errs.email = "Email is required.";
+    if (!firstName.trim()) errs.firstName = "First name is required.";
+    if (!lastName.trim()) errs.lastName = "Last name is required.";
     if (!password.trim()) errs.password = "Password is required.";
     return errs;
   };
@@ -73,24 +75,31 @@ export default function AdminAddUserScreen() {
           value={email}
           onChangeText={setEmail}
         />
+        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
       </View>
       <View style={styles.field}>
-        <Text style={styles.label}>First Name</Text>
+        <Text style={styles.label}>First Name *</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, errors.firstName && styles.inputError]}
           placeholder="John"
           value={firstName}
           onChangeText={setFirstName}
         />
+        {errors.firstName && (
+          <Text style={styles.errorText}>{errors.firstName}</Text>
+        )}
       </View>
       <View style={styles.field}>
-        <Text style={styles.label}>Last Name</Text>
+        <Text style={styles.label}>Last Name *</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, errors.lastName && styles.inputError]}
           placeholder="Doe"
           value={lastName}
           onChangeText={setLastName}
         />
+        {errors.lastName && (
+          <Text style={styles.errorText}>{errors.lastName}</Text>
+        )}
       </View>
       <View style={styles.field}>
         <Text style={styles.label}>Password *</Text>

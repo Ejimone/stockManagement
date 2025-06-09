@@ -1292,3 +1292,70 @@ INFO 2025-06-09 19:11:05,729 basehttp 12544 6137901056 "GET /api/users/?role=Sal
 INFO 2025-06-09 19:11:07,966 basehttp 12544 6137901056 "GET /api/users/5/ HTTP/1.1" 200 172
 INFO 2025-06-09 19:11:10,443 basehttp 12544 6137901056 "DELETE /api/users/5/ HTTP/1.1" 204 0
 INFO 2025-06-09 19:11:12,108 basehttp 12544 6137901056 "GET /api/users/?role=Salesperson HTTP/1.1" 200 1050
+INFO 2025-06-09 19:13:04,449 autoreload 12544 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-09 19:13:04,719 autoreload 21105 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 19:13:12,955 autoreload 21105 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-09 19:13:13,176 autoreload 21130 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 19:13:57,021 autoreload 21130 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-09 19:13:57,259 autoreload 22373 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 19:14:11,526 basehttp 22373 6170701824 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:14:11,528 basehttp 22373 6187528192 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:14:13,896 basehttp 22373 6170701824 "GET /api/users/?role=Salesperson HTTP/1.1" 200 710
+INFO 2025-06-09 19:14:16,900 basehttp 22373 6170701824 "DELETE /api/users/8/ HTTP/1.1" 204 42
+INFO 2025-06-09 19:14:17,046 basehttp 22373 6187528192 "GET /api/users/?role=Salesperson HTTP/1.1" 200 543
+INFO 2025-06-09 19:14:24,599 basehttp 22373 6187528192 "GET /api/users/?role=Salesperson HTTP/1.1" 200 543
+INFO 2025-06-09 19:14:31,147 basehttp 22373 6187528192 "GET /api/users/?role=Salesperson HTTP/1.1" 200 543
+INFO 2025-06-09 19:14:34,598 basehttp 22373 6187528192 "DELETE /api/users/4/ HTTP/1.1" 204 42
+INFO 2025-06-09 19:14:34,628 basehttp 22373 6170701824 "GET /api/users/?role=Salesperson HTTP/1.1" 200 375
+WARNING 2025-06-09 19:15:12,791 log 22373 6170701824 Bad Request: /api/users/
+WARNING 2025-06-09 19:15:12,791 basehttp 22373 6170701824 "POST /api/users/ HTTP/1.1" 400 58
+INFO 2025-06-09 19:16:35,073 basehttp 22373 6325039104 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:16:35,074 basehttp 22373 6341865472 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:16:43,368 basehttp 22373 6325039104 "GET /api/products/?search= HTTP/1.1" 200 5731
+INFO 2025-06-09 19:16:43,971 basehttp 22373 6325039104 "GET /api/products/?search= HTTP/1.1" 200 5731
+INFO 2025-06-09 19:16:43,971 basehttp 22373 6341865472 "GET /api/users/?role=Salesperson HTTP/1.1" 200 375
+INFO 2025-06-09 19:17:11,638 basehttp 22373 6325039104 "POST /api/users/ HTTP/1.1" 201 155
+INFO 2025-06-09 19:17:13,587 basehttp 22373 6325039104 "GET /api/users/?role=Salesperson HTTP/1.1" 200 531
+WARNING 2025-06-09 19:17:54,773 log 22373 6325039104 Bad Request: /api/users/
+WARNING 2025-06-09 19:17:54,774 basehttp 22373 6325039104 "POST /api/users/ HTTP/1.1" 400 58
+WARNING 2025-06-09 19:18:02,820 log 22373 6325039104 Bad Request: /api/users/
+WARNING 2025-06-09 19:18:02,821 basehttp 22373 6325039104 "POST /api/users/ HTTP/1.1" 400 58
+INFO 2025-06-09 19:18:22,963 basehttp 22373 6358691840 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:18:22,963 basehttp 22373 6375518208 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:18:25,344 basehttp 22373 6358691840 "GET /api/users/?role=Salesperson HTTP/1.1" 200 531
+INFO 2025-06-09 19:18:57,054 basehttp 22373 6358691840 "POST /api/users/ HTTP/1.1" 201 158
+INFO 2025-06-09 19:18:58,725 basehttp 22373 6358691840 "GET /api/users/?role=Salesperson HTTP/1.1" 200 690
+INFO 2025-06-09 19:19:03,252 basehttp 22373 6358691840 "GET /api/users/?role=Salesperson HTTP/1.1" 200 690
+INFO 2025-06-09 19:19:04,258 basehttp 22373 6358691840 "GET /api/products/?search= HTTP/1.1" 200 5731
+INFO 2025-06-09 19:19:04,785 basehttp 22373 6358691840 "GET /api/products/?search= HTTP/1.1" 200 5731
+INFO 2025-06-09 19:19:05,288 basehttp 22373 6358691840 "GET /api/users/?role=Salesperson HTTP/1.1" 200 690
+INFO 2025-06-09 19:19:10,768 basehttp 22373 6358691840 "DELETE /api/users/2/ HTTP/1.1" 204 42
+INFO 2025-06-09 19:19:10,872 basehttp 22373 6375518208 "GET /api/users/?role=Salesperson HTTP/1.1" 200 530
+INFO 2025-06-09 19:19:19,770 basehttp 22373 6358691840 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:19:19,771 basehttp 22373 6392344576 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:19:22,070 basehttp 22373 6358691840 "GET /api/users/?role=Salesperson HTTP/1.1" 200 530
+INFO 2025-06-09 19:19:57,051 basehttp 22373 6358691840 "GET /api/users/?role=Salesperson HTTP/1.1" 200 530
+INFO 2025-06-09 19:20:26,337 basehttp 22373 6170701824 "GET /api/users/?role=Salesperson HTTP/1.1" 200 530
+WARNING 2025-06-09 19:20:52,039 log 22373 6170701824 Bad Request: /api/users/
+WARNING 2025-06-09 19:20:52,039 basehttp 22373 6170701824 "POST /api/users/ HTTP/1.1" 400 58
+INFO 2025-06-09 19:21:13,274 basehttp 22373 6325039104 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:21:13,284 basehttp 22373 6341865472 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:21:16,766 basehttp 22373 6325039104 "GET /api/users/?role=Salesperson HTTP/1.1" 200 530
+WARNING 2025-06-09 19:21:39,574 log 22373 6325039104 Bad Request: /api/users/
+WARNING 2025-06-09 19:21:39,575 basehttp 22373 6325039104 "POST /api/users/ HTTP/1.1" 400 83
+INFO 2025-06-09 19:21:53,811 basehttp 22373 6325039104 "GET /api/users/?role=Salesperson HTTP/1.1" 200 530
+INFO 2025-06-09 19:21:58,072 basehttp 22373 6325039104 "GET /api/users/10/ HTTP/1.1" 200 158
+INFO 2025-06-09 19:22:03,054 basehttp 22373 6325039104 "GET /api/users/?role=Salesperson HTTP/1.1" 200 530
+INFO 2025-06-09 19:23:19,487 autoreload 26867 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 19:23:27,299 basehttp 26867 6140440576 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:23:27,299 basehttp 26867 6123614208 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:23:30,472 basehttp 26867 6123614208 "GET /api/users/?role=Salesperson HTTP/1.1" 200 530
+WARNING 2025-06-09 19:23:53,369 log 26867 6123614208 Bad Request: /api/users/
+WARNING 2025-06-09 19:23:53,369 basehttp 26867 6123614208 "POST /api/users/ HTTP/1.1" 400 42
+INFO 2025-06-09 19:27:34,572 basehttp 26867 6157266944 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:27:34,573 basehttp 26867 6325039104 "GET /api/dashboard/ HTTP/1.1" 200 224
+INFO 2025-06-09 19:27:36,226 basehttp 26867 6157266944 "GET /api/users/?role=Salesperson HTTP/1.1" 200 530
+INFO 2025-06-09 19:27:58,936 basehttp 26867 6157266944 "POST /api/users/ HTTP/1.1" 201 157
+INFO 2025-06-09 19:28:00,590 basehttp 26867 6157266944 "GET /api/users/?role=Salesperson HTTP/1.1" 200 688
+INFO 2025-06-09 19:28:23,391 basehttp 26867 6157266944 "POST /api/users/ HTTP/1.1" 201 156
+INFO 2025-06-09 19:28:24,608 basehttp 26867 6157266944 "GET /api/users/?role=Salesperson HTTP/1.1" 200 845
