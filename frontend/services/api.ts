@@ -254,6 +254,8 @@ export const deleteUser = async (userId: string | number): Promise<void> => {
 export interface Product {
   id: string | number;
   name: string;
+  sku?: string;
+  description?: string;
   category?: string;
   price?: number;
   stock_quantity?: number;

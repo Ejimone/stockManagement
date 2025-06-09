@@ -30,7 +30,7 @@ const InitialLayout = () => {
       // Check if already in the correct group to prevent loop
       // Only redirect if not in the right group (admin vs sales)
       if (segments[0] !== targetGroup) {
-        router.replace(targetDashboard);
+        router.replace(targetDashboard as any);
       }
     } else {
       // User is not authenticated

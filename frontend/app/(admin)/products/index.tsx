@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Alert,
   RefreshControl,
+  Button,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { getProducts, deleteProduct, Product } from "../../../services/api"; // Adjust path
@@ -49,10 +50,8 @@ export default function AdminProductsScreen() {
 
   const fetchProductsData = useCallback(
     async (resetPage = false) => {
-      if (!resetPage)
-        setIsLoading(
-          true
-        ); // Full loader only on initial/filter change, not for pagination
+      if (!resetPage) setIsLoading(true);
+      // Full loader only on initial/filter change, not for pagination
       else if (!refreshing) setIsLoading(true); // Show loader if resetting page due to search/filter change and not already refreshing
 
       setError(null);
