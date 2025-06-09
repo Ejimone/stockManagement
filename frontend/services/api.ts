@@ -333,11 +333,31 @@ export const deleteProduct = async (
 // Define Sale type (adjust as per your backend)
 export interface Sale {
   id: string | number;
-  salesperson_id?: string | number;
+  salesperson?: string | number;
+  salesperson_name?: string;
+  customer_name?: string;
+  customer_phone?: string;
+  products_sold?: any[]; // Array of product details
+  items?: SaleItem[]; // Sale items from backend
   total_amount?: number;
+  payment_method?: string;
   payment_status?: string;
-  sale_date?: string;
-  // Add other sale fields
+  amount_paid?: number;
+  balance?: number;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// Define SaleItem type for detailed sale items
+export interface SaleItem {
+  id: string | number;
+  product: string | number;
+  product_name?: string;
+  product_sku?: string;
+  quantity: number;
+  price_at_sale: number;
+  subtotal: number;
 }
 
 /**
@@ -387,6 +407,14 @@ export const updateSale = async (
 ): Promise<Sale> => {
   const response = await apiClient.patch<Sale>(`/sales/${saleId}/`, saleData); // Using PATCH for partial updates
   return response.data;
+};
+
+/**
+ * Delete a sale (Admin only).
+ * @param saleId ID of the sale to delete.
+ */
+export const deleteSale = async (saleId: string | number): Promise<void> => {
+  await apiClient.delete(`/sales/${saleId}/`);
 };
 
 // --- Payment Management (Admin Only) ---
