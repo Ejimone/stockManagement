@@ -14,7 +14,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import {
   getSaleDetails,
   updateSale,
-  getSalePdfReceiptUrl,
+  displayPdfReceipt,
   Sale,
   SaleItem,
 } from "../../../services/api";
@@ -80,25 +80,7 @@ export default function SalesSaleDetailScreen() {
 
   const handleDownloadReceipt = async () => {
     try {
-      // For web: direct download
-      if (typeof window !== "undefined") {
-        const url = getSalePdfReceiptUrl(id as string);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `receipt_sale_${id}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        // For mobile: open in browser or external app
-        const url = getSalePdfReceiptUrl(id as string);
-        const canOpen = await Linking.canOpenURL(url);
-        if (canOpen) {
-          await Linking.openURL(url);
-        } else {
-          Alert.alert("Error", "Cannot open PDF receipt");
-        }
-      }
+      await displayPdfReceipt(id as string);
     } catch (error: any) {
       console.error("Failed to download receipt:", error);
       Alert.alert("Error", "Failed to download receipt");

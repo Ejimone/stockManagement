@@ -1,6 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import * as tokenStorage from "./tokenStorage";
 import { User } from "../contexts/AuthContext"; // For User type
+import { Platform } from "react-native";
 
 // Use either localhost for development on same machine, or device's local IP address
 // for testing on real devices, or your production backend URL
@@ -580,6 +581,50 @@ export const getSalePdfReceipt = async (
  */
 export const getSalePdfReceiptUrl = (saleId: string | number): string => {
   return `${API_BASE_URL}sales/${saleId}/pdf/`;
+};
+
+/**
+ * Display PDF receipt in a shareable format for React Native
+ */
+export const displayPdfReceipt = async (
+  saleId: string | number
+): Promise<void> => {
+  try {
+    // Get the authenticated URL
+    const pdfUrl = getSalePdfReceiptUrl(saleId);
+
+    // For React Native, we'll need to show this URL in a way that includes authentication
+    // The simplest approach is to use the device's browser with a message to the user
+    const { Alert, Linking } = await import("react-native");
+
+    Alert.alert(
+      "PDF Receipt",
+      "Your receipt will open in the browser. You may need to log in to view it.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Open Receipt",
+          onPress: async () => {
+            try {
+              const canOpen = await Linking.canOpenURL(pdfUrl);
+              if (canOpen) {
+                await Linking.openURL(pdfUrl);
+              } else {
+                Alert.alert("Error", "Cannot open PDF viewer on this device");
+              }
+            } catch (error) {
+              console.error("Failed to open URL:", error);
+              Alert.alert("Error", "Failed to open receipt");
+            }
+          },
+        },
+      ]
+    );
+  } catch (error) {
+    console.error("Failed to display PDF receipt:", error);
+    const { Alert } = await import("react-native");
+    Alert.alert("Error", "Could not generate PDF receipt");
+  }
 };
 
 // Export the configured apiClient if other parts of the app need to make calls with it directly

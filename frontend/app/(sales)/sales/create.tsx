@@ -15,7 +15,7 @@ import { Stack, useRouter } from "expo-router";
 import {
   createSale,
   getProducts,
-  getSalePdfReceiptUrl,
+  displayPdfReceipt,
   Product,
 } from "../../../services/api";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -144,25 +144,7 @@ export default function SalesCreateSaleScreen() {
             text: "Download Receipt",
             onPress: async () => {
               try {
-                const receiptUrl = getSalePdfReceiptUrl(newSale.id);
-
-                if (typeof window !== "undefined") {
-                  // Web: direct download
-                  const link = document.createElement("a");
-                  link.href = receiptUrl;
-                  link.download = `receipt_sale_${newSale.id}.pdf`;
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                } else {
-                  // Mobile: open in browser
-                  const canOpen = await Linking.canOpenURL(receiptUrl);
-                  if (canOpen) {
-                    await Linking.openURL(receiptUrl);
-                  } else {
-                    Alert.alert("Error", "Cannot open PDF receipt");
-                  }
-                }
+                await displayPdfReceipt(newSale.id);
                 router.back();
               } catch (error) {
                 console.error("Failed to download receipt:", error);

@@ -598,7 +598,7 @@ def generate_receipt_pdf(request, sale_id):
         sale = Sale.objects.get(id=sale_id)
         
         # Permission check: Admin can view all, Salesperson can view only their own
-        if request.user.role != 'admin' and sale.salesperson != request.user:
+        if request.user.role != 'Admin' and sale.salesperson != request.user:
             return Response(
                 {'error': 'You do not have permission to generate receipt for this sale'}, 
                 status=status.HTTP_403_FORBIDDEN
