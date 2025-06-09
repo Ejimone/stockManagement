@@ -1,7 +1,7 @@
-import { SplashScreen, Stack, useRouter, useSegments } from 'expo-router';
-import { AuthProvider, useAuth } from '../contexts/AuthContext'; // Adjusted path
-import React, { useEffect } from 'react';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { SplashScreen, Stack, useRouter, useSegments } from "expo-router";
+import { AuthProvider, useAuth } from "../contexts/AuthContext"; // Adjusted path
+import React, { useEffect } from "react";
+import { ActivityIndicator, View, StyleSheet } from "react-native";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -20,22 +20,22 @@ const InitialLayout = () => {
 
     SplashScreen.hideAsync(); // Hide splash screen once auth state is determined and not loading.
 
-    const inAuthGroup = segments[0] === '(auth)';
+    const inAuthGroup = segments[0] === "(auth)";
 
     if (isAuthenticated) {
       // User is authenticated
-      const targetGroup = user?.role === 'Admin' ? '(admin)' : '(sales)';
+      const targetGroup = user?.role === "Admin" ? "(admin)" : "(sales)";
       const targetDashboard = `/${targetGroup}/dashboard`;
 
-      // Check if already in the correct group and screen to prevent loop
-      // segments[0] is the group, segments[1] would be the screen in that group
-      if (segments[0] !== targetGroup || segments[1] !== 'dashboard') {
+      // Check if already in the correct group to prevent loop
+      // Only redirect if not in the right group (admin vs sales)
+      if (segments[0] !== targetGroup) {
         router.replace(targetDashboard);
       }
     } else {
       // User is not authenticated
       if (!inAuthGroup) {
-        router.replace('/(auth)/login');
+        router.replace("/(auth)/login");
       }
     }
   }, [isAuthenticated, isLoading, user, segments, router]);
@@ -74,7 +74,7 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
