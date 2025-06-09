@@ -64,6 +64,7 @@ class LoginSerializer(serializers.Serializer):
 class ProductSerializer(serializers.ModelSerializer):
     """Serializer for Product model"""
     stock_status = serializers.SerializerMethodField()
+    price = serializers.FloatField()
     
     class Meta:
         model = Product

@@ -10,9 +10,12 @@
  * @returns A string representation of the price, formatted to 2 decimal places
  */
 export const formatPrice = (price: any): string => {
-  // Check if price exists and is a valid number
-  if (price !== undefined && price !== null && typeof price === "number") {
-    return price.toFixed(2);
+  // Check if price exists and is a valid number or numeric string
+  if (price !== undefined && price !== null) {
+    const numericPrice = typeof price === "string" ? parseFloat(price) : price;
+    if (!isNaN(numericPrice) && isFinite(numericPrice)) {
+      return numericPrice.toFixed(2);
+    }
   }
   // Return a default value for invalid prices
   return "0.00";

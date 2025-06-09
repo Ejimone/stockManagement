@@ -257,10 +257,13 @@ export interface Product {
   sku?: string;
   description?: string;
   category?: string;
-  price?: number;
+  price?: number | string; // Allow both number and string to handle API variations
   stock_quantity?: number;
   active?: boolean;
-  // Add other product fields
+  is_active?: boolean; // Backend uses is_active
+  stock_status?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 /**
