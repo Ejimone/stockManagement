@@ -16,6 +16,9 @@ python-decouple==3.8  # For environment variables
 Pillow==10.4.0  # Image processing
 python-dateutil==2.8.2
 
+# PDF Generation
+reportlab==4.0.8  # PDF generation library
+
 # Development and Testing
 pytest==8.3.2
 pytest-django==4.8.0

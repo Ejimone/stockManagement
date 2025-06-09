@@ -3,6 +3,7 @@ API Views for the Stock Management System
 """
 import logging
 from django.db import transaction
+from django.http import HttpResponse
 from django.db.models import Q, Sum, Count
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -264,6 +265,68 @@ class SaleDetailView(generics.RetrieveUpdateDestroyAPIView):
             )
         
         return super().update(request, *args, **kwargs)
+
+
+class SaleReceiptView(APIView):
+    """Generate and download PDF receipt for a sale"""
+    permission_classes = [IsOwnerOrAdmin]
+    
+    def get(self, request, pk):
+        """Generate and return PDF receipt for a sale"""
+        try:
+            # Get the sale
+            user = request.user
+            if user.role == 'Salesperson':
+                sale = Sale.objects.select_related('salesperson').prefetch_related('items__product').get(
+                    pk=pk, salesperson=user
+                )
+            else:
+                sale = Sale.objects.select_related('salesperson').prefetch_related('items__product').get(pk=pk)
+            
+            # Prepare sale data for PDF generation
+            sale_data = {
+                'id': sale.id,
+                'created_at': sale.created_at.isoformat(),
+                'salesperson_name': sale.salesperson.full_name,
+                'payment_method': sale.payment_method,
+                'payment_status': sale.payment_status,
+                'total_amount': float(sale.total_amount),
+                'amount_paid': float(sale.amount_paid),
+                'balance': float(sale.balance),
+                'products_sold': []
+            }
+            
+            # Add products to sale data
+            for item in sale.items.all():
+                sale_data['products_sold'].append({
+                    'name': item.product.name,
+                    'quantity': item.quantity,
+                    'price_at_sale': float(item.price_at_sale)
+                })
+            
+            # Generate PDF receipt
+            from .pdf_generator import generate_sale_receipt
+            pdf_data = generate_sale_receipt(sale_data)
+            
+            # Create HTTP response with PDF
+            response = HttpResponse(pdf_data, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="receipt_{sale.id}.pdf"'
+            response['Content-Length'] = len(pdf_data)
+            
+            logger.info(f"PDF receipt generated for sale {sale.id} by user {request.user.email}")
+            return response
+            
+        except Sale.DoesNotExist:
+            return Response(
+                {'error': 'Sale not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            logger.error(f"Error generating PDF receipt for sale {pk}: {str(e)}")
+            return Response(
+                {'error': 'Failed to generate receipt'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class PaymentListCreateView(generics.ListCreateAPIView):

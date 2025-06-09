@@ -1571,3 +1571,35 @@ INFO 2025-06-09 21:40:04,725 basehttp 40550 6221705216 "GET /api/sales/ HTTP/1.1
 INFO 2025-06-09 21:40:09,222 basehttp 40550 6221705216 "GET /api/dashboard/ HTTP/1.1" 200 236
 INFO 2025-06-09 21:40:17,317 basehttp 40550 6221705216 "GET /api/dashboard/ HTTP/1.1" 200 236
 INFO 2025-06-09 21:40:36,062 basehttp 40550 6221705216 "GET /api/sales/ HTTP/1.1" 200 15041
+INFO 2025-06-09 21:44:55,903 autoreload 40550 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-09 21:44:56,173 autoreload 42995 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 21:45:13,523 autoreload 42995 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-09 21:45:13,764 autoreload 43049 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 21:45:26,031 autoreload 43049 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/urls.py changed, reloading.
+INFO 2025-06-09 21:45:26,267 autoreload 43091 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 21:45:40,740 autoreload 45337 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 21:46:54,408 autoreload 46579 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 21:47:12,483 autoreload 48760 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 21:47:20,237 autoreload 50924 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 21:48:01,023 autoreload 43091 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-09 21:48:01,285 autoreload 52240 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 21:48:01,945 autoreload 50924 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/urls.py changed, reloading.
+INFO 2025-06-09 21:48:02,112 autoreload 52250 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-09 21:48:25,879 basehttp 52240 6175682560 "GET /api/dashboard/ HTTP/1.1" 200 236
+INFO 2025-06-09 21:48:25,879 basehttp 52240 6158856192 "GET /api/dashboard/ HTTP/1.1" 200 236
+INFO 2025-06-09 21:48:31,856 basehttp 52240 6175682560 "GET /api/dashboard/ HTTP/1.1" 200 236
+INFO 2025-06-09 21:48:33,947 basehttp 52240 6175682560 "GET /api/sales/ HTTP/1.1" 200 15041
+INFO 2025-06-09 21:48:36,159 basehttp 52240 6175682560 "GET /api/sales/ HTTP/1.1" 200 15041
+INFO 2025-06-09 21:48:37,914 basehttp 52240 6175682560 "GET /api/sales/23/ HTTP/1.1" 200 454
+INFO 2025-06-09 21:48:48,344 basehttp 52240 6175682560 "PATCH /api/sales/23/ HTTP/1.1" 200 454
+INFO 2025-06-09 21:48:52,840 basehttp 52240 6175682560 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-09 21:49:04,039 api_views 52240 6175682560 Restored 1 units to product AirPods Pro
+INFO 2025-06-09 21:49:04,041 api_views 52240 6175682560 Sale None deleted by admin generalbanx@gmail.com
+INFO 2025-06-09 21:49:04,041 basehttp 52240 6175682560 "DELETE /api/sales/23/ HTTP/1.1" 204 0
+INFO 2025-06-09 21:49:05,274 basehttp 52240 6175682560 "GET /api/sales/ HTTP/1.1" 200 14586
+INFO 2025-06-09 21:49:07,371 basehttp 52240 6175682560 "GET /api/products/?active_only=true HTTP/1.1" 200 5740
+INFO 2025-06-09 21:49:14,519 basehttp 52240 6175682560 "GET /api/sales/ HTTP/1.1" 200 14586
+INFO 2025-06-09 21:49:17,651 basehttp 52240 6175682560 "GET /api/products/?active_only=true HTTP/1.1" 200 5740
+INFO 2025-06-09 21:49:38,459 basehttp 52240 6175682560 "POST /api/sales/ HTTP/1.1" 201 575
+INFO 2025-06-09 21:49:40,142 basehttp 52240 6175682560 "GET /api/sales/ HTTP/1.1" 200 15162
+INFO 2025-06-09 21:49:48,034 basehttp 52240 6175682560 "GET /api/sales/24/ HTTP/1.1" 200 575
