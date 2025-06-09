@@ -1,8 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { Text, View, ScrollView, StyleSheet, ActivityIndicator, RefreshControl, Button } from 'react-native';
+import React, { useEffect, useState } from "react";
+import {
+  Text,
+  View,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+  RefreshControl,
+  Button,
+} from "react-native";
 // Removed Stack import as title is handled by _layout.tsx, useRouter may not be needed.
-import { useAuth } from '../../../contexts/AuthContext'; // Adjust path as needed
-import { getDashboardStats } from '../../../services/api'; // Adjust path
+import { useAuth } from "../../../contexts/AuthContext"; // Adjust path as needed
+import { getDashboardStats } from "../../../services/api"; // Adjust path
 
 // Define the expected structure of Salesperson dashboard stats
 interface SalespersonDashboardStats {
@@ -10,20 +18,29 @@ interface SalespersonDashboardStats {
   my_revenue_today: number;
   my_sales_this_month: number;
   my_revenue_this_month: number;
-  my_pending_sales?: number;  // Optional based on API
+  my_pending_sales?: number; // Optional based on API
   my_pending_amount?: number; // Optional based on API
   // Add other stats as per your API response for a salesperson
 }
 
 // MetricCard component (copied structure from Admin Dashboard for this task)
-const MetricCard: React.FC<{ label: string; value: string | number; context?: string; icon?: React.ReactNode }> = ({ label, value, context, icon }) => (
+const MetricCard: React.FC<{
+  label: string;
+  value: string | number;
+  context?: string;
+  icon?: React.ReactNode;
+}> = ({ label, value, context, icon }) => (
   <View style={styles.card}>
     <View style={styles.cardTextContainer}>
       <Text style={styles.cardLabel}>{label}</Text>
       <Text style={styles.cardValue}>{value}</Text>
       {context && <Text style={styles.cardContext}>{context}</Text>}
     </View>
-    {icon || <View style={styles.cardIconPlaceholder}><Text style={styles.iconText}>📊</Text></View>}
+    {icon || (
+      <View style={styles.cardIconPlaceholder}>
+        <Text style={styles.iconText}>📊</Text>
+      </View>
+    )}
   </View>
 );
 
@@ -37,13 +54,34 @@ export default function SalespersonDashboardScreen() {
 
   const fetchSalespersonStats = async () => {
     try {
+      console.log("Sales dashboard: Attempting to fetch stats");
       setError(null);
       // Assuming getDashboardStats() returns salesperson-specific data when called by a salesperson
       const data = await getDashboardStats();
+      console.log("Sales dashboard: Stats fetched successfully:", data);
       setStats(data as SalespersonDashboardStats); // Cast or validate structure if API returns different types
     } catch (err: any) {
       console.error("Failed to fetch salesperson dashboard stats:", err);
-      setError(err.message || "Failed to fetch your dashboard data. Please try again.");
+
+      // Provide more detailed error information
+      let errorMessage =
+        "Failed to fetch your dashboard data. Please try again.";
+
+      if (err.response) {
+        console.error("Error response data:", err.response.data);
+        console.error("Error response status:", err.response.status);
+        errorMessage = `Server error (${err.response.status}): ${JSON.stringify(
+          err.response.data
+        )}`;
+      } else if (err.request) {
+        console.error("No response received");
+        errorMessage = "Network error: No response from server";
+      } else {
+        console.error("Error details:", err.message);
+        errorMessage = err.message || errorMessage;
+      }
+
+      setError(errorMessage);
       setStats(null);
     } finally {
       setIsLoading(false);
@@ -77,24 +115,40 @@ export default function SalespersonDashboardScreen() {
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>{error}</Text>
         <View style={styles.buttonSpacing}>
-         <Button title="Retry" onPress={fetchSalespersonStats} color="#007AFF"/>
+          <Button
+            title="Retry"
+            onPress={fetchSalespersonStats}
+            color="#007AFF"
+          />
         </View>
       </View>
     );
   }
 
   const formatCurrency = (value: number | undefined) => {
-    if (typeof value !== 'number') return 'N/A';
+    if (typeof value !== "number") return "N/A";
     return `$${value.toFixed(2)}`;
   };
 
   return (
     <ScrollView
       style={styles.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#007AFF"]}/>}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={["#007AFF"]}
+        />
+      }
     >
-      <Text style={styles.welcomeMessage}>Welcome back, {user?.email || 'Salesperson'}!</Text>
-      {error && <Text style={[styles.errorText, {marginBottom: 10}]}>Error: {error}</Text>}
+      <Text style={styles.welcomeMessage}>
+        Welcome back, {user?.email || "Salesperson"}!
+      </Text>
+      {error && (
+        <Text style={[styles.errorText, { marginBottom: 10 }]}>
+          Error: {error}
+        </Text>
+      )}
 
       {stats ? (
         <>
@@ -104,7 +158,7 @@ export default function SalespersonDashboardScreen() {
           />
           <MetricCard
             label="My Sales Today"
-            value={stats.my_sales_today?.toString() || '0'}
+            value={stats.my_sales_today?.toString() || "0"}
           />
           <MetricCard
             label="My Revenue This Month"
@@ -112,17 +166,27 @@ export default function SalespersonDashboardScreen() {
           />
           <MetricCard
             label="My Sales This Month"
-            value={stats.my_sales_this_month?.toString() || '0'}
+            value={stats.my_sales_this_month?.toString() || "0"}
           />
           {stats.my_pending_sales !== undefined && (
-            <MetricCard label="My Pending Sales (Count)" value={stats.my_pending_sales.toString()} />
+            <MetricCard
+              label="My Pending Sales (Count)"
+              value={stats.my_pending_sales.toString()}
+            />
           )}
           {stats.my_pending_amount !== undefined && (
-            <MetricCard label="My Pending Sales (Amount)" value={formatCurrency(stats.my_pending_amount)} />
+            <MetricCard
+              label="My Pending Sales (Amount)"
+              value={formatCurrency(stats.my_pending_amount)}
+            />
           )}
         </>
       ) : (
-        !isLoading && <Text style={styles.noDataText}>No dashboard data available for you at the moment.</Text>
+        !isLoading && (
+          <Text style={styles.noDataText}>
+            No dashboard data available for you at the moment.
+          </Text>
+        )
       )}
     </ScrollView>
   );
@@ -132,28 +196,28 @@ export default function SalespersonDashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
   welcomeMessage: {
     fontSize: 18,
-    fontWeight: '500',
-    color: '#333',
+    fontWeight: "500",
+    color: "#333",
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: "#E0E0E0",
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 8,
     padding: 16,
     marginVertical: 8,
     marginHorizontal: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    shadowColor: '#000000',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    shadowColor: "#000000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 3,
@@ -164,57 +228,58 @@ const styles = StyleSheet.create({
   },
   cardLabel: {
     fontSize: 14,
-    color: '#60758a',
+    color: "#60758a",
     marginBottom: 4,
   },
   cardValue: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#111418',
+    fontWeight: "bold",
+    color: "#111418",
   },
   cardContext: {
     fontSize: 12,
-    color: '#777',
+    color: "#777",
     marginTop: 4,
   },
   cardIconPlaceholder: {
     width: 48,
     height: 48,
-    backgroundColor: '#E0F2F7', // Different color for Salesperson dashboard icon bg
+    backgroundColor: "#E0F2F7", // Different color for Salesperson dashboard icon bg
     borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginLeft: 12,
   },
-  iconText: { // Simple text as icon placeholder
+  iconText: {
+    // Simple text as icon placeholder
     fontSize: 24,
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
   },
   errorContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
   errorText: {
     fontSize: 16,
-    color: 'red',
-    textAlign: 'center',
+    color: "red",
+    textAlign: "center",
     marginBottom: 12,
   },
   noDataText: {
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 30,
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   buttonSpacing: {
-      marginTop: 10,
-  }
+    marginTop: 10,
+  },
 });

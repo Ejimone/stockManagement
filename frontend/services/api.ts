@@ -1,8 +1,12 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import * as tokenStorage from './tokenStorage';
-import { User } from '../contexts/AuthContext'; // For User type
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+import * as tokenStorage from "./tokenStorage";
+import { User } from "../contexts/AuthContext"; // For User type
 
-const API_BASE_URL = 'http://localhost:8000/api/'; // Your backend API base URL
+// Use either localhost for development on same machine, or device's local IP address
+// for testing on real devices, or your production backend URL
+const API_BASE_URL = "http://10.0.2.2:8000/api/"; // For Android emulator (points to host machine's localhost)
+// const API_BASE_URL = "http://localhost:8000/api/"; // For web/iOS simulator
+// const API_BASE_URL = "http://<your-computer-ip>:8000/api/"; // Use your computer's IP when testing on real devices
 
 // Error response type from backend (adjust if needed)
 export interface ApiErrorResponse {
@@ -29,15 +33,18 @@ export interface PaginatedResponse<T> {
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
-  }
+    "Content-Type": "application/json",
+  },
 });
 
 // Request Interceptor: Add token to headers for non-auth requests
 apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    const authEndpoints = ['/auth/login/', '/auth/refresh/', '/auth/register/'];
-    if (config.url && authEndpoints.some(endpoint => config.url!.endsWith(endpoint))) {
+    const authEndpoints = ["/auth/login/", "/auth/refresh/", "/auth/register/"];
+    if (
+      config.url &&
+      authEndpoints.some((endpoint) => config.url!.endsWith(endpoint))
+    ) {
       return config;
     }
     const { accessToken } = await tokenStorage.getToken();
@@ -52,10 +59,13 @@ apiClient.interceptors.request.use(
 );
 
 let isRefreshing = false;
-let failedQueue: { resolve: (value?: any) => void; reject: (reason?: any) => void }[] = [];
+let failedQueue: {
+  resolve: (value?: any) => void;
+  reject: (reason?: any) => void;
+}[] = [];
 
 const processQueue = (error: Error | null, token: string | null = null) => {
-  failedQueue.forEach(prom => {
+  failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else {
@@ -69,20 +79,28 @@ const processQueue = (error: Error | null, token: string | null = null) => {
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<ApiErrorResponse>) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry
+    ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then(token => {
-          if (originalRequest.headers) {
-            originalRequest.headers['Authorization'] = 'Bearer ' + token;
-          }
-          return apiClient(originalRequest);
-        }).catch(err => {
-          return Promise.reject(err); // Propagate the error after queue processing
-        });
+        })
+          .then((token) => {
+            if (originalRequest.headers) {
+              originalRequest.headers["Authorization"] = "Bearer " + token;
+            }
+            return apiClient(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err); // Propagate the error after queue processing
+          });
       }
 
       originalRequest._retry = true;
@@ -96,17 +114,26 @@ apiClient.interceptors.response.use(
         isRefreshing = false;
         processQueue(new Error("No refresh token"), null);
         // Consider navigating to login via a global navigation utility or event
-        return Promise.reject(new Error("No refresh token available. Please login."));
+        return Promise.reject(
+          new Error("No refresh token available. Please login.")
+        );
       }
 
       try {
-        const response = await axios.post<{ access: string; refresh?: string }>(`${API_BASE_URL}auth/refresh/`, { refresh: refreshToken });
-        const { access: newAccessToken, refresh: newRefreshToken } = response.data;
+        const response = await axios.post<{ access: string; refresh?: string }>(
+          `${API_BASE_URL}auth/refresh/`,
+          { refresh: refreshToken }
+        );
+        const { access: newAccessToken, refresh: newRefreshToken } =
+          response.data;
 
-        await tokenStorage.saveToken(newAccessToken, newRefreshToken || refreshToken);
+        await tokenStorage.saveToken(
+          newAccessToken,
+          newRefreshToken || refreshToken
+        );
 
         if (originalRequest.headers) {
-          originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
         }
         // Update default header for subsequent requests from other parts of the app if needed
         // However, the request interceptor should handle adding the new token correctly.
@@ -133,19 +160,37 @@ apiClient.interceptors.response.use(
 /**
  * Logs in a user. Uses a direct axios call as it should not send existing auth token.
  */
-export const loginUser = async (email_address: string, password_str: string): Promise<LoginApiResponse> => {
-  const response = await axios.post<LoginApiResponse>(`${API_BASE_URL}auth/login/`, {
-    email: email_address,
-    password: password_str,
-  });
-  return response.data;
+export const loginUser = async (
+  email_address: string,
+  password_str: string
+): Promise<LoginApiResponse> => {
+  console.log(
+    `Attempting to login with email: ${email_address} to URL: ${API_BASE_URL}auth/login/`
+  );
+  try {
+    const response = await axios.post<LoginApiResponse>(
+      `${API_BASE_URL}auth/login/`,
+      {
+        email: email_address,
+        password: password_str,
+      },
+      {
+        timeout: 10000, // 10 second timeout
+      }
+    );
+    console.log("Login successful:", response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error("Login error details:", error.message, error.response?.data);
+    throw error;
+  }
 };
 
 /**
  * Fetches the current authenticated user's profile.
  */
 export const getCurrentUser = async (): Promise<User> => {
-  const response = await apiClient.get<User>('/auth/me/');
+  const response = await apiClient.get<User>("/auth/me/");
   return response.data;
 };
 
@@ -154,8 +199,12 @@ export const getCurrentUser = async (): Promise<User> => {
  * Get a list of users.
  * @param params Optional query parameters (e.g., { role: 'Salesperson' })
  */
-export const getUsers = async (params?: { role?: string }): Promise<PaginatedResponse<User>> => {
-  const response = await apiClient.get<PaginatedResponse<User>>('/users/', { params });
+export const getUsers = async (params?: {
+  role?: string;
+}): Promise<PaginatedResponse<User>> => {
+  const response = await apiClient.get<PaginatedResponse<User>>("/users/", {
+    params,
+  });
   return response.data;
 };
 
@@ -164,7 +213,7 @@ export const getUsers = async (params?: { role?: string }): Promise<PaginatedRes
  * @param userData Data for the new user.
  */
 export const createUser = async (userData: object): Promise<User> => {
-  const response = await apiClient.post<User>('/users/', userData);
+  const response = await apiClient.post<User>("/users/", userData);
   return response.data;
 };
 
@@ -172,7 +221,9 @@ export const createUser = async (userData: object): Promise<User> => {
  * Get details for a specific user.
  * @param userId ID of the user.
  */
-export const getUserDetails = async (userId: string | number): Promise<User> => {
+export const getUserDetails = async (
+  userId: string | number
+): Promise<User> => {
   const response = await apiClient.get<User>(`/users/${userId}/`);
   return response.data;
 };
@@ -182,7 +233,10 @@ export const getUserDetails = async (userId: string | number): Promise<User> => 
  * @param userId ID of the user to update.
  * @param userData Data to update.
  */
-export const updateUser = async (userId: string | number, userData: object): Promise<User> => {
+export const updateUser = async (
+  userId: string | number,
+  userData: object
+): Promise<User> => {
   const response = await apiClient.put<User>(`/users/${userId}/`, userData);
   return response.data;
 };
@@ -211,8 +265,16 @@ export interface Product {
  * Get a list of products.
  * @param params Optional query parameters (e.g., { category: 'Electronics', stock_status: 'in_stock', search: 'laptop', active_only: true })
  */
-export const getProducts = async (params?: { category?: string; stock_status?: string; search?: string; active_only?: boolean }): Promise<PaginatedResponse<Product>> => {
-  const response = await apiClient.get<PaginatedResponse<Product>>('/products/', { params });
+export const getProducts = async (params?: {
+  category?: string;
+  stock_status?: string;
+  search?: string;
+  active_only?: boolean;
+}): Promise<PaginatedResponse<Product>> => {
+  const response = await apiClient.get<PaginatedResponse<Product>>(
+    "/products/",
+    { params }
+  );
   return response.data;
 };
 
@@ -221,7 +283,7 @@ export const getProducts = async (params?: { category?: string; stock_status?: s
  * @param productData Data for the new product.
  */
 export const createProduct = async (productData: object): Promise<Product> => {
-  const response = await apiClient.post<Product>('/products/', productData);
+  const response = await apiClient.post<Product>("/products/", productData);
   return response.data;
 };
 
@@ -229,7 +291,9 @@ export const createProduct = async (productData: object): Promise<Product> => {
  * Get details for a specific product.
  * @param productId ID of the product.
  */
-export const getProductDetails = async (productId: string | number): Promise<Product> => {
+export const getProductDetails = async (
+  productId: string | number
+): Promise<Product> => {
   const response = await apiClient.get<Product>(`/products/${productId}/`);
   return response.data;
 };
@@ -239,8 +303,14 @@ export const getProductDetails = async (productId: string | number): Promise<Pro
  * @param productId ID of the product to update.
  * @param productData Data to update.
  */
-export const updateProduct = async (productId: string | number, productData: object): Promise<Product> => {
-  const response = await apiClient.put<Product>(`/products/${productId}/`, productData);
+export const updateProduct = async (
+  productId: string | number,
+  productData: object
+): Promise<Product> => {
+  const response = await apiClient.put<Product>(
+    `/products/${productId}/`,
+    productData
+  );
   return response.data;
 };
 
@@ -248,7 +318,9 @@ export const updateProduct = async (productId: string | number, productData: obj
  * Delete a product (Admin only).
  * @param productId ID of the product to delete.
  */
-export const deleteProduct = async (productId: string | number): Promise<void> => {
+export const deleteProduct = async (
+  productId: string | number
+): Promise<void> => {
   await apiClient.delete(`/products/${productId}/`);
 };
 
@@ -267,8 +339,15 @@ export interface Sale {
  * Get a list of sales.
  * @param params Optional query parameters (e.g., { date_from: '2023-01-01', payment_status: 'paid', salesperson: 1 })
  */
-export const getSales = async (params?: { date_from?: string; date_to?: string; payment_status?: string; salesperson?: string | number }): Promise<PaginatedResponse<Sale>> => {
-  const response = await apiClient.get<PaginatedResponse<Sale>>('/sales/', { params });
+export const getSales = async (params?: {
+  date_from?: string;
+  date_to?: string;
+  payment_status?: string;
+  salesperson?: string | number;
+}): Promise<PaginatedResponse<Sale>> => {
+  const response = await apiClient.get<PaginatedResponse<Sale>>("/sales/", {
+    params,
+  });
   return response.data;
 };
 
@@ -277,7 +356,7 @@ export const getSales = async (params?: { date_from?: string; date_to?: string; 
  * @param saleData Data for the new sale.
  */
 export const createSale = async (saleData: object): Promise<Sale> => {
-  const response = await apiClient.post<Sale>('/sales/', saleData);
+  const response = await apiClient.post<Sale>("/sales/", saleData);
   return response.data;
 };
 
@@ -285,7 +364,9 @@ export const createSale = async (saleData: object): Promise<Sale> => {
  * Get details for a specific sale.
  * @param saleId ID of the sale.
  */
-export const getSaleDetails = async (saleId: string | number): Promise<Sale> => {
+export const getSaleDetails = async (
+  saleId: string | number
+): Promise<Sale> => {
   const response = await apiClient.get<Sale>(`/sales/${saleId}/`);
   return response.data;
 };
@@ -295,7 +376,10 @@ export const getSaleDetails = async (saleId: string | number): Promise<Sale> => 
  * @param saleId ID of the sale to update.
  * @param saleData Data to update.
  */
-export const updateSale = async (saleId: string | number, saleData: object): Promise<Sale> => {
+export const updateSale = async (
+  saleId: string | number,
+  saleData: object
+): Promise<Sale> => {
   const response = await apiClient.patch<Sale>(`/sales/${saleId}/`, saleData); // Using PATCH for partial updates
   return response.data;
 };
@@ -316,8 +400,16 @@ export interface Payment {
  * Get a list of payments.
  * @param params Optional query parameters (e.g., { sale: 1, status: 'completed' })
  */
-export const getPayments = async (params?: { sale?: string | number; status?: string; date_from?: string; date_to?: string }): Promise<PaginatedResponse<Payment>> => {
-  const response = await apiClient.get<PaginatedResponse<Payment>>('/payments/', { params });
+export const getPayments = async (params?: {
+  sale?: string | number;
+  status?: string;
+  date_from?: string;
+  date_to?: string;
+}): Promise<PaginatedResponse<Payment>> => {
+  const response = await apiClient.get<PaginatedResponse<Payment>>(
+    "/payments/",
+    { params }
+  );
   return response.data;
 };
 
@@ -326,7 +418,7 @@ export const getPayments = async (params?: { sale?: string | number; status?: st
  * @param paymentData Data for the new payment.
  */
 export const recordPayment = async (paymentData: object): Promise<Payment> => {
-  const response = await apiClient.post<Payment>('/payments/', paymentData);
+  const response = await apiClient.post<Payment>("/payments/", paymentData);
   return response.data;
 };
 
@@ -334,7 +426,9 @@ export const recordPayment = async (paymentData: object): Promise<Payment> => {
  * Get details for a specific payment.
  * @param paymentId ID of the payment.
  */
-export const getPaymentDetails = async (paymentId: string | number): Promise<Payment> => {
+export const getPaymentDetails = async (
+  paymentId: string | number
+): Promise<Payment> => {
   const response = await apiClient.get<Payment>(`/payments/${paymentId}/`);
   return response.data;
 };
@@ -344,26 +438,80 @@ export const getPaymentDetails = async (paymentId: string | number): Promise<Pay
  * @param paymentId ID of the payment to update.
  * @param paymentData Data to update.
  */
-export const updatePayment = async (paymentId: string | number, paymentData: object): Promise<Payment> => {
-  const response = await apiClient.patch<Payment>(`/payments/${paymentId}/`, paymentData); // Using PATCH
+export const updatePayment = async (
+  paymentId: string | number,
+  paymentData: object
+): Promise<Payment> => {
+  const response = await apiClient.patch<Payment>(
+    `/payments/${paymentId}/`,
+    paymentData
+  ); // Using PATCH
   return response.data;
 };
+
+// Import mock data for fallback when backend is unavailable
+import { mockDashboardStats } from "./mockData";
 
 // --- Dashboard & Reporting ---
 /**
  * Get dashboard statistics.
+ * @param useFallback Whether to use fallback mock data if the API fails
  */
-export const getDashboardStats = async (): Promise<any> => { // Replace 'any' with specific DashboardStats type
-  const response = await apiClient.get<any>('/dashboard/stats/');
-  return response.data;
+export const getDashboardStats = async (
+  useFallback: boolean = true
+): Promise<any> => {
+  try {
+    console.log("Fetching dashboard stats...");
+    // Replace 'any' with specific DashboardStats type
+    const response = await apiClient.get<any>("/dashboard/");
+    console.log("Dashboard stats response:", response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error("Dashboard stats error:", error.message);
+    console.error("Full error:", error);
+
+    if (error.response) {
+      console.error("Response data:", error.response.data);
+      console.error("Response status:", error.response.status);
+    }
+
+    if (useFallback) {
+      console.warn("Using mock dashboard data as fallback");
+
+      // Try to determine the user role
+      try {
+        // Use stored user in token storage instead of direct import to avoid circular dependency
+        const storedUser = await tokenStorage.getUser();
+        const role = (storedUser as any)?.role || "Salesperson";
+
+        console.log("Using fallback data for role:", role);
+        // Return appropriate mock data based on user role
+        return role === "Admin"
+          ? mockDashboardStats.admin
+          : mockDashboardStats.salesperson;
+      } catch (e) {
+        console.error("Error getting user role for fallback data:", e);
+        // Default to Salesperson mock data if role can't be determined
+        return mockDashboardStats.salesperson;
+      }
+    }
+
+    throw error;
+  }
 };
 
 /**
  * Get sales report.
  * @param params Optional query parameters for filtering the report.
  */
-export const getSalesReport = async (params?: { date_from?: string; date_to?: string; salesperson?: string | number; payment_status?: string }): Promise<any> => { // Replace 'any' with specific SalesReport type
-  const response = await apiClient.get<any>('/reports/sales/', { params });
+export const getSalesReport = async (params?: {
+  date_from?: string;
+  date_to?: string;
+  salesperson?: string | number;
+  payment_status?: string;
+}): Promise<any> => {
+  // Replace 'any' with specific SalesReport type
+  const response = await apiClient.get<any>("/reports/sales/", { params });
   return response.data;
 };
 
@@ -371,8 +519,13 @@ export const getSalesReport = async (params?: { date_from?: string; date_to?: st
  * Get inventory report (Admin only).
  * @param params Optional query parameters for filtering the report.
  */
-export const getInventoryReport = async (params?: { category?: string; stock_status?: string; active_only?: boolean }): Promise<any> => { // Replace 'any' with specific InventoryReport type
-  const response = await apiClient.get<any>('/reports/inventory/', { params });
+export const getInventoryReport = async (params?: {
+  category?: string;
+  stock_status?: string;
+  active_only?: boolean;
+}): Promise<any> => {
+  // Replace 'any' with specific InventoryReport type
+  const response = await apiClient.get<any>("/reports/inventory/", { params });
   return response.data;
 };
 

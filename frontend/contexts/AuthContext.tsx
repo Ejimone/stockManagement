@@ -1,11 +1,18 @@
-import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
-import * as tokenStorage from '../services/tokenStorage';
-import apiClient, { loginUser, LoginApiResponse } from '../services/api'; // Import apiClient and loginUser
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  ReactNode,
+} from "react";
+import * as tokenStorage from "../services/tokenStorage";
+import apiClient, { loginUser, LoginApiResponse } from "../services/api"; // Import apiClient and loginUser
+import { debugConnection } from "../services/connectionDebug";
 
 export interface User {
   id: string;
   email: string;
-  role: 'Admin' | 'Salesperson' | string;
+  role: "Admin" | "Salesperson" | string;
 }
 
 interface AuthContextType {
@@ -33,19 +40,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       try {
         const storedTokens = await tokenStorage.getToken();
-        const storedUser = await tokenStorage.getUser() as User | null;
+        const storedUser = (await tokenStorage.getUser()) as User | null;
         if (storedTokens && storedTokens.accessToken && storedUser) {
           setToken(storedTokens.accessToken);
           setUser(storedUser);
-          apiClient.defaults.headers.common['Authorization'] = `Bearer ${storedTokens.accessToken}`;
+          apiClient.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${storedTokens.accessToken}`;
         } else {
-          delete apiClient.defaults.headers.common['Authorization'];
+          delete apiClient.defaults.headers.common["Authorization"];
         }
       } catch (e) {
         console.error("Failed to load auth state:", e);
         await tokenStorage.removeToken();
         await tokenStorage.removeUser();
-        delete apiClient.defaults.headers.common['Authorization'];
+        delete apiClient.defaults.headers.common["Authorization"];
       } finally {
         setIsLoading(false);
       }
@@ -53,10 +62,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loadAuthState();
   }, []);
 
-  const signIn = async (email_val: string, password_val: string): Promise<boolean> => {
+  const signIn = async (
+    email_val: string,
+    password_val: string
+  ): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const response: LoginApiResponse = await loginUser(email_val, password_val); // Use loginUser from api.ts
+      // Run connection debugging to help diagnose issues
+      console.log("Running connection debug before sign-in attempt...");
+      await debugConnection();
+
+      const response: LoginApiResponse = await loginUser(
+        email_val,
+        password_val
+      ); // Use loginUser from api.ts
       const { access, refresh, user: userData } = response;
 
       await tokenStorage.saveToken(access, refresh);
@@ -64,7 +83,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       setToken(access);
       setUser(userData);
-      apiClient.defaults.headers.common['Authorization'] = `Bearer ${access}`;
+      apiClient.defaults.headers.common["Authorization"] = `Bearer ${access}`;
+      console.log("Sign-in successful, user data:", userData);
       setIsLoading(false);
       return true;
     } catch (e) {
@@ -72,7 +92,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Ensure cleanup if login API call failed but tokens were somehow set before
       await tokenStorage.removeToken();
       await tokenStorage.removeUser();
-      delete apiClient.defaults.headers.common['Authorization'];
+      delete apiClient.defaults.headers.common["Authorization"];
       setToken(null);
       setUser(null);
       setIsLoading(false);
@@ -89,7 +109,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await tokenStorage.removeUser();
       setToken(null);
       setUser(null);
-      delete apiClient.defaults.headers.common['Authorization'];
+      delete apiClient.defaults.headers.common["Authorization"];
     } catch (e) {
       console.error("Failed to sign out:", e);
       // Even if backend logout fails, clear client-side session
@@ -97,14 +117,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await tokenStorage.removeUser();
       setToken(null);
       setUser(null);
-      delete apiClient.defaults.headers.common['Authorization'];
+      delete apiClient.defaults.headers.common["Authorization"];
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, isAuthenticated: !!token && !!user, isLoading, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        user,
+        isAuthenticated: !!token && !!user,
+        isLoading,
+        signIn,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -113,7 +142,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
