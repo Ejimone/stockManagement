@@ -13,6 +13,10 @@ export interface User {
   id: string;
   email: string;
   role: "Admin" | "Salesperson" | string;
+  first_name?: string;
+  last_name?: string;
+  is_active?: boolean;
+  date_joined?: string;
 }
 
 interface AuthContextType {
