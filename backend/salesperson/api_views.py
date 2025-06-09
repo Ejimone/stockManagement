@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import User, Product, Sale, Payment, SaleItem
+from .models import User, Product, Sale, Payment, SaleItem, PDFAccessToken
 from .serializers import (
     UserSerializer, LoginSerializer, ProductSerializer, 
     SaleSerializer, PaymentSerializer, SalesReportSerializer,
@@ -617,5 +617,83 @@ def generate_receipt_pdf(request, sale_id):
         logger.error(f"Error generating PDF receipt for sale {sale_id}: {str(e)}")
         return Response(
             {'error': 'Failed to generate receipt'}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def create_pdf_token(request, sale_id):
+    """
+    Create a secure token for unauthenticated PDF access
+    Returns a token that can be used to download the PDF without authentication
+    """
+    try:
+        # Check if sale exists and user has permission to view it
+        sale = Sale.objects.get(id=sale_id)
+        
+        # Permission check: Admin can view all, Salesperson can view only their own
+        if request.user.role != 'Admin' and sale.salesperson != request.user:
+            return Response(
+                {'error': 'You do not have permission to generate receipt for this sale'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Create a new PDF access token
+        pdf_token = PDFAccessToken.objects.create(sale=sale)
+        
+        return Response({
+            'token': str(pdf_token.token),
+            'expires_at': pdf_token.expires_at.isoformat(),
+            'download_url': f'/api/sales/{sale_id}/pdf/{pdf_token.token}/'
+        }, status=status.HTTP_201_CREATED)
+        
+    except Sale.DoesNotExist:
+        return Response(
+            {'error': 'Sale not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        logger.error(f"Error creating PDF token for sale {sale_id}: {str(e)}")
+        return Response(
+            {'error': 'Failed to create PDF token'}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])  # No authentication required
+def download_pdf_with_token(request, sale_id, token):
+    """
+    Download PDF using a secure token (no authentication required)
+    """
+    try:
+        # Find the token
+        pdf_token = PDFAccessToken.objects.get(token=token, sale_id=sale_id)
+        
+        # Check if token is valid
+        if not pdf_token.is_valid():
+            return Response(
+                {'error': 'Token has expired or is invalid'}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        # Mark token as used (optional - you might want to allow multiple downloads)
+        # pdf_token.is_used = True
+        # pdf_token.save()
+        
+        # Generate and return PDF
+        pdf_response = generate_sale_receipt_pdf(sale_id)
+        return pdf_response
+        
+    except PDFAccessToken.DoesNotExist:
+        return Response(
+            {'error': 'Invalid token'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        logger.error(f"Error downloading PDF with token for sale {sale_id}: {str(e)}")
+        return Response(
+            {'error': 'Failed to download receipt'}, 
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )

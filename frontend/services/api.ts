@@ -565,7 +565,76 @@ export const getInventoryReport = async (params?: {
 
 // --- PDF Receipt Functions ---
 /**
- * Generate and download PDF receipt for a sale
+ * Create a PDF access token for a sale (authenticated)
+ */
+export const createPdfToken = async (
+  saleId: string | number
+): Promise<{ token: string; expires_at: string; download_url: string }> => {
+  const response = await apiClient.post(`/sales/${saleId}/pdf-token/`);
+  return response.data;
+};
+
+/**
+ * Download and save PDF receipt directly to device storage
+ */
+export const downloadAndSavePdfReceipt = async (
+  saleId: string | number
+): Promise<{ success: boolean; filePath?: string; error?: string }> => {
+  try {
+    // First, create a PDF token
+    const tokenData = await createPdfToken(saleId);
+
+    // Import required React Native modules
+    const { Platform } = await import("react-native");
+    const FileSystem = await import("expo-file-system");
+    const Sharing = await import("expo-sharing");
+
+    // Build the download URL (no authentication needed)
+    const downloadUrl = `${API_BASE_URL.replace("/api/", "")}${
+      tokenData.download_url
+    }`;
+
+    // Generate filename
+    const fileName = `receipt_sale_${saleId}_${Date.now()}.pdf`;
+    const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+
+    // Download the file
+    console.log("Downloading PDF from:", downloadUrl);
+    const downloadResult = await FileSystem.downloadAsync(downloadUrl, fileUri);
+
+    if (downloadResult.status === 200) {
+      console.log("PDF downloaded successfully to:", downloadResult.uri);
+
+      // Share/save the file
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(downloadResult.uri, {
+          mimeType: "application/pdf",
+          dialogTitle: "Save Receipt",
+          UTI: "com.adobe.pdf",
+        });
+      }
+
+      return {
+        success: true,
+        filePath: downloadResult.uri,
+      };
+    } else {
+      return {
+        success: false,
+        error: `Download failed with status: ${downloadResult.status}`,
+      };
+    }
+  } catch (error) {
+    console.error("Failed to download PDF receipt:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
+  }
+};
+
+/**
+ * Generate and download PDF receipt for a sale (legacy method)
  */
 export const getSalePdfReceipt = async (
   saleId: string | number
@@ -577,44 +646,40 @@ export const getSalePdfReceipt = async (
 };
 
 /**
- * Generate PDF receipt URL for a sale
+ * Generate PDF receipt URL for a sale (legacy method)
  */
 export const getSalePdfReceiptUrl = (saleId: string | number): string => {
   return `${API_BASE_URL}sales/${saleId}/pdf/`;
 };
 
 /**
- * Display PDF receipt in a shareable format for React Native
+ * Display PDF receipt with download option
  */
 export const displayPdfReceipt = async (
   saleId: string | number
 ): Promise<void> => {
   try {
-    // Get the authenticated URL
-    const pdfUrl = getSalePdfReceiptUrl(saleId);
-
-    // For React Native, we'll need to show this URL in a way that includes authentication
-    // The simplest approach is to use the device's browser with a message to the user
-    const { Alert, Linking } = await import("react-native");
+    const { Alert } = await import("react-native");
 
     Alert.alert(
       "PDF Receipt",
-      "Your receipt will open in the browser. You may need to log in to view it.",
+      "Would you like to download the receipt to your device?",
       [
         { text: "Cancel", style: "cancel" },
         {
-          text: "Open Receipt",
+          text: "Download",
           onPress: async () => {
-            try {
-              const canOpen = await Linking.canOpenURL(pdfUrl);
-              if (canOpen) {
-                await Linking.openURL(pdfUrl);
-              } else {
-                Alert.alert("Error", "Cannot open PDF viewer on this device");
-              }
-            } catch (error) {
-              console.error("Failed to open URL:", error);
-              Alert.alert("Error", "Failed to open receipt");
+            const result = await downloadAndSavePdfReceipt(saleId);
+            if (result.success) {
+              Alert.alert(
+                "Success",
+                "Receipt downloaded and saved successfully!"
+              );
+            } else {
+              Alert.alert(
+                "Error",
+                result.error || "Failed to download receipt"
+              );
             }
           },
         },

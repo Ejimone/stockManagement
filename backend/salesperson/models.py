@@ -3,6 +3,9 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from decimal import Decimal
+import uuid
+from django.utils import timezone
+from datetime import timedelta
 
 
 class UserManager(BaseUserManager):
@@ -473,3 +476,32 @@ class SaleItem(models.Model):
     
     def __str__(self):
         return f"{self.quantity}x {self.product_name} @ ₦{self.price_at_sale}"
+
+class PDFAccessToken(models.Model):
+    """
+    Temporary tokens for unauthenticated PDF access
+    """
+    token = models.UUIDField(default=uuid.uuid4, unique=True, db_index=True)
+    sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='pdf_tokens')
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['token']),
+            models.Index(fields=['expires_at']),
+        ]
+    
+    def save(self, *args, **kwargs):
+        """Set expiration time to 24 hours from creation if not set."""
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(hours=24)
+        super().save(*args, **kwargs)
+    
+    def is_valid(self):
+        """Check if token is still valid (not expired and not used)."""
+        return not self.is_used and timezone.now() < self.expires_at
+    
+    def __str__(self):
+        return f"PDF Token for Sale {self.sale.id} - {'Valid' if self.is_valid() else 'Invalid'}"
