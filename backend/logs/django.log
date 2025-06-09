@@ -1514,3 +1514,4 @@ INFO 2025-06-09 21:30:50,106 basehttp 36067 6191493120 "GET /api/dashboard/ HTTP
 INFO 2025-06-09 21:30:55,671 basehttp 36067 6191493120 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
 INFO 2025-06-09 21:30:56,639 basehttp 36067 6191493120 "GET /api/sales/ HTTP/1.1" 200 15527
 INFO 2025-06-09 21:31:08,106 autoreload 36067 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-09 21:31:08,423 autoreload 38614 8668733184 Watching for file changes with StatReloader
