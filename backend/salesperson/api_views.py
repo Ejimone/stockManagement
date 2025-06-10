@@ -480,15 +480,37 @@ def payment_summary(request):
             pass
     
     # Calculate statistics
-    total_payments = payments_queryset.aggregate(total=Sum('amount'))['total'] or 0
+    # Total payments - sum of all completed payments + amount paid from sales
+    payment_records_total = payments_queryset.filter(status='Completed').aggregate(total=Sum('amount'))['total'] or 0
+    sales_amount_paid_total = sales_queryset.aggregate(total=Sum('amount_paid'))['total'] or 0
+    total_payments = payment_records_total + sales_amount_paid_total
+    
+    # Total credits and partial debts
     total_credits = sales_queryset.filter(payment_status='unpaid').aggregate(total=Sum('balance'))['total'] or 0
     total_partial_debts = sales_queryset.filter(payment_status='partial').aggregate(total=Sum('balance'))['total'] or 0
     
     # Count statistics
     completed_payments = payments_queryset.filter(status='Completed').count()
     pending_payments = payments_queryset.filter(status='Pending').count()
-    credit_sales_count = sales_queryset.filter(payment_status='unpaid').count()
+    
+    # Credit sales count should include all sales made on credit, regardless of payment status
+    credit_sales_count = sales_queryset.filter(payment_method='Credit').count()
     partial_payments_count = sales_queryset.filter(payment_status='partial').count()
+    
+    # Calculate total credits over 1000
+    credits_over_1000 = sales_queryset.filter(
+        payment_status='unpaid', 
+        balance__gte=1000
+    ).aggregate(total=Sum('balance'))['total'] or 0
+    
+    # Debug logging
+    print(f"Debug - User: {user.email}, Role: {user.role}")
+    print(f"Debug - Sales count: {sales_queryset.count()}")
+    print(f"Debug - Payments count: {payments_queryset.count()}")
+    print(f"Debug - Total payments: {total_payments}")
+    print(f"Debug - Credit sales count: {credit_sales_count}")
+    print(f"Debug - Total partial debts: {total_partial_debts}")
+    print(f"Debug - Credits over 1000: {credits_over_1000}")
     
     # Top customers with debt
     customers_with_debt = sales_queryset.filter(
@@ -521,6 +543,7 @@ def payment_summary(request):
         'total_payments': total_payments,
         'total_credits': total_credits,
         'total_partial_debts': total_partial_debts,
+        'credits_over_1000': credits_over_1000,
         'completed_payments_count': completed_payments,
         'pending_payments_count': pending_payments,
         'credit_sales_count': credit_sales_count,

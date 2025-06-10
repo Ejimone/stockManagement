@@ -474,6 +474,7 @@ export interface PaymentSummary {
   total_payments: number;
   total_credits: number;
   total_partial_debts: number;
+  credits_over_1000: number;
   completed_payments_count: number;
   pending_payments_count: number;
   credit_sales_count: number;
