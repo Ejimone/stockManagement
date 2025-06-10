@@ -417,7 +417,8 @@ export default function SalespersonPaymentsScreen() {
     <View style={styles.container}>
       <Stack.Screen
         options={{
-          title: "My Payments & Credits",
+          title: "My Payment Summary",
+          headerShown: true,
           headerRight: () => (
             <TouchableOpacity
               style={styles.headerButton}
