@@ -2618,3 +2618,5 @@ INFO 2025-06-10 07:39:39,661 api_views 66393 6146125824 Sale 31 payment status u
 INFO 2025-06-10 07:39:39,663 basehttp 66393 6146125824 "PATCH /api/sales/31/payment-status/ HTTP/1.1" 200 502
 INFO 2025-06-10 07:39:43,538 basehttp 66393 6146125824 "GET /api/sales/26/ HTTP/1.1" 200 585
 INFO 2025-06-10 07:39:45,578 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3593
+INFO 2025-06-10 07:42:17,283 autoreload 66393 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/serializers.py changed, reloading.
+INFO 2025-06-10 07:42:17,605 autoreload 77131 8668733184 Watching for file changes with StatReloader
