@@ -849,3 +849,147 @@ def download_pdf_with_token(request, sale_id, token):
             {'error': 'Failed to download receipt'}, 
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def comprehensive_reports(request):
+    """Generate comprehensive reports with chart data"""
+    user = request.user
+    today = timezone.now().date()
+    
+    # Get query parameters
+    date_from = request.GET.get('date_from', None)
+    date_to = request.GET.get('date_to', None)
+    
+    # Default to last 30 days if no dates provided
+    if not date_from:
+        date_from = today - timedelta(days=30)
+    else:
+        try:
+            date_from = datetime.strptime(date_from, '%Y-%m-%d').date()
+        except ValueError:
+            date_from = today - timedelta(days=30)
+    
+    if not date_to:
+        date_to = today
+    else:
+        try:
+            date_to = datetime.strptime(date_to, '%Y-%m-%d').date()
+        except ValueError:
+            date_to = today
+    
+    # Base querysets
+    sales_queryset = Sale.objects.filter(created_at__date__gte=date_from, created_at__date__lte=date_to)
+    products_queryset = Product.objects.filter(is_active=True)
+    payments_queryset = Payment.objects.filter(created_at__date__gte=date_from, created_at__date__lte=date_to)
+    
+    # Role-based filtering
+    if user.role == 'Salesperson':
+        sales_queryset = sales_queryset.filter(salesperson=user)
+        payments_queryset = payments_queryset.filter(sale__salesperson=user)
+    
+    # Chart Data - Daily Sales for the period
+    chart_data = []
+    current_date = date_from
+    while current_date <= date_to:
+        daily_sales = sales_queryset.filter(created_at__date=current_date).aggregate(
+            total_amount=Sum('total_amount'),
+            count=Count('id')
+        )
+        chart_data.append({
+            'date': current_date.strftime('%Y-%m-%d'),
+            'sales_amount': float(daily_sales['total_amount'] or 0),
+            'sales_count': daily_sales['count']
+        })
+        current_date += timedelta(days=1)
+    
+    # Sales Summary
+    sales_summary = sales_queryset.aggregate(
+        total_sales=Count('id'),
+        total_revenue=Sum('total_amount'),
+        total_paid=Sum('amount_paid'),
+        total_balance=Sum('balance')
+    )
+    
+    # Payment Status Breakdown
+    payment_status_breakdown = sales_queryset.values('payment_status').annotate(
+        count=Count('id'),
+        total=Sum('total_amount')
+    ).order_by('payment_status')
+    
+    # Top Products
+    top_products = SaleItem.objects.filter(sale__in=sales_queryset).values(
+        'product__name', 'product__sku', 'product__price'
+    ).annotate(
+        total_quantity=Sum('quantity'),
+        total_revenue=Sum('subtotal')
+    ).order_by('-total_quantity')[:10]
+    
+    # Inventory Status (Admin only)
+    inventory_status = {}
+    if user.role == 'Admin':
+        inventory_status = {
+            'total_products': products_queryset.count(),
+            'out_of_stock': products_queryset.filter(stock_quantity=0).count(),
+            'low_stock': products_queryset.filter(stock_quantity__gt=0, stock_quantity__lte=10).count(),
+            'in_stock': products_queryset.filter(stock_quantity__gt=10).count(),
+            'low_stock_items': list(products_queryset.filter(
+                stock_quantity__gt=0, stock_quantity__lte=10
+            ).values('id', 'name', 'sku', 'stock_quantity', 'price')[:10]),
+            'out_of_stock_items': list(products_queryset.filter(
+                stock_quantity=0
+            ).values('id', 'name', 'sku', 'price')[:10])
+        }
+    
+    # Credit/Debt Summary
+    credit_summary = {
+        'total_unpaid_sales': sales_queryset.filter(payment_status='unpaid').count(),
+        'total_partial_sales': sales_queryset.filter(payment_status='partial').count(),
+        'total_outstanding_balance': sales_queryset.filter(
+            payment_status__in=['unpaid', 'partial']
+        ).aggregate(total=Sum('balance'))['total'] or 0,
+        'unpaid_sales': list(sales_queryset.filter(
+            payment_status='unpaid'
+        ).values(
+            'id', 'customer_name', 'customer_phone', 'total_amount', 'balance', 'created_at'
+        )[:10]),
+        'partial_sales': list(sales_queryset.filter(
+            payment_status='partial'
+        ).values(
+            'id', 'customer_name', 'customer_phone', 'total_amount', 'amount_paid', 'balance', 'created_at'
+        )[:10])
+    }
+    
+    # Payment Summary
+    payment_summary = payments_queryset.aggregate(
+        total_payments=Count('id'),
+        total_amount=Sum('amount')
+    )
+    
+    # Recent Activity
+    recent_sales = list(sales_queryset.order_by('-created_at')[:5].values(
+        'id', 'customer_name', 'total_amount', 'payment_status', 'created_at'
+    ))
+    
+    recent_payments = list(payments_queryset.order_by('-created_at')[:5].values(
+        'id', 'sale__customer_name', 'amount', 'payment_method', 'created_at'
+    ))
+    
+    return Response({
+        'chart_data': chart_data,
+        'sales_summary': sales_summary,
+        'payment_status_breakdown': list(payment_status_breakdown),
+        'top_products': list(top_products),
+        'inventory_status': inventory_status,
+        'credit_summary': credit_summary,
+        'payment_summary': payment_summary,
+        'recent_activity': {
+            'sales': recent_sales,
+            'payments': recent_payments
+        },
+        'period': {
+            'from': date_from.strftime('%Y-%m-%d'),
+            'to': date_to.strftime('%Y-%m-%d')
+        }
+    })

@@ -37,6 +37,7 @@ api_urlpatterns = [
     path('dashboard/', api_views.dashboard_stats, name='api_dashboard'),
     path('reports/sales/', api_views.sales_report, name='api_sales_report'),
     path('reports/inventory/', api_views.inventory_report, name='api_inventory_report'),
+    path('reports/comprehensive/', api_views.comprehensive_reports, name='api_comprehensive_reports'),
 ]
 
 urlpatterns = [

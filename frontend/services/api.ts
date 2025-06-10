@@ -634,6 +634,20 @@ export const getInventoryReport = async (params?: {
   return response.data;
 };
 
+/**
+ * Get comprehensive reports with chart data.
+ * @param params Optional query parameters for filtering the report.
+ */
+export const getComprehensiveReports = async (params?: {
+  date_from?: string;
+  date_to?: string;
+}): Promise<any> => {
+  const response = await apiClient.get<any>("/reports/comprehensive/", {
+    params,
+  });
+  return response.data;
+};
+
 // --- PDF Receipt Functions ---
 /**
  * Create a PDF access token for a sale (authenticated)
