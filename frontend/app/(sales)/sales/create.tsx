@@ -49,21 +49,30 @@ export default function SalesCreateSaleScreen() {
 
   // Handle preselected product from navigation params
   useEffect(() => {
-    if (
-      params.preselectedProductId &&
-      products.length > 0 &&
-      cart.length === 0
-    ) {
+    if (products.length === 0 || cart.length > 0) return;
+
+    // Handle preselected product by ID
+    if (params.preselectedProductId) {
       const preselectedProduct = products.find(
         (product) => product.id.toString() === params.preselectedProductId
       );
-
       if (preselectedProduct) {
         addToCart(preselectedProduct);
-        // Note: We don't show an alert here since the banner provides visual feedback
+        return;
       }
     }
-  }, [products, params.preselectedProductId]);
+
+    // Handle preselected product by SKU
+    if (params.preselectedSku) {
+      const preselectedProduct = products.find(
+        (product) => product.sku === params.preselectedSku
+      );
+      if (preselectedProduct) {
+        addToCart(preselectedProduct);
+        return;
+      }
+    }
+  }, [products, params.preselectedProductId, params.preselectedSku]);
 
   const fetchProducts = async () => {
     try {

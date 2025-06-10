@@ -2620,3 +2620,67 @@ INFO 2025-06-10 07:39:43,538 basehttp 66393 6146125824 "GET /api/sales/26/ HTTP/
 INFO 2025-06-10 07:39:45,578 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3593
 INFO 2025-06-10 07:42:17,283 autoreload 66393 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/serializers.py changed, reloading.
 INFO 2025-06-10 07:42:17,605 autoreload 77131 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 07:42:30,974 basehttp 77131 6122598400 "GET /api/products/?active_only=true HTTP/1.1" 200 5709
+INFO 2025-06-10 07:42:35,614 basehttp 77131 6122598400 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3593
+INFO 2025-06-10 07:42:46,474 basehttp 77131 6139424768 "GET /admin/salesperson/sale/ HTTP/1.1" 200 31078
+INFO 2025-06-10 07:42:46,488 basehttp 77131 6139424768 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-10 07:42:48,365 basehttp 77131 6139424768 "GET /admin/salesperson/sale/ HTTP/1.1" 200 31078
+INFO 2025-06-10 07:42:48,372 basehttp 77131 6139424768 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-10 07:42:48,918 basehttp 77131 6139424768 "GET /admin/salesperson/sale/ HTTP/1.1" 200 31078
+INFO 2025-06-10 07:42:48,929 basehttp 77131 6139424768 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-10 07:43:17,595 basehttp 77131 6139424768 "GET /admin/ HTTP/1.1" 200 12935
+INFO 2025-06-10 07:43:20,178 basehttp 77131 6139424768 "GET /admin/ HTTP/1.1" 200 12935
+INFO 2025-06-10 07:43:21,553 basehttp 77131 6139424768 "GET /admin/ HTTP/1.1" 200 12935
+INFO 2025-06-10 07:43:23,214 basehttp 77131 6139424768 "GET /admin/salesperson/sale/ HTTP/1.1" 200 31078
+INFO 2025-06-10 07:43:23,231 basehttp 77131 6139424768 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-10 07:43:43,684 basehttp 77131 6139424768 "GET /admin/salesperson/sale/?created_at__gte=2025-06-10+00%3A00%3A00%2B00%3A00&created_at__lt=2025-06-11+00%3A00%3A00%2B00%3A00 HTTP/1.1" 200 24949
+INFO 2025-06-10 07:43:43,701 basehttp 77131 6139424768 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-10 07:44:00,376 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3510
+INFO 2025-06-10 07:44:14,258 basehttp 77131 6122598400 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:44:23,845 basehttp 77131 6122598400 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3593
+INFO 2025-06-10 07:44:28,616 basehttp 77131 6122598400 "GET /api/payments/summary/ HTTP/1.1" 200 214
+INFO 2025-06-10 07:44:28,622 basehttp 77131 6156251136 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 07:44:34,791 basehttp 77131 6122598400 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3593
+INFO 2025-06-10 07:51:23,516 basehttp 77131 6122598400 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3593
+INFO 2025-06-10 07:51:25,419 basehttp 77131 6122598400 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 07:51:25,430 basehttp 77131 6122598400 "GET /api/payments/summary/ HTTP/1.1" 200 214
+INFO 2025-06-10 07:51:27,821 basehttp 77131 6122598400 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3593
+INFO 2025-06-10 07:51:28,876 basehttp 77131 6122598400 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:51:30,970 basehttp 77131 6122598400 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3593
+INFO 2025-06-10 07:51:32,527 basehttp 77131 6122598400 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:52:16,071 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3510
+INFO 2025-06-10 07:52:26,552 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3510
+INFO 2025-06-10 07:52:44,887 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3510
+INFO 2025-06-10 07:53:05,344 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3510
+INFO 2025-06-10 07:53:16,551 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3510
+INFO 2025-06-10 07:53:32,961 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3510
+INFO 2025-06-10 07:53:53,816 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3510
+INFO 2025-06-10 07:54:12,593 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3510
+INFO 2025-06-10 07:54:22,550 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3510
+INFO 2025-06-10 07:54:36,641 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3510
+INFO 2025-06-10 07:55:37,430 basehttp 77131 6122598400 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:55:37,432 basehttp 77131 6139424768 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:55:38,825 basehttp 77131 6139424768 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:55:38,825 basehttp 77131 6122598400 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:57:55,373 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3510
+INFO 2025-06-10 07:58:08,006 basehttp 77131 6122598400 "GET /api/sales/31/ HTTP/1.1" 200 445
+INFO 2025-06-10 07:58:11,654 basehttp 77131 6122598400 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:58:11,654 basehttp 77131 6139424768 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:58:12,163 basehttp 77131 6122598400 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:58:18,335 basehttp 77131 6122598400 "GET /api/sales/27/ HTTP/1.1" 200 471
+INFO 2025-06-10 07:58:47,297 basehttp 77131 6139424768 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 07:58:47,300 basehttp 77131 6122598400 "GET /api/payments/summary/ HTTP/1.1" 200 214
+INFO 2025-06-10 07:59:18,133 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3510
+INFO 2025-06-10 07:59:40,760 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-06-03&date_to=2025-06-10 HTTP/1.1" 200 2199
+INFO 2025-06-10 07:59:45,863 basehttp 77131 6122598400 "GET /api/reports/comprehensive/?date_from=2025-03-12&date_to=2025-06-10 HTTP/1.1" 200 6930
+WARNING 2025-06-10 08:00:00,824 log 77131 6122598400 Not Found: /api/products/search/
+WARNING 2025-06-10 08:00:00,824 basehttp 77131 6122598400 "GET /api/products/search/ HTTP/1.1" 404 10227
+WARNING 2025-06-10 08:00:03,281 log 77131 6122598400 Not Found: /api/products/search/
+WARNING 2025-06-10 08:00:03,281 basehttp 77131 6122598400 "GET /api/products/search/ HTTP/1.1" 404 10227
+WARNING 2025-06-10 08:00:04,128 log 77131 6122598400 Not Found: /api/products/search/
+WARNING 2025-06-10 08:00:04,128 basehttp 77131 6122598400 "GET /api/products/search/ HTTP/1.1" 404 10227
+INFO 2025-06-10 08:00:14,020 basehttp 77131 6156251136 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 08:00:14,020 basehttp 77131 6173077504 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 08:00:18,381 basehttp 77131 6156251136 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3510
+WARNING 2025-06-10 08:00:24,535 log 77131 6156251136 Not Found: /api/products/search/
+WARNING 2025-06-10 08:00:24,535 basehttp 77131 6156251136 "GET /api/products/search/ HTTP/1.1" 404 10227

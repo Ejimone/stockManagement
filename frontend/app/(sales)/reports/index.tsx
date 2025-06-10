@@ -8,11 +8,14 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  Modal,
+  FlatList,
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../../contexts/AuthContext";
-import { getComprehensiveReports } from "../../../services/api";
+import { getComprehensiveReports, getSales } from "../../../services/api";
 import { formatCurrency, formatDate } from "../../../utils/formatters";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -89,10 +92,18 @@ interface SalesReportsData {
 
 export default function SalesMyReportsScreen() {
   const { user } = useAuth();
+  const router = useRouter();
   const [reportsData, setReportsData] = useState<SalesReportsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState("30");
+
+  // Modal states
+  const [paymentStatusModalVisible, setPaymentStatusModalVisible] =
+    useState(false);
+  const [selectedPaymentStatus, setSelectedPaymentStatus] =
+    useState<string>("");
+  const [paymentStatusSales, setPaymentStatusSales] = useState<any[]>([]);
 
   const fetchReports = async (period: string = "30") => {
     try {
@@ -186,31 +197,36 @@ export default function SalesMyReportsScreen() {
     return (
       <View style={styles.chartContainer}>
         <Text style={styles.sectionTitle}>My Daily Sales Performance</Text>
-        <LineChart
-          data={chartData}
-          width={screenWidth - 32}
-          height={220}
-          yAxisLabel="₦"
-          yAxisSuffix=""
-          chartConfig={{
-            backgroundColor: "#ffffff",
-            backgroundGradientFrom: "#ffffff",
-            backgroundGradientTo: "#ffffff",
-            decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            style: {
-              borderRadius: 16,
-            },
-            propsForDots: {
-              r: "4",
-              strokeWidth: "2",
-              stroke: "#3b82f6",
-            },
-          }}
-          bezier
-          style={styles.chart}
-        />
+        <ScrollView horizontal showsHorizontalScrollIndicator={true}>
+          <LineChart
+            data={chartData}
+            width={Math.max(
+              screenWidth - 32,
+              reportsData.chart_data.length * 50
+            )}
+            height={220}
+            yAxisLabel="₦"
+            yAxisSuffix=""
+            chartConfig={{
+              backgroundColor: "#ffffff",
+              backgroundGradientFrom: "#ffffff",
+              backgroundGradientTo: "#ffffff",
+              decimalPlaces: 0,
+              color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              style: {
+                borderRadius: 16,
+              },
+              propsForDots: {
+                r: "4",
+                strokeWidth: "2",
+                stroke: "#3b82f6",
+              },
+            }}
+            bezier
+            style={styles.chart}
+          />
+        </ScrollView>
       </View>
     );
   };
@@ -278,6 +294,66 @@ export default function SalesMyReportsScreen() {
     );
   };
 
+  const handlePaymentStatusClick = async (status: string) => {
+    try {
+      setSelectedPaymentStatus(status);
+
+      // Fetch sales with the specific payment status
+      const params = {
+        payment_status: status,
+        salesperson: user?.id,
+      };
+
+      const salesResponse = await getSales(params);
+      setPaymentStatusSales(salesResponse.results || salesResponse);
+      setPaymentStatusModalVisible(true);
+    } catch (error) {
+      console.error("Failed to fetch sales by status:", error);
+      Alert.alert("Error", "Failed to load sales data");
+    }
+  };
+
+  const handleProductClick = (productSku: string, productName: string) => {
+    // Show options: View Product Details or Create Sale
+    Alert.alert(
+      `${productName}`,
+      "What would you like to do with this product?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "View Product Details",
+          onPress: () => {
+            router.push({
+              pathname: "/(sales)/products/[id]",
+              params: { id: "search", sku: productSku },
+            });
+          },
+        },
+        {
+          text: "Create Sale",
+          style: "default",
+          onPress: () => {
+            router.push({
+              pathname: "/(sales)/sales/create",
+              params: { preselectedSku: productSku },
+            });
+          },
+        },
+      ]
+    );
+  };
+
+  const handleActivitySaleClick = (saleId: number) => {
+    // Navigate to sale detail page
+    router.push({
+      pathname: "/(sales)/sales/[id]",
+      params: { id: saleId.toString() },
+    });
+  };
+
   const renderPaymentStatusBreakdown = () => {
     if (!reportsData?.payment_status_breakdown) return null;
 
@@ -285,7 +361,12 @@ export default function SalesMyReportsScreen() {
       <View style={styles.reportSection}>
         <Text style={styles.sectionTitle}>Payment Status Breakdown</Text>
         {reportsData.payment_status_breakdown.map((status) => (
-          <View key={status.payment_status} style={styles.statusItem}>
+          <TouchableOpacity
+            key={status.payment_status}
+            style={styles.statusItem}
+            onPress={() => handlePaymentStatusClick(status.payment_status)}
+            activeOpacity={0.7}
+          >
             <View style={styles.statusInfo}>
               <Text style={styles.statusName}>
                 {status.payment_status.charAt(0).toUpperCase() +
@@ -295,22 +376,25 @@ export default function SalesMyReportsScreen() {
                 {status.count} sales • {formatCurrency(status.total)}
               </Text>
             </View>
-            <View
-              style={[
-                styles.statusIndicator,
-                {
-                  backgroundColor:
-                    status.payment_status === "paid"
-                      ? "#22c55e"
-                      : status.payment_status === "partial"
-                      ? "#f59e0b"
-                      : "#ef4444",
-                },
-              ]}
-            >
-              <Text style={styles.statusCount}>{status.count}</Text>
+            <View style={styles.statusRightContainer}>
+              <View
+                style={[
+                  styles.statusIndicator,
+                  {
+                    backgroundColor:
+                      status.payment_status === "paid"
+                        ? "#22c55e"
+                        : status.payment_status === "partial"
+                        ? "#f59e0b"
+                        : "#ef4444",
+                  },
+                ]}
+              >
+                <Text style={styles.statusCount}>{status.count}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color="#6b7280" />
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
     );
@@ -394,7 +478,14 @@ export default function SalesMyReportsScreen() {
       <View style={styles.reportSection}>
         <Text style={styles.sectionTitle}>My Top Selling Products</Text>
         {reportsData.top_products.slice(0, 5).map((product, index) => (
-          <View key={product.product__sku} style={styles.topProductItem}>
+          <TouchableOpacity
+            key={product.product__sku}
+            style={styles.topProductItem}
+            onPress={() =>
+              handleProductClick(product.product__sku, product.product__name)
+            }
+            activeOpacity={0.7}
+          >
             <View style={styles.topProductRank}>
               <Text style={styles.topProductRankText}>{index + 1}</Text>
             </View>
@@ -413,7 +504,8 @@ export default function SalesMyReportsScreen() {
                 {formatCurrency(product.total_revenue)}
               </Text>
             </View>
-          </View>
+            <Ionicons name="chevron-forward" size={16} color="#6b7280" />
+          </TouchableOpacity>
         ))}
       </View>
     );
@@ -432,7 +524,12 @@ export default function SalesMyReportsScreen() {
           <View style={styles.activitySection}>
             <Text style={styles.activitySectionTitle}>Recent Sales</Text>
             {recent_activity.sales.map((sale) => (
-              <View key={sale.id} style={styles.activityItem}>
+              <TouchableOpacity
+                key={sale.id}
+                style={styles.activityItem}
+                onPress={() => handleActivitySaleClick(sale.id)}
+                activeOpacity={0.7}
+              >
                 <View style={styles.activityItemInfo}>
                   <Text style={styles.activityItemTitle}>
                     {sale.customer_name}
@@ -441,10 +538,13 @@ export default function SalesMyReportsScreen() {
                     {formatDate(sale.created_at)} • {sale.payment_status}
                   </Text>
                 </View>
-                <Text style={styles.activityItemAmount}>
-                  {formatCurrency(sale.total_amount)}
-                </Text>
-              </View>
+                <View style={styles.activityItemRightContainer}>
+                  <Text style={styles.activityItemAmount}>
+                    {formatCurrency(sale.total_amount)}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={16} color="#6b7280" />
+                </View>
+              </TouchableOpacity>
             ))}
           </View>
         )}
@@ -473,6 +573,70 @@ export default function SalesMyReportsScreen() {
     );
   };
 
+  const renderPaymentStatusModal = () => (
+    <Modal
+      visible={paymentStatusModalVisible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+      onRequestClose={() => setPaymentStatusModalVisible(false)}
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalHeader}>
+          <Text style={styles.modalTitle}>
+            {selectedPaymentStatus.charAt(0).toUpperCase() +
+              selectedPaymentStatus.slice(1)}{" "}
+            Sales
+          </Text>
+          <TouchableOpacity
+            onPress={() => setPaymentStatusModalVisible(false)}
+            style={styles.modalCloseButton}
+          >
+            <Ionicons name="close" size={24} color="#6b7280" />
+          </TouchableOpacity>
+        </View>
+
+        <FlatList
+          data={paymentStatusSales}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.modalSaleItem}
+              onPress={() => {
+                setPaymentStatusModalVisible(false);
+                handleActivitySaleClick(item.id);
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={styles.modalSaleInfo}>
+                <Text style={styles.modalSaleCustomer}>
+                  {item.customer_name || "Unknown Customer"}
+                </Text>
+                <Text style={styles.modalSaleDetails}>
+                  Sale #{item.id} • {formatDate(item.created_at)}
+                </Text>
+                <Text style={styles.modalSalePayment}>
+                  {item.payment_method || "Unknown"} • {item.payment_status}
+                </Text>
+              </View>
+              <View style={styles.modalSaleAmountContainer}>
+                <Text style={styles.modalSaleAmount}>
+                  {formatCurrency(item.total_amount)}
+                </Text>
+                {item.balance > 0 && (
+                  <Text style={styles.modalSaleBalance}>
+                    Balance: {formatCurrency(item.balance)}
+                  </Text>
+                )}
+              </View>
+            </TouchableOpacity>
+          )}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.modalListContainer}
+        />
+      </View>
+    </Modal>
+  );
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -497,6 +661,7 @@ export default function SalesMyReportsScreen() {
       {renderCreditSummary()}
       {renderTopProducts()}
       {renderRecentActivity()}
+      {renderPaymentStatusModal()}
     </ScrollView>
   );
 }
@@ -824,5 +989,87 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     color: "#111827",
+  },
+  // New styles for enhanced functionality
+  statusRightContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  activityItemRightContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "#f8f9fa",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 16,
+    backgroundColor: "#ffffff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  modalCloseButton: {
+    padding: 8,
+  },
+  modalListContainer: {
+    padding: 16,
+  },
+  modalSaleItem: {
+    backgroundColor: "#ffffff",
+    padding: 16,
+    marginBottom: 8,
+    borderRadius: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  modalSaleInfo: {
+    flex: 1,
+  },
+  modalSaleCustomer: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#111827",
+    marginBottom: 4,
+  },
+  modalSaleDetails: {
+    fontSize: 14,
+    color: "#6b7280",
+    marginBottom: 2,
+  },
+  modalSalePayment: {
+    fontSize: 12,
+    color: "#6b7280",
+  },
+  modalSaleAmountContainer: {
+    alignItems: "flex-end",
+  },
+  modalSaleAmount: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#111827",
+  },
+  modalSaleBalance: {
+    fontSize: 12,
+    color: "#dc2626",
+    marginTop: 2,
   },
 });
