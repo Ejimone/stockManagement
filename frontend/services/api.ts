@@ -5,9 +5,12 @@ import { Platform } from "react-native";
 
 // Use either localhost for development on same machine, or device's local IP address
 // for testing on real devices, or your production backend URL
-const API_BASE_URL = "http://10.0.2.2:8000/api/"; // For Android emulator (points to host machine's localhost)
-// const API_BASE_URL = "http://localhost:8001/api/"; // For web/iOS simulator
-// const API_BASE_URL = "http://<your-computer-ip>:8001/api/"; // Use your computer's IP when testing on real devices
+const API_BASE_URL =
+  Platform.OS === "web"
+    ? "http://localhost:8000/api/"
+    : Platform.OS === "ios"
+    ? "http://localhost:8000/api/"
+    : "http://10.0.2.2:8000/api/"; // For Android emulator (points to host machine's localhost)
 
 // Error response type from backend (adjust if needed)
 export interface ApiErrorResponse {

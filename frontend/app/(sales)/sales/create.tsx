@@ -11,7 +11,7 @@ import {
   FlatList,
   Linking,
 } from "react-native";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
   createSale,
   getProducts,
@@ -29,6 +29,7 @@ interface CartItem {
 export default function SalesCreateSaleScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const params = useLocalSearchParams();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -45,6 +46,24 @@ export default function SalesCreateSaleScreen() {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  // Handle preselected product from navigation params
+  useEffect(() => {
+    if (
+      params.preselectedProductId &&
+      products.length > 0 &&
+      cart.length === 0
+    ) {
+      const preselectedProduct = products.find(
+        (product) => product.id.toString() === params.preselectedProductId
+      );
+
+      if (preselectedProduct) {
+        addToCart(preselectedProduct);
+        // Note: We don't show an alert here since the banner provides visual feedback
+      }
+    }
+  }, [products, params.preselectedProductId]);
 
   const fetchProducts = async () => {
     try {
@@ -276,7 +295,25 @@ export default function SalesCreateSaleScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Stack.Screen options={{ title: "Create New Sale" }} />
+      <Stack.Screen
+        options={{
+          title: params.preselectedProductName
+            ? `Create Sale - ${params.preselectedProductName}`
+            : "Create New Sale",
+        }}
+      />
+
+      {/* Preselected Product Banner */}
+      {params.preselectedProductId && params.preselectedProductName && (
+        <View style={styles.preselectedBanner}>
+          <Text style={styles.preselectedText}>
+            🛒 Starting sale with: {params.preselectedProductName}
+          </Text>
+          <Text style={styles.preselectedSubtext}>
+            You can add more products or adjust the quantity below.
+          </Text>
+        </View>
+      )}
 
       {/* Product Search */}
       <View style={styles.section}>
@@ -675,5 +712,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#999",
     paddingVertical: 16,
+  },
+  preselectedBanner: {
+    backgroundColor: "#e7f3ff",
+    borderLeftWidth: 4,
+    borderLeftColor: "#3b82f6",
+    padding: 16,
+    margin: 16,
+    borderRadius: 8,
+  },
+  preselectedText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1e40af",
+    marginBottom: 4,
+  },
+  preselectedSubtext: {
+    fontSize: 14,
+    color: "#3730a3",
   },
 });
