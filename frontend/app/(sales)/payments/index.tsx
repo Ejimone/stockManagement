@@ -17,33 +17,20 @@ import { useFocusEffect } from "@react-navigation/native";
 import {
   getPayments,
   getPaymentSummary,
-  recordPayment,
   displayPdfReceipt,
   Payment,
   PaymentSummary,
   PaymentFilters,
 } from "../../../services/api";
-import {
-  formatCurrency,
-  formatDate,
-  formatDateTime,
-} from "../../../utils/formatters";
+import { formatCurrency, formatDateTime } from "../../../utils/formatters";
 
-export default function AdminPaymentsScreen() {
+export default function SalespersonPaymentsScreen() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [summary, setSummary] = useState<PaymentSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filters, setFilters] = useState<PaymentFilters>({});
   const [showFilters, setShowFilters] = useState(false);
-  const [showNewPayment, setShowNewPayment] = useState(false);
-
-  // New payment form states
-  const [newPaymentSaleId, setNewPaymentSaleId] = useState("");
-  const [newPaymentAmount, setNewPaymentAmount] = useState("");
-  const [newPaymentMethod, setNewPaymentMethod] = useState("Cash");
-  const [newPaymentReference, setNewPaymentReference] = useState("");
-  const [newPaymentNotes, setNewPaymentNotes] = useState("");
 
   // Filter states
   const [filterCustomerName, setFilterCustomerName] = useState("");
@@ -116,39 +103,6 @@ export default function AdminPaymentsScreen() {
     }
   };
 
-  const handleCreatePayment = async () => {
-    try {
-      if (!newPaymentSaleId || !newPaymentAmount) {
-        Alert.alert("Error", "Please fill in all required fields");
-        return;
-      }
-
-      const paymentData = {
-        sale: parseInt(newPaymentSaleId),
-        amount: parseFloat(newPaymentAmount),
-        payment_method: newPaymentMethod,
-        reference_number: newPaymentReference || undefined,
-        notes: newPaymentNotes || undefined,
-      };
-
-      await recordPayment(paymentData);
-
-      // Reset form
-      setNewPaymentSaleId("");
-      setNewPaymentAmount("");
-      setNewPaymentMethod("Cash");
-      setNewPaymentReference("");
-      setNewPaymentNotes("");
-      setShowNewPayment(false);
-
-      Alert.alert("Success", "Payment recorded successfully");
-      await loadData(); // Refresh data
-    } catch (error) {
-      console.error("Error creating payment:", error);
-      Alert.alert("Error", "Failed to record payment");
-    }
-  };
-
   const renderPaymentItem = ({ item }: { item: Payment }) => (
     <View style={styles.paymentCard}>
       <View style={styles.paymentHeader}>
@@ -205,7 +159,7 @@ export default function AdminPaymentsScreen() {
 
         <TouchableOpacity
           style={styles.detailButton}
-          onPress={() => router.push(`/(admin)/payments/${item.id}`)}
+          onPress={() => router.push(`/(sales)/payments/${item.id}` as any)}
         >
           <Ionicons name="eye-outline" size={16} color="#34C759" />
           <Text style={styles.buttonText}>Details</Text>
@@ -229,7 +183,7 @@ export default function AdminPaymentsScreen() {
 
   const renderSummaryCard = () => (
     <View style={styles.summaryCard}>
-      <Text style={styles.summaryTitle}>Payment Summary</Text>
+      <Text style={styles.summaryTitle}>My Payment Summary</Text>
       <View style={styles.summaryGrid}>
         <View style={styles.summaryItem}>
           <Text style={styles.summaryValue}>
@@ -263,22 +217,14 @@ export default function AdminPaymentsScreen() {
     <View style={styles.container}>
       <Stack.Screen
         options={{
-          title: "Payments & Credits",
+          title: "My Payments & Credits",
           headerRight: () => (
-            <View style={styles.headerButtons}>
-              <TouchableOpacity
-                style={styles.headerButton}
-                onPress={() => setShowFilters(true)}
-              >
-                <Ionicons name="filter" size={24} color="#007AFF" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.headerButton}
-                onPress={() => setShowNewPayment(true)}
-              >
-                <Ionicons name="add" size={24} color="#007AFF" />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={() => setShowFilters(true)}
+            >
+              <Ionicons name="filter" size={24} color="#007AFF" />
+            </TouchableOpacity>
           ),
         }}
       />
@@ -390,96 +336,6 @@ export default function AdminPaymentsScreen() {
           </View>
         </View>
       </Modal>
-
-      {/* New Payment Modal */}
-      <Modal
-        visible={showNewPayment}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowNewPayment(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Record New Payment</Text>
-              <TouchableOpacity onPress={() => setShowNewPayment(false)}>
-                <Ionicons name="close" size={24} color="#000" />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView style={styles.filterForm}>
-              <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>Sale ID *</Text>
-                <TextInput
-                  style={styles.filterInput}
-                  value={newPaymentSaleId}
-                  onChangeText={setNewPaymentSaleId}
-                  placeholder="Enter sale ID"
-                  keyboardType="numeric"
-                />
-              </View>
-
-              <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>Amount *</Text>
-                <TextInput
-                  style={styles.filterInput}
-                  value={newPaymentAmount}
-                  onChangeText={setNewPaymentAmount}
-                  placeholder="Enter payment amount"
-                  keyboardType="numeric"
-                />
-              </View>
-
-              <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>Payment Method *</Text>
-                <TextInput
-                  style={styles.filterInput}
-                  value={newPaymentMethod}
-                  onChangeText={setNewPaymentMethod}
-                  placeholder="Cash, Credit, Mobile Money"
-                />
-              </View>
-
-              <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>Reference Number</Text>
-                <TextInput
-                  style={styles.filterInput}
-                  value={newPaymentReference}
-                  onChangeText={setNewPaymentReference}
-                  placeholder="Transaction reference (optional)"
-                />
-              </View>
-
-              <View style={styles.filterRow}>
-                <Text style={styles.filterLabel}>Notes</Text>
-                <TextInput
-                  style={[styles.filterInput, styles.notesInput]}
-                  value={newPaymentNotes}
-                  onChangeText={setNewPaymentNotes}
-                  placeholder="Additional notes (optional)"
-                  multiline
-                  numberOfLines={3}
-                />
-              </View>
-            </ScrollView>
-
-            <View style={styles.filterActions}>
-              <TouchableOpacity
-                style={styles.clearButton}
-                onPress={() => setShowNewPayment(false)}
-              >
-                <Text style={styles.clearButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.applyButton}
-                onPress={handleCreatePayment}
-              >
-                <Text style={styles.applyButtonText}>Record Payment</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -489,12 +345,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f5f5f5",
   },
-  headerButtons: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
   headerButton: {
-    marginLeft: 15,
+    marginRight: 16,
   },
   listContainer: {
     padding: 16,
@@ -707,59 +559,5 @@ const styles = StyleSheet.create({
   applyButtonText: {
     color: "#fff",
     fontWeight: "600",
-  },
-  newPaymentForm: {
-    padding: 20,
-  },
-  formGroup: {
-    marginBottom: 16,
-  },
-  formLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 4,
-    color: "#333",
-  },
-  formInput: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-  },
-  newPaymentActions: {
-    flexDirection: "row",
-    padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: 12,
-    marginRight: 8,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  saveButton: {
-    flex: 1,
-    paddingVertical: 12,
-    marginLeft: 8,
-    backgroundColor: "#007AFF",
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  cancelButtonText: {
-    color: "#666",
-    fontWeight: "600",
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  notesInput: {
-    height: 80,
-    textAlignVertical: "top",
   },
 });

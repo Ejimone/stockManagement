@@ -1695,3 +1695,283 @@ INFO 2025-06-10 03:32:25,173 basehttp 73947 6219558912 "GET /api/sales/2/pdf/59b
 INFO 2025-06-10 03:32:37,866 basehttp 73947 6202732544 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
 INFO 2025-06-10 03:34:30,151 basehttp 73947 6202732544 "POST /api/sales/2/pdf-token/ HTTP/1.1" 201 168
 INFO 2025-06-10 03:34:30,173 basehttp 73947 6219558912 "GET /api/sales/2/pdf/d342cabd-02f0-4c89-a02f-a13bef525aec/ HTTP/1.1" 200 2483
+INFO 2025-06-10 03:41:04,047 autoreload 73947 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/serializers.py changed, reloading.
+INFO 2025-06-10 03:41:04,404 autoreload 866 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 03:41:39,154 autoreload 866 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 03:41:39,408 autoreload 949 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 03:41:47,674 autoreload 949 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 03:41:47,888 autoreload 976 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 03:41:57,171 autoreload 976 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/urls.py changed, reloading.
+INFO 2025-06-10 03:41:57,349 autoreload 1001 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 03:49:29,170 autoreload 1001 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/urls.py changed, reloading.
+INFO 2025-06-10 03:49:29,524 autoreload 2002 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 03:49:34,591 basehttp 2002 6206746624 "GET /api/dashboard/ HTTP/1.1" 200 227
+INFO 2025-06-10 03:49:34,591 basehttp 2002 6189920256 "GET /api/dashboard/ HTTP/1.1" 200 227
+INFO 2025-06-10 03:49:37,839 basehttp 2002 6206746624 "GET /api/payments/summary/ HTTP/1.1" 200 693
+ERROR 2025-06-10 03:49:37,855 log 2002 6189920256 Internal Server Error: /api/payments/
+Traceback (most recent call last):
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/generics.py", line 243, in get
+    return self.list(request, *args, **kwargs)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 43, in list
+    return self.get_paginated_response(serializer.data)
+                                       ^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 795, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 249, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 714, in to_representation
+    self.child.to_representation(item) for item in iterable
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 523, in to_representation
+    for field in fields:
+                 ^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 384, in _readable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 372, in fields
+    for key, value in self.get_fields().items():
+                      ~~~~~~~~~~~~~~~^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1079, in get_fields
+    field_names = self.get_field_names(declared_fields, info)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1175, in get_field_names
+    assert field_name in fields, (
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: The field 'salesperson_name' was declared on serializer PaymentSerializer, but has not been included in the 'fields' option.
+ERROR 2025-06-10 03:49:37,858 basehttp 2002 6189920256 "GET /api/payments/ HTTP/1.1" 500 143429
+INFO 2025-06-10 03:49:43,599 basehttp 2002 6206746624 "GET /api/sales/ HTTP/1.1" 200 15162
+INFO 2025-06-10 03:49:45,748 basehttp 2002 6206746624 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-10 03:49:46,897 basehttp 2002 6206746624 "GET /api/products/?search= HTTP/1.1" 200 5731
+INFO 2025-06-10 03:49:47,397 basehttp 2002 6206746624 "GET /api/products/?search= HTTP/1.1" 200 5731
+INFO 2025-06-10 03:49:47,651 basehttp 2002 6206746624 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-10 03:50:24,677 basehttp 2002 6223572992 "GET /api/dashboard/ HTTP/1.1" 200 227
+INFO 2025-06-10 03:50:24,678 basehttp 2002 6240399360 "GET /api/dashboard/ HTTP/1.1" 200 227
+INFO 2025-06-10 03:50:29,223 basehttp 2002 6223572992 "GET /api/payments/summary/ HTTP/1.1" 200 693
+ERROR 2025-06-10 03:50:29,234 log 2002 6240399360 Internal Server Error: /api/payments/
+Traceback (most recent call last):
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/generics.py", line 243, in get
+    return self.list(request, *args, **kwargs)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 43, in list
+    return self.get_paginated_response(serializer.data)
+                                       ^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 795, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 249, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 714, in to_representation
+    self.child.to_representation(item) for item in iterable
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 523, in to_representation
+    for field in fields:
+                 ^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 384, in _readable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 372, in fields
+    for key, value in self.get_fields().items():
+                      ~~~~~~~~~~~~~~~^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1079, in get_fields
+    field_names = self.get_field_names(declared_fields, info)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1175, in get_field_names
+    assert field_name in fields, (
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: The field 'salesperson_name' was declared on serializer PaymentSerializer, but has not been included in the 'fields' option.
+ERROR 2025-06-10 03:50:29,236 basehttp 2002 6240399360 "GET /api/payments/ HTTP/1.1" 500 143429
+INFO 2025-06-10 03:50:32,579 basehttp 2002 6240399360 "GET /api/payments/summary/ HTTP/1.1" 200 693
+ERROR 2025-06-10 03:50:32,589 log 2002 6223572992 Internal Server Error: /api/payments/
+Traceback (most recent call last):
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/generics.py", line 243, in get
+    return self.list(request, *args, **kwargs)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 43, in list
+    return self.get_paginated_response(serializer.data)
+                                       ^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 795, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 249, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 714, in to_representation
+    self.child.to_representation(item) for item in iterable
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 523, in to_representation
+    for field in fields:
+                 ^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 384, in _readable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 372, in fields
+    for key, value in self.get_fields().items():
+                      ~~~~~~~~~~~~~~~^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1079, in get_fields
+    field_names = self.get_field_names(declared_fields, info)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1175, in get_field_names
+    assert field_name in fields, (
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: The field 'salesperson_name' was declared on serializer PaymentSerializer, but has not been included in the 'fields' option.
+ERROR 2025-06-10 03:50:32,590 basehttp 2002 6223572992 "GET /api/payments/ HTTP/1.1" 500 143429
+INFO 2025-06-10 03:51:42,057 autoreload 2002 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/serializers.py changed, reloading.
+INFO 2025-06-10 03:51:42,402 autoreload 2319 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 03:53:25,525 autoreload 6417 8668733184 Watching for file changes with StatReloader
+WARNING 2025-06-10 03:53:29,044 log 2319 6156431360 Unauthorized: /api/payments/
+WARNING 2025-06-10 03:53:29,044 basehttp 2319 6156431360 "GET /api/payments/ HTTP/1.1" 401 58
+WARNING 2025-06-10 03:53:46,539 log 2319 6156431360 Bad Request: /api/auth/login/
+WARNING 2025-06-10 03:53:46,539 basehttp 2319 6156431360 "POST /api/auth/login/ HTTP/1.1" 400 51
+INFO 2025-06-10 03:53:57,044 basehttp 2319 6173257728 "POST /api/auth/login/ HTTP/1.1" 200 584
+ERROR 2025-06-10 03:54:04,014 log 2319 6156431360 Internal Server Error: /api/payments/
+Traceback (most recent call last):
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/generics.py", line 243, in get
+    return self.list(request, *args, **kwargs)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 43, in list
+    return self.get_paginated_response(serializer.data)
+                                       ^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 795, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 249, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 714, in to_representation
+    self.child.to_representation(item) for item in iterable
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 538, in to_representation
+    ret[field.field_name] = field.to_representation(attribute)
+                            ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/evidenceejimone/daddy/venv/lib/python3.13/site-packages/rest_framework/fields.py", line 1870, in to_representation
+    return method(value)
+  File "/Users/evidenceejimone/daddy/backend/salesperson/serializers.py", line 228, in get_sale_items_summary
+    sale_items = obj.sale.sale_items.all()
+                 ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Sale' object has no attribute 'sale_items'
+ERROR 2025-06-10 03:54:04,015 basehttp 2319 6156431360 "GET /api/payments/ HTTP/1.1" 500 140497
+INFO 2025-06-10 03:54:21,993 autoreload 2319 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/serializers.py changed, reloading.
+INFO 2025-06-10 03:54:22,267 autoreload 9812 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 03:54:32,800 basehttp 9812 6124138496 "GET /api/payments/ HTTP/1.1" 200 2053
+INFO 2025-06-10 03:54:40,434 basehttp 9812 6124138496 "GET /api/payments/ HTTP/1.1" 200 2053
+INFO 2025-06-10 03:54:40,436 basehttp 9812 6140964864 "GET /api/payments/summary/ HTTP/1.1" 200 693
+INFO 2025-06-10 03:54:41,553 basehttp 9812 6157791232 "GET /api/payments/summary/ HTTP/1.1" 200 693
+INFO 2025-06-10 03:54:44,261 basehttp 9812 6140964864 "GET /api/payments/3/ HTTP/1.1" 200 566
+INFO 2025-06-10 03:54:49,131 basehttp 9812 6174617600 "GET /api/payments/1/ HTTP/1.1" 200 715
+INFO 2025-06-10 03:54:52,058 basehttp 9812 6140964864 "POST /api/sales/3/pdf-token/ HTTP/1.1" 201 168
+INFO 2025-06-10 03:54:52,545 basehttp 9812 6157791232 "GET /api/sales/3/pdf/e0070822-acab-42b6-bfcf-eab5dd239844/ HTTP/1.1" 200 2486
+INFO 2025-06-10 03:54:58,957 autoreload 9812 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/serializers.py changed, reloading.
+INFO 2025-06-10 03:54:59,254 autoreload 12400 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 03:55:05,672 basehttp 12400 6137016320 "GET /api/dashboard/ HTTP/1.1" 200 227
+INFO 2025-06-10 03:55:05,672 basehttp 12400 6153842688 "GET /api/dashboard/ HTTP/1.1" 200 227
+INFO 2025-06-10 03:55:07,949 basehttp 12400 6137016320 "GET /api/payments/ HTTP/1.1" 200 2053
+INFO 2025-06-10 03:55:07,950 basehttp 12400 6153842688 "GET /api/payments/summary/ HTTP/1.1" 200 693
+INFO 2025-06-10 03:55:12,711 basehttp 12400 6137016320 "GET /api/payments/3/ HTTP/1.1" 200 566
+INFO 2025-06-10 03:55:20,824 basehttp 12400 6137016320 "GET /api/payments/ HTTP/1.1" 200 2053
+INFO 2025-06-10 03:55:20,827 basehttp 12400 6153842688 "GET /api/payments/summary/ HTTP/1.1" 200 693
+INFO 2025-06-10 03:55:22,270 basehttp 12400 6137016320 "GET /api/sales/ HTTP/1.1" 200 15162
+INFO 2025-06-10 03:55:22,940 basehttp 12400 6137016320 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-10 03:55:23,696 basehttp 12400 6137016320 "GET /api/products/?search= HTTP/1.1" 200 5731
+INFO 2025-06-10 03:55:24,212 basehttp 12400 6137016320 "GET /api/products/?search= HTTP/1.1" 200 5731
+INFO 2025-06-10 03:55:25,051 basehttp 12400 6137016320 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-10 03:55:26,252 basehttp 12400 6137016320 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-10 03:55:27,065 basehttp 12400 6137016320 "GET /api/payments/ HTTP/1.1" 200 2053
+INFO 2025-06-10 03:55:27,066 basehttp 12400 6153842688 "GET /api/payments/summary/ HTTP/1.1" 200 693
+INFO 2025-06-10 03:55:27,500 basehttp 12400 6137016320 "GET /api/sales/ HTTP/1.1" 200 15162
+INFO 2025-06-10 03:55:29,780 basehttp 12400 6137016320 "GET /api/sales/ HTTP/1.1" 200 15162
+INFO 2025-06-10 03:55:30,908 basehttp 12400 6137016320 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-10 03:55:35,634 basehttp 12400 6137016320 "GET /api/products/?search= HTTP/1.1" 200 5731
+INFO 2025-06-10 03:55:43,597 basehttp 12400 6137016320 "GET /api/products/?search= HTTP/1.1" 200 5731
+INFO 2025-06-10 03:55:57,492 basehttp 12400 6137016320 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-10 03:56:22,779 basehttp 12400 6137016320 "GET /api/payments/ HTTP/1.1" 200 2053
+INFO 2025-06-10 03:56:22,779 basehttp 12400 6153842688 "GET /api/payments/summary/ HTTP/1.1" 200 693
+INFO 2025-06-10 03:56:46,666 basehttp 12400 6137016320 "GET /api/dashboard/ HTTP/1.1" 200 227
+INFO 2025-06-10 03:56:54,930 basehttp 12400 6137016320 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-10 03:56:56,179 basehttp 12400 6137016320 "GET /api/users/?role=Salesperson HTTP/1.1" 200 2278
+INFO 2025-06-10 03:56:57,074 basehttp 12400 6137016320 "GET /api/sales/ HTTP/1.1" 200 15162
+INFO 2025-06-10 03:56:57,692 basehttp 12400 6137016320 "GET /api/payments/ HTTP/1.1" 200 2053
+INFO 2025-06-10 03:56:57,693 basehttp 12400 6153842688 "GET /api/payments/summary/ HTTP/1.1" 200 693
+INFO 2025-06-10 03:56:59,679 basehttp 12400 6137016320 "GET /api/payments/ HTTP/1.1" 200 2053
+INFO 2025-06-10 03:56:59,680 basehttp 12400 6153842688 "GET /api/payments/summary/ HTTP/1.1" 200 693

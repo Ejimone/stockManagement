@@ -11,6 +11,7 @@ from rest_framework import status, generics, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.exceptions import PermissionDenied
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import User, Product, Sale, Payment, SaleItem, PDFAccessToken
@@ -331,24 +332,49 @@ class SaleReceiptView(APIView):
 
 
 class PaymentListCreateView(generics.ListCreateAPIView):
-    """List all payments or create a new payment (Admin only)"""
+    """List all payments or create a new payment"""
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
-        """Filter payments based on query parameters"""
-        queryset = Payment.objects.select_related('sale', 'recorded_by')
+        """Filter payments based on query parameters and user role"""
+        user = self.request.user
+        queryset = Payment.objects.select_related('sale', 'recorded_by', 'sale__salesperson')
+        
+        # Role-based filtering: Salespersons can only see payments for their own sales
+        if user.role == 'Salesperson':
+            queryset = queryset.filter(sale__salesperson=user)
         
         # Filter by sale
         sale_id = self.request.query_params.get('sale', None)
         if sale_id:
             queryset = queryset.filter(sale_id=sale_id)
         
-        # Filter by status
+        # Filter by customer name
+        customer_name = self.request.query_params.get('customer_name', None)
+        if customer_name:
+            queryset = queryset.filter(sale__customer_name__icontains=customer_name)
+        
+        # Filter by customer phone
+        customer_phone = self.request.query_params.get('customer_phone', None)
+        if customer_phone:
+            queryset = queryset.filter(sale__customer_phone__icontains=customer_phone)
+        
+        # Filter by payment status
         status_filter = self.request.query_params.get('status', None)
         if status_filter:
             queryset = queryset.filter(status=status_filter)
+        
+        # Filter by payment method
+        payment_method = self.request.query_params.get('payment_method', None)
+        if payment_method:
+            queryset = queryset.filter(payment_method=payment_method)
+        
+        # Filter by sale payment status (debt/credit status)
+        sale_payment_status = self.request.query_params.get('sale_payment_status', None)
+        if sale_payment_status:
+            queryset = queryset.filter(sale__payment_status=sale_payment_status)
         
         # Filter by date range
         date_from = self.request.query_params.get('date_from', None)
@@ -368,14 +394,140 @@ class PaymentListCreateView(generics.ListCreateAPIView):
             except ValueError:
                 pass
         
+        # Filter by time range (for more specific filtering)
+        time_from = self.request.query_params.get('time_from', None)
+        time_to = self.request.query_params.get('time_to', None)
+        
+        if time_from:
+            try:
+                time_from = datetime.strptime(time_from, '%H:%M').time()
+                queryset = queryset.filter(created_at__time__gte=time_from)
+            except ValueError:
+                pass
+        
+        if time_to:
+            try:
+                time_to = datetime.strptime(time_to, '%H:%M').time()
+                queryset = queryset.filter(created_at__time__lte=time_to)
+            except ValueError:
+                pass
+        
         return queryset.order_by('-created_at')
+    
+    def perform_create(self, serializer):
+        """Ensure only admins can create payments"""
+        if self.request.user.role != 'Admin':
+            raise PermissionDenied("Only administrators can record payments.")
+        serializer.save()
 
 
 class PaymentDetailView(generics.RetrieveUpdateAPIView):
-    """Retrieve or update a payment (Admin only)"""
+    """Retrieve or update a payment"""
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        """Filter based on user role"""
+        user = self.request.user
+        queryset = Payment.objects.select_related('sale', 'recorded_by', 'sale__salesperson')
+        
+        # Role-based filtering: Salespersons can only see payments for their own sales
+        if user.role == 'Salesperson':
+            queryset = queryset.filter(sale__salesperson=user)
+        
+        return queryset
+    
+    def perform_update(self, serializer):
+        """Ensure only admins can update payments"""
+        if self.request.user.role != 'Admin':
+            raise PermissionDenied("Only administrators can update payments.")
+        serializer.save()
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def payment_summary(request):
+    """Get payment summary statistics"""
+    user = request.user
+    
+    # Base queryset based on user role
+    if user.role == 'Admin':
+        payments_queryset = Payment.objects.all()
+        sales_queryset = Sale.objects.all()
+    else:
+        payments_queryset = Payment.objects.filter(sale__salesperson=user)
+        sales_queryset = Sale.objects.filter(salesperson=user)
+    
+    # Apply date filters if provided
+    date_from = request.GET.get('date_from', None)
+    date_to = request.GET.get('date_to', None)
+    
+    if date_from:
+        try:
+            date_from = datetime.strptime(date_from, '%Y-%m-%d').date()
+            payments_queryset = payments_queryset.filter(created_at__date__gte=date_from)
+            sales_queryset = sales_queryset.filter(created_at__date__gte=date_from)
+        except ValueError:
+            pass
+    
+    if date_to:
+        try:
+            date_to = datetime.strptime(date_to, '%Y-%m-%d').date()
+            payments_queryset = payments_queryset.filter(created_at__date__lte=date_to)
+            sales_queryset = sales_queryset.filter(created_at__date__lte=date_to)
+        except ValueError:
+            pass
+    
+    # Calculate statistics
+    total_payments = payments_queryset.aggregate(total=Sum('amount'))['total'] or 0
+    total_credits = sales_queryset.filter(payment_status='unpaid').aggregate(total=Sum('balance'))['total'] or 0
+    total_partial_debts = sales_queryset.filter(payment_status='partial').aggregate(total=Sum('balance'))['total'] or 0
+    
+    # Count statistics
+    completed_payments = payments_queryset.filter(status='Completed').count()
+    pending_payments = payments_queryset.filter(status='Pending').count()
+    credit_sales_count = sales_queryset.filter(payment_status='unpaid').count()
+    partial_payments_count = sales_queryset.filter(payment_status='partial').count()
+    
+    # Top customers with debt
+    customers_with_debt = sales_queryset.filter(
+        payment_status__in=['unpaid', 'partial'],
+        customer_name__isnull=False
+    ).exclude(customer_name='').values(
+        'customer_name', 'customer_phone'
+    ).annotate(
+        total_debt=Sum('balance'),
+        sales_count=Count('id')
+    ).order_by('-total_debt')[:10]
+    
+    # Recent payments
+    recent_payments = payments_queryset.select_related(
+        'sale', 'recorded_by'
+    ).order_by('-created_at')[:5]
+    
+    recent_payments_data = [
+        {
+            'id': payment.id,
+            'amount': payment.amount,
+            'customer_name': payment.sale.customer_name,
+            'payment_method': payment.payment_method,
+            'created_at': payment.created_at,
+            'recorded_by': payment.recorded_by.full_name
+        } for payment in recent_payments
+    ]
+    
+    return Response({
+        'total_payments': total_payments,
+        'total_credits': total_credits,
+        'total_partial_debts': total_partial_debts,
+        'completed_payments_count': completed_payments,
+        'pending_payments_count': pending_payments,
+        'credit_sales_count': credit_sales_count,
+        'partial_payments_count': partial_payments_count,
+        'customers_with_debt': list(customers_with_debt),
+        'recent_payments': recent_payments_data
+    })
 
 
 @api_view(['GET'])

@@ -35,7 +35,60 @@ export const formatCurrency = (
   return `${currencySymbol}${formatPrice(value)}`;
 };
 
+/**
+ * Formats a date string to a readable format
+ *
+ * @param dateString - The date string to format
+ * @returns A formatted date string
+ */
+export const formatDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch (error) {
+    return "Invalid Date";
+  }
+};
+
+/**
+ * Formats a date string to include both date and time
+ *
+ * @param dateString - The date string to format
+ * @returns A formatted date-time string
+ */
+export const formatDateTime = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch (error) {
+    return "Invalid Date";
+  }
+};
+
+/**
+ * Formats a date for input fields (YYYY-MM-DD)
+ *
+ * @param date - The date to format
+ * @returns A formatted date string for inputs
+ */
+export const formatDateForInput = (date: Date): string => {
+  return date.toISOString().split("T")[0];
+};
+
 export default {
   formatPrice,
   formatCurrency,
+  formatDate,
+  formatDateTime,
+  formatDateForInput,
 };

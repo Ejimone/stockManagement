@@ -28,9 +28,10 @@ api_urlpatterns = [
     path('sales/<int:sale_id>/pdf-token/', api_views.create_pdf_token, name='api_create_pdf_token'),
     path('sales/<int:sale_id>/pdf/<uuid:token>/', api_views.download_pdf_with_token, name='api_download_pdf_token'),
     
-    # Payment management endpoints (Admin only)
+    # Payment management endpoints
     path('payments/', api_views.PaymentListCreateView.as_view(), name='api_payment_list'),
     path('payments/<int:pk>/', api_views.PaymentDetailView.as_view(), name='api_payment_detail'),
+    path('payments/summary/', api_views.payment_summary, name='api_payment_summary'),
     
     # Dashboard and reporting endpoints
     path('dashboard/', api_views.dashboard_stats, name='api_dashboard'),

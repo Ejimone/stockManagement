@@ -205,15 +205,35 @@ class PaymentSerializer(serializers.ModelSerializer):
     """Serializer for Payment model"""
     recorded_by_name = serializers.CharField(source='recorded_by.full_name', read_only=True)
     sale_customer = serializers.CharField(source='sale.customer_name', read_only=True)
+    sale_customer_phone = serializers.CharField(source='sale.customer_phone', read_only=True)
+    sale_total_amount = serializers.DecimalField(source='sale.total_amount', max_digits=12, decimal_places=2, read_only=True)
+    sale_balance = serializers.DecimalField(source='sale.balance', max_digits=12, decimal_places=2, read_only=True)
+    sale_payment_status = serializers.CharField(source='sale.payment_status', read_only=True)
+    sale_created_at = serializers.DateTimeField(source='sale.created_at', read_only=True)
+    salesperson_name = serializers.CharField(source='sale.salesperson.full_name', read_only=True)
+    sale_items_summary = serializers.SerializerMethodField()
     
     class Meta:
         model = Payment
         fields = [
-            'id', 'sale', 'sale_customer', 'amount', 'payment_method', 
-            'reference_number', 'status', 'recorded_by', 'recorded_by_name', 
-            'notes', 'created_at'
+            'id', 'sale', 'sale_customer', 'sale_customer_phone', 'sale_total_amount', 
+            'sale_balance', 'sale_payment_status', 'sale_created_at', 'salesperson_name',
+            'sale_items_summary', 'amount', 'payment_method', 'reference_number', 
+            'status', 'recorded_by', 'recorded_by_name', 'notes', 'created_at'
         ]
         read_only_fields = ['recorded_by', 'created_at']
+    
+    def get_sale_items_summary(self, obj):
+        """Get a summary of items in the sale"""
+        sale_items = obj.sale.items.all()
+        return [
+            {
+                'product_name': item.product_name,
+                'quantity': item.quantity,
+                'price': item.price_at_sale,
+                'subtotal': item.subtotal
+            } for item in sale_items
+        ]
     
     def create(self, validated_data):
         """Create payment with recorded_by set to current user"""

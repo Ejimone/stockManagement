@@ -418,47 +418,114 @@ export const deleteSale = async (saleId: string | number): Promise<void> => {
   await apiClient.delete(`/sales/${saleId}/`);
 };
 
-// --- Payment Management (Admin Only) ---
-// Define Payment type (adjust as per your backend)
+// --- Payment Management ---
+// Enhanced Payment type based on backend PaymentSerializer
 export interface Payment {
   id: string | number;
-  sale_id?: string | number;
-  amount?: number;
-  payment_date?: string;
-  payment_method?: string;
+  sale: number;
+  sale_customer?: string;
+  sale_customer_phone?: string;
+  sale_total_amount?: number;
+  sale_balance?: number;
+  sale_payment_status?: string;
+  sale_created_at?: string;
+  salesperson_name?: string;
+  sale_items_summary?: Array<{
+    product_name: string;
+    quantity: number;
+    price: number;
+    subtotal: number;
+  }>;
+  amount: number;
+  payment_method: string;
+  reference_number?: string;
+  status: string;
+  recorded_by?: number;
+  recorded_by_name?: string;
+  notes?: string;
+  created_at: string;
+}
+
+export interface PaymentSummary {
+  total_payments: number;
+  total_credits: number;
+  total_partial_debts: number;
+  completed_payments_count: number;
+  pending_payments_count: number;
+  credit_sales_count: number;
+  partial_payments_count: number;
+  customers_with_debt: Array<{
+    customer_name: string;
+    customer_phone?: string;
+    total_debt: number;
+    sales_count: number;
+  }>;
+  recent_payments: Array<{
+    id: number;
+    amount: number;
+    customer_name?: string;
+    payment_method: string;
+    created_at: string;
+    recorded_by: string;
+  }>;
+}
+
+export interface PaymentFilters {
+  sale?: string | number;
+  customer_name?: string;
+  customer_phone?: string;
   status?: string;
-  // Add other payment fields
+  payment_method?: string;
+  sale_payment_status?: string;
+  date_from?: string;
+  date_to?: string;
+  time_from?: string;
+  time_to?: string;
 }
 
 /**
- * Get a list of payments.
- * @param params Optional query parameters (e.g., { sale: 1, status: 'completed' })
+ * Get a list of payments with comprehensive filtering.
  */
-export const getPayments = async (params?: {
-  sale?: string | number;
-  status?: string;
-  date_from?: string;
-  date_to?: string;
-}): Promise<PaginatedResponse<Payment>> => {
+export const getPayments = async (
+  filters?: PaymentFilters
+): Promise<PaginatedResponse<Payment>> => {
   const response = await apiClient.get<PaginatedResponse<Payment>>(
     "/payments/",
-    { params }
+    { params: filters }
   );
   return response.data;
 };
 
 /**
- * Record a new payment.
- * @param paymentData Data for the new payment.
+ * Get payment summary statistics.
  */
-export const recordPayment = async (paymentData: object): Promise<Payment> => {
+export const getPaymentSummary = async (filters?: {
+  date_from?: string;
+  date_to?: string;
+}): Promise<PaymentSummary> => {
+  const response = await apiClient.get<PaymentSummary>("/payments/summary/", {
+    params: filters,
+  });
+  return response.data;
+};
+
+/**
+ * Record a new payment (Admin only).
+ */
+export const recordPayment = async (paymentData: {
+  sale: number;
+  amount: number;
+  payment_method: string;
+  reference_number?: string;
+  status?: string;
+  notes?: string;
+}): Promise<Payment> => {
   const response = await apiClient.post<Payment>("/payments/", paymentData);
   return response.data;
 };
 
 /**
  * Get details for a specific payment.
- * @param paymentId ID of the payment.
  */
 export const getPaymentDetails = async (
   paymentId: string | number
@@ -468,18 +535,22 @@ export const getPaymentDetails = async (
 };
 
 /**
- * Update an existing payment.
- * @param paymentId ID of the payment to update.
- * @param paymentData Data to update.
+ * Update an existing payment (Admin only).
  */
 export const updatePayment = async (
   paymentId: string | number,
-  paymentData: object
+  paymentData: Partial<{
+    amount: number;
+    payment_method: string;
+    reference_number: string;
+    status: string;
+    notes: string;
+  }>
 ): Promise<Payment> => {
   const response = await apiClient.patch<Payment>(
     `/payments/${paymentId}/`,
     paymentData
-  ); // Using PATCH
+  );
   return response.data;
 };
 
