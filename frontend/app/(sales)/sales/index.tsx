@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { Stack, useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { getSales, Sale } from "../../../services/api";
+import { getSales, Sale, updateSalePaymentStatus } from "../../../services/api";
 import { formatCurrency } from "../../../utils/formatters";
 import { useAuth } from "../../../contexts/AuthContext";
 
@@ -78,11 +78,76 @@ export default function SalesMySalesScreen() {
     fetchSales(true);
   };
 
+  const handleMarkAsPaid = async (sale: Sale, event: any) => {
+    // Prevent the TouchableOpacity press event from firing
+    event.stopPropagation();
+
+    // Do nothing if the sale is already paid
+    const isPaid = sale.payment_status?.toLowerCase() === "paid";
+    if (isPaid) {
+      return; // Exit early, no action for paid sales
+    }
+
+    try {
+      Alert.alert(
+        "Mark as Paid",
+        `Are you sure you want to mark Sale #${sale.id} as fully paid?`,
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Mark as Paid",
+            style: "default",
+            onPress: async () => {
+              try {
+                setIsLoading(true);
+                await updateSalePaymentStatus(sale.id);
+
+                // Update the sale in the local state
+                setSales((prevSales) =>
+                  prevSales.map((s) =>
+                    s.id === sale.id
+                      ? {
+                          ...s,
+                          payment_status: "paid",
+                          amount_paid: s.total_amount,
+                          balance: 0,
+                        }
+                      : s
+                  )
+                );
+
+                Alert.alert("Success", "Sale marked as paid successfully!");
+              } catch (error: any) {
+                console.error("Failed to update payment status:", error);
+                Alert.alert(
+                  "Error",
+                  error.response?.data?.error ||
+                    "Failed to update payment status. Please try again."
+                );
+              } finally {
+                setIsLoading(false);
+              }
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      console.error("Error in handleMarkAsPaid:", error);
+    }
+  };
+
   const handleSalePress = (sale: Sale) => {
     router.push({
       pathname: `/(sales)/sales/[id]`,
       params: { id: sale.id.toString() },
     });
+  };
+
+  const handleCreateNewSale = () => {
+    router.push("/(sales)/sales/create");
   };
 
   const getPaymentStatusColor = (status?: string) => {
@@ -152,63 +217,97 @@ export default function SalesMySalesScreen() {
     );
   });
 
-  const renderSaleItem = ({ item }: { item: Sale }) => (
-    <TouchableOpacity
-      style={styles.saleCard}
-      onPress={() => handleSalePress(item)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.saleHeader}>
-        <View style={styles.saleInfo}>
-          <Text style={styles.saleId}>Sale #{item.id}</Text>
-          <Text style={styles.saleDate}>{formatDate(item.created_at)}</Text>
-        </View>
-        <View style={styles.amountContainer}>
-          <Text style={styles.amount}>
-            {formatCurrency(item.total_amount || 0)}
-          </Text>
-          <View
-            style={[
-              styles.paymentStatus,
-              { backgroundColor: getPaymentStatusColor(item.payment_status) },
-            ]}
-          >
-            <Ionicons
-              name={getPaymentStatusIcon(item.payment_status) as any}
-              size={12}
-              color="#ffffff"
-            />
-            <Text style={styles.paymentStatusText}>
-              {item.payment_status || "Unknown"}
+  const renderSaleItem = ({ item }: { item: Sale }) => {
+    const canMarkAsPaid =
+      item.payment_status?.toLowerCase() === "partial" ||
+      item.payment_status?.toLowerCase() === "unpaid";
+
+    return (
+      <TouchableOpacity
+        style={styles.saleCard}
+        onPress={() => handleSalePress(item)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.saleHeader}>
+          <View style={styles.saleInfo}>
+            <Text style={styles.saleId}>Sale #{item.id}</Text>
+            <Text style={styles.saleDate}>{formatDate(item.created_at)}</Text>
+          </View>
+          <View style={styles.amountContainer}>
+            <Text style={styles.amount}>
+              {formatCurrency(item.total_amount || 0)}
             </Text>
+            <View
+              style={[
+                styles.paymentStatus,
+                { backgroundColor: getPaymentStatusColor(item.payment_status) },
+              ]}
+            >
+              <Ionicons
+                name={getPaymentStatusIcon(item.payment_status) as any}
+                size={12}
+                color="#ffffff"
+              />
+              <Text style={styles.paymentStatusText}>
+                {item.payment_status || "Unknown"}
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      <View style={styles.saleDetails}>
-        {item.customer_name && (
-          <Text style={styles.customerName}>
-            Customer: {item.customer_name}
+        <View style={styles.saleDetails}>
+          {item.customer_name && item.customer_name.trim() && (
+            <Text style={styles.customerName}>
+              Customer: {item.customer_name}
+            </Text>
+          )}
+          <Text style={styles.paymentMethod}>
+            Payment: {item.payment_method || "Not specified"}
           </Text>
-        )}
-        <Text style={styles.paymentMethod}>
-          Payment: {item.payment_method || "Not specified"}
-        </Text>
-        {item.balance && item.balance > 0 && (
-          <Text style={styles.balance}>
-            Balance: {formatCurrency(item.balance)}
-          </Text>
-        )}
-      </View>
+          {item.balance !== null &&
+            item.balance !== undefined &&
+            item.balance > 0 && (
+              <Text style={styles.balance}>
+                Balance: {formatCurrency(item.balance)}
+              </Text>
+            )}
+        </View>
 
-      <View style={styles.saleFooter}>
-        <Text style={styles.itemCount}>
-          {item.items?.length || item.products_sold?.length || 0} item(s)
-        </Text>
-        <Ionicons name="chevron-forward" size={16} color="#6b7280" />
-      </View>
-    </TouchableOpacity>
-  );
+        <View style={styles.saleFooter}>
+          <Text style={styles.itemCount}>
+            {item.items?.length || item.products_sold?.length || 0} item(s)
+          </Text>
+          <View style={styles.saleFooterActions}>
+            {/* Always show button for debugging */}
+            <TouchableOpacity
+              style={[
+                styles.markPaidButton,
+                {
+                  backgroundColor: canMarkAsPaid ? "#22c55e" : "#6b7280",
+                  opacity: canMarkAsPaid ? 1 : 0.6,
+                },
+              ]}
+              onPress={
+                canMarkAsPaid
+                  ? (event) => handleMarkAsPaid(item, event)
+                  : undefined
+              }
+              activeOpacity={canMarkAsPaid ? 0.8 : 1}
+              disabled={!canMarkAsPaid}
+            >
+              <Ionicons name="checkmark-circle" size={16} color="#ffffff" />
+              <Text style={styles.markPaidButtonText}>
+                {canMarkAsPaid
+                  ? "Mark as Paid"
+                  : `Status: ${item.payment_status || "Unknown"}`}
+              </Text>
+            </TouchableOpacity>
+            <Ionicons name="chevron-forward" size={16} color="#6b7280" />
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   const renderDateFilter = () => (
     <View style={styles.filterContainer}>
@@ -242,7 +341,7 @@ export default function SalesMySalesScreen() {
         {dateFilter === "all"
           ? "You haven't made any sales yet"
           : `No sales found for ${
-              dateFilter === "today" ? "today" : `the past ${dateFilter}`
+              dateFilter === "today" ? "today" : "the past " + dateFilter
             }`}
       </Text>
     </View>
@@ -276,6 +375,18 @@ export default function SalesMySalesScreen() {
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ title: "My Sales" }} />
+
+      {/* Create New Sale Button */}
+      <View style={styles.createButtonContainer}>
+        <TouchableOpacity
+          style={styles.createSaleButton}
+          onPress={handleCreateNewSale}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="add-circle" size={20} color="#ffffff" />
+          <Text style={styles.createSaleButtonText}>Create New Sale</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
@@ -481,6 +592,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#6b7280",
   },
+  saleFooterActions: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  markPaidButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#22c55e",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+    minWidth: 120,
+  },
+  markPaidButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#ffffff",
+    marginLeft: 4,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
@@ -537,5 +668,34 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#6b7280",
     textAlign: "center",
+  },
+  createButtonContainer: {
+    padding: 16,
+    backgroundColor: "#ffffff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+  },
+  createSaleButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#3b82f6",
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  createSaleButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#ffffff",
+    marginLeft: 8,
   },
 });

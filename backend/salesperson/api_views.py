@@ -993,3 +993,64 @@ def comprehensive_reports(request):
             'to': date_to.strftime('%Y-%m-%d')
         }
     })
+
+
+@api_view(['PATCH'])
+@permission_classes([permissions.IsAuthenticated])
+def update_sale_payment_status(request, pk):
+    """
+    Update the payment status of a sale to 'paid' (Salesperson can update own sales, Admin can update any)
+    """
+    try:
+        # Get the sale
+        user = request.user
+        if user.role == 'Salesperson':
+            sale = Sale.objects.get(pk=pk, salesperson=user)
+        else:  # Admin
+            sale = Sale.objects.get(pk=pk)
+        
+        # Get the new payment status from request
+        new_status = request.data.get('payment_status', '').lower()
+        
+        # Only allow updating to 'paid' status for this endpoint
+        if new_status != 'paid':
+            return Response(
+                {'error': 'This endpoint only allows updating payment status to "paid"'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Only allow updating if current status is 'partial' or 'unpaid'
+        current_status = sale.payment_status.lower() if sale.payment_status else ''
+        if current_status not in ['partial', 'unpaid']:
+            return Response(
+                {'error': f'Cannot update payment status from "{sale.payment_status}" to "paid". Only "partial" and "unpaid" sales can be marked as paid.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Update the sale
+        old_status = sale.payment_status
+        sale.payment_status = 'paid'
+        sale.amount_paid = sale.total_amount  # Mark as fully paid
+        sale.balance = 0  # Clear any balance
+        sale.save()
+        
+        logger.info(f"Sale {sale.id} payment status updated from '{old_status}' to 'paid' by {user.email}")
+        
+        # Return updated sale data
+        serializer = SaleSerializer(sale)
+        return Response({
+            'message': 'Payment status updated successfully',
+            'sale': serializer.data
+        }, status=status.HTTP_200_OK)
+        
+    except Sale.DoesNotExist:
+        return Response(
+            {'error': 'Sale not found or you do not have permission to update it'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        logger.error(f"Error updating sale payment status: {str(e)}")
+        return Response(
+            {'error': 'An error occurred while updating the payment status'}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

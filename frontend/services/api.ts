@@ -421,6 +421,20 @@ export const updateSale = async (
 };
 
 /**
+ * Update a sale's payment status to 'paid' (Salesperson can update own sales, Admin can update any).
+ * @param saleId ID of the sale to update.
+ */
+export const updateSalePaymentStatus = async (
+  saleId: string | number
+): Promise<{ message: string; sale: Sale }> => {
+  const response = await apiClient.patch<{ message: string; sale: Sale }>(
+    `/sales/${saleId}/payment-status/`,
+    { payment_status: "paid" }
+  );
+  return response.data;
+};
+
+/**
  * Delete a sale (Admin only).
  * @param saleId ID of the sale to delete.
  */

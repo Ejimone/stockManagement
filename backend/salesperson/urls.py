@@ -24,6 +24,7 @@ api_urlpatterns = [
     path('sales/', api_views.SaleListCreateView.as_view(), name='api_sale_list'),
     path('sales/<int:pk>/', api_views.SaleDetailView.as_view(), name='api_sale_detail'),
     path('sales/<int:pk>/receipt/', api_views.SaleReceiptView.as_view(), name='api_sale_receipt'),
+    path('sales/<int:pk>/payment-status/', api_views.update_sale_payment_status, name='api_update_sale_payment_status'),
     path('sales/<int:sale_id>/pdf/', api_views.generate_receipt_pdf, name='api_sale_pdf'),
     path('sales/<int:sale_id>/pdf-token/', api_views.create_pdf_token, name='api_create_pdf_token'),
     path('sales/<int:sale_id>/pdf/<uuid:token>/', api_views.download_pdf_with_token, name='api_download_pdf_token'),

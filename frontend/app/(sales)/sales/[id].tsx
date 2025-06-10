@@ -15,6 +15,7 @@ import {
   getSaleDetails,
   updateSale,
   displayPdfReceipt,
+  updateSalePaymentStatus,
   Sale,
   SaleItem,
 } from "../../../services/api";
@@ -45,6 +46,55 @@ export default function SalesSaleDetailScreen() {
       setError(err.message || "Failed to load sale details.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleMarkAsPaid = async () => {
+    if (!sale) return;
+
+    // Do nothing if the sale is already paid
+    const isPaid = sale.payment_status?.toLowerCase() === "paid";
+    if (isPaid) {
+      return; // Exit early, no action for paid sales
+    }
+
+    try {
+      Alert.alert(
+        "Mark as Paid",
+        `Are you sure you want to mark Sale #${sale.id} as fully paid?`,
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Mark as Paid",
+            style: "default",
+            onPress: async () => {
+              try {
+                setIsLoading(true);
+                const response = await updateSalePaymentStatus(sale.id);
+
+                // Update the sale in the local state
+                setSale(response.sale);
+
+                Alert.alert("Success", "Sale marked as paid successfully!");
+              } catch (error: any) {
+                console.error("Failed to update payment status:", error);
+                Alert.alert(
+                  "Error",
+                  error.response?.data?.error ||
+                    "Failed to update payment status. Please try again."
+                );
+              } finally {
+                setIsLoading(false);
+              }
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      console.error("Error in handleMarkAsPaid:", error);
     }
   };
 
@@ -188,6 +238,51 @@ export default function SalesSaleDetailScreen() {
             Balance: {formatPrice(sale.balance)}
           </Text>
         )}
+
+        {/* Mark as Paid Button - Debug version always visible */}
+        <TouchableOpacity
+          style={[
+            styles.markPaidButton,
+            {
+              backgroundColor:
+                sale.payment_status?.toLowerCase() === "partial" ||
+                sale.payment_status?.toLowerCase() === "unpaid"
+                  ? "#22c55e"
+                  : "#6b7280",
+              marginTop: 16,
+              opacity:
+                sale.payment_status?.toLowerCase() === "partial" ||
+                sale.payment_status?.toLowerCase() === "unpaid"
+                  ? 1
+                  : 0.6,
+            },
+          ]}
+          onPress={
+            sale.payment_status?.toLowerCase() === "partial" ||
+            sale.payment_status?.toLowerCase() === "unpaid"
+              ? handleMarkAsPaid
+              : undefined
+          }
+          activeOpacity={
+            sale.payment_status?.toLowerCase() === "partial" ||
+            sale.payment_status?.toLowerCase() === "unpaid"
+              ? 0.8
+              : 1
+          }
+          disabled={
+            !(
+              sale.payment_status?.toLowerCase() === "partial" ||
+              sale.payment_status?.toLowerCase() === "unpaid"
+            )
+          }
+        >
+          <Text style={styles.markPaidButtonText}>
+            {sale.payment_status?.toLowerCase() === "partial" ||
+            sale.payment_status?.toLowerCase() === "unpaid"
+              ? "✓ Mark as Paid Completed"
+              : `Current Status: ${sale.payment_status}`}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Notes */}
@@ -640,5 +735,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#666666",
     textAlign: "center",
+  },
+  markPaidButton: {
+    backgroundColor: "#22c55e",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    alignItems: "center",
+  },
+  markPaidButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#ffffff",
   },
 });

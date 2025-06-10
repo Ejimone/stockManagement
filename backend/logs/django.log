@@ -2464,3 +2464,157 @@ INFO 2025-06-10 06:59:19,926 basehttp 51997 6129135616 "GET /api/sales/?date_fro
 INFO 2025-06-10 06:59:20,793 basehttp 51997 6129135616 "GET /api/sales/?date_from=2025-06-03&salesperson=9 HTTP/1.1" 200 3169
 INFO 2025-06-10 06:59:21,541 basehttp 51997 6129135616 "GET /api/sales/?date_from=2025-05-11&salesperson=9 HTTP/1.1" 200 3169
 INFO 2025-06-10 06:59:23,693 basehttp 51997 6129135616 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:00:28,163 basehttp 51997 6129135616 "GET /api/sales/25/ HTTP/1.1" 200 588
+INFO 2025-06-10 07:01:22,955 basehttp 51997 6129135616 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:01:24,941 basehttp 51997 6129135616 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:01:27,036 basehttp 51997 6129135616 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:01:28,941 basehttp 51997 6129135616 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:01:31,226 basehttp 51997 6129135616 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:02:26,492 autoreload 51997 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 07:02:26,503 autoreload 55053 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 07:02:26,818 autoreload 58771 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 07:02:26,828 autoreload 58770 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 07:02:43,311 autoreload 58771 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/serializers.py changed, reloading.
+INFO 2025-06-10 07:02:43,315 autoreload 58770 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/serializers.py changed, reloading.
+INFO 2025-06-10 07:02:43,595 autoreload 58819 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 07:02:43,598 autoreload 58818 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 07:04:11,783 autoreload 61242 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 07:04:25,359 autoreload 58818 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 07:04:25,369 autoreload 58819 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 07:04:25,719 autoreload 62469 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 07:04:25,746 autoreload 62468 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 07:04:32,627 basehttp 62468 6125285376 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:04:33,583 basehttp 62468 6125285376 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:04:35,124 basehttp 62468 6125285376 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:04:44,283 basehttp 62468 6125285376 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:04:50,512 basehttp 62468 6125285376 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:04:53,577 basehttp 62468 6125285376 "GET /api/sales/29/ HTTP/1.1" 200 566
+INFO 2025-06-10 07:06:48,437 autoreload 62468 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 07:06:48,456 autoreload 62469 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 07:06:48,770 autoreload 62772 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 07:06:48,780 autoreload 62771 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 07:06:58,073 autoreload 62771 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/urls.py changed, reloading.
+INFO 2025-06-10 07:06:58,116 autoreload 62772 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/urls.py changed, reloading.
+INFO 2025-06-10 07:06:58,314 autoreload 62813 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 07:06:58,364 autoreload 62814 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 07:08:43,638 autoreload 65288 8668733184 Watching for file changes with StatReloader
+WARNING 2025-06-10 07:10:17,435 log 62813 6136377344 Unauthorized: /api/sales/
+WARNING 2025-06-10 07:10:17,436 basehttp 62813 6136377344 "GET /api/sales/ HTTP/1.1" 401 58
+INFO 2025-06-10 07:11:22,706 autoreload 62813 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 07:11:23,041 autoreload 62814 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/urls.py changed, reloading.
+INFO 2025-06-10 07:11:23,152 autoreload 66393 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 07:11:23,362 autoreload 66394 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 07:11:28,955 basehttp 66393 6129299456 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:11:29,777 basehttp 66393 6129299456 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:11:31,347 basehttp 66393 6129299456 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:11:33,117 basehttp 66393 6129299456 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:11:40,000 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:11:42,577 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:11:44,375 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:11:45,631 basehttp 66393 6129299456 "GET /api/sales/30/ HTTP/1.1" 200 439
+INFO 2025-06-10 07:12:15,880 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:12:17,283 basehttp 66393 6129299456 "GET /api/sales/30/ HTTP/1.1" 200 439
+INFO 2025-06-10 07:12:22,647 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:12:25,581 basehttp 66393 6129299456 "GET /api/sales/30/ HTTP/1.1" 200 439
+INFO 2025-06-10 07:12:29,937 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:13:23,092 basehttp 66393 6129299456 "GET /api/sales/29/ HTTP/1.1" 200 566
+INFO 2025-06-10 07:13:26,721 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:15:42,432 basehttp 66393 6129299456 "GET /api/sales/26/ HTTP/1.1" 200 588
+INFO 2025-06-10 07:15:44,880 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:15:47,770 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:15:49,792 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:16:27,438 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:16:33,692 basehttp 66393 6129299456 "GET /api/sales/29/ HTTP/1.1" 200 566
+INFO 2025-06-10 07:16:41,209 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:16:44,348 basehttp 66393 6129299456 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:16:45,600 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:16:46,281 basehttp 66393 6129299456 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:16:46,800 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:16:50,663 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:16:53,427 basehttp 66393 6129299456 "GET /api/sales/27/ HTTP/1.1" 200 478
+INFO 2025-06-10 07:17:16,058 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:17:35,479 basehttp 66393 6129299456 "GET /api/sales/29/ HTTP/1.1" 200 566
+INFO 2025-06-10 07:17:45,444 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:18:03,398 basehttp 66393 6129299456 "GET /api/sales/30/ HTTP/1.1" 200 439
+INFO 2025-06-10 07:19:47,915 basehttp 66393 6129299456 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:19:50,547 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:19:54,116 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:19:55,378 basehttp 66393 6129299456 "GET /api/sales/29/ HTTP/1.1" 200 566
+WARNING 2025-06-10 07:20:39,071 log 66393 6146125824 Method Not Allowed: /api/auth/login/
+WARNING 2025-06-10 07:20:39,072 basehttp 66393 6146125824 "GET /api/auth/login/ HTTP/1.1" 405 40
+INFO 2025-06-10 07:22:38,414 basehttp 66393 6162952192 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:22:38,414 basehttp 66393 6146125824 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:22:39,732 basehttp 66393 6162952192 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 07:22:52,611 api_views 66393 6162952192 Sale 30 payment status updated from 'Partial' to 'paid' by Banx@gmail.com
+INFO 2025-06-10 07:22:52,613 basehttp 66393 6162952192 "PATCH /api/sales/30/payment-status/ HTTP/1.1" 200 492
+INFO 2025-06-10 07:23:03,198 api_views 66393 6162952192 Sale 29 payment status updated from 'Unpaid' to 'paid' by Banx@gmail.com
+INFO 2025-06-10 07:23:03,206 basehttp 66393 6162952192 "PATCH /api/sales/29/payment-status/ HTTP/1.1" 200 621
+INFO 2025-06-10 07:24:14,915 basehttp 66393 6162952192 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3163
+INFO 2025-06-10 07:25:02,672 basehttp 66393 6162952192 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3163
+INFO 2025-06-10 07:25:11,012 basehttp 66393 6162952192 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3163
+INFO 2025-06-10 07:25:25,813 basehttp 66393 6162952192 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3163
+INFO 2025-06-10 07:25:48,424 basehttp 66393 6162952192 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3163
+INFO 2025-06-10 07:26:19,739 basehttp 66393 6162952192 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3163
+INFO 2025-06-10 07:26:24,454 basehttp 66393 6129299456 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:26:24,458 basehttp 66393 12901707776 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:26:25,614 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3163
+INFO 2025-06-10 07:26:36,347 basehttp 66393 6129299456 "GET /api/sales/28/ HTTP/1.1" 200 453
+INFO 2025-06-10 07:26:40,293 api_views 66393 6129299456 Sale 28 payment status updated from 'Partial' to 'paid' by Banx@gmail.com
+INFO 2025-06-10 07:26:40,294 basehttp 66393 6129299456 "PATCH /api/sales/28/payment-status/ HTTP/1.1" 200 507
+INFO 2025-06-10 07:26:45,139 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3160
+INFO 2025-06-10 07:27:17,197 api_views 66393 6129299456 Sale 26 payment status updated from 'Partial' to 'paid' by Banx@gmail.com
+INFO 2025-06-10 07:27:17,200 basehttp 66393 6129299456 "PATCH /api/sales/26/payment-status/ HTTP/1.1" 200 642
+INFO 2025-06-10 07:27:19,578 basehttp 66393 6129299456 "GET /api/sales/26/ HTTP/1.1" 200 585
+INFO 2025-06-10 07:27:39,714 basehttp 66393 6129299456 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3157
+INFO 2025-06-10 07:29:19,033 basehttp 66393 6129299456 "GET /api/sales/26/ HTTP/1.1" 200 585
+INFO 2025-06-10 07:30:51,094 basehttp 66393 6129299456 "GET /api/sales/26/ HTTP/1.1" 200 585
+INFO 2025-06-10 07:31:29,405 basehttp 66393 6129299456 "GET /api/sales/26/ HTTP/1.1" 200 585
+INFO 2025-06-10 07:33:09,336 basehttp 66393 6129299456 "GET /api/sales/26/ HTTP/1.1" 200 585
+INFO 2025-06-10 07:33:15,713 basehttp 66393 6146125824 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:33:15,714 basehttp 66393 6162952192 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:33:17,590 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3157
+INFO 2025-06-10 07:33:19,211 basehttp 66393 6146125824 "GET /api/sales/30/ HTTP/1.1" 200 435
+INFO 2025-06-10 07:33:28,441 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3157
+INFO 2025-06-10 07:33:32,637 api_views 66393 6146125824 Sale 25 payment status updated from 'Partial' to 'paid' by Banx@gmail.com
+INFO 2025-06-10 07:33:32,639 basehttp 66393 6146125824 "PATCH /api/sales/25/payment-status/ HTTP/1.1" 200 642
+INFO 2025-06-10 07:33:34,626 basehttp 66393 6146125824 "GET /api/sales/25/ HTTP/1.1" 200 585
+INFO 2025-06-10 07:33:38,642 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:33:39,012 basehttp 66393 6146125824 "GET /api/sales/25/ HTTP/1.1" 200 585
+INFO 2025-06-10 07:33:43,207 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:33:44,673 basehttp 66393 6146125824 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3571
+INFO 2025-06-10 07:33:58,287 basehttp 66393 6146125824 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3571
+INFO 2025-06-10 07:34:02,590 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:34:13,118 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:34:28,381 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:34:29,809 basehttp 66393 6146125824 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:34:29,813 basehttp 66393 6162952192 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:34:30,298 basehttp 66393 6146125824 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:34:33,318 basehttp 66393 6146125824 "GET /api/products/?active_only=true HTTP/1.1" 200 5709
+INFO 2025-06-10 07:34:35,566 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:34:37,293 basehttp 66393 6146125824 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:34:38,171 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:34:40,209 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:34:44,646 basehttp 66393 6146125824 "GET /api/sales/?date_from=2025-06-10&date_to=2025-06-10&salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:34:45,651 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:34:46,671 basehttp 66393 6146125824 "GET /api/sales/?date_from=2025-06-10&date_to=2025-06-10&salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:34:47,796 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:35:30,872 basehttp 66393 6146125824 "GET /api/sales/29/ HTTP/1.1" 200 564
+INFO 2025-06-10 07:35:35,545 basehttp 66393 6146125824 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 07:35:40,042 basehttp 66393 6146125824 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:35:52,662 basehttp 66393 6146125824 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 07:36:01,844 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:36:05,364 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:36:12,595 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3154
+INFO 2025-06-10 07:36:18,596 basehttp 66393 6146125824 "GET /api/sales/27/ HTTP/1.1" 200 478
+INFO 2025-06-10 07:36:23,708 api_views 66393 6146125824 Sale 27 payment status updated from 'Partial' to 'paid' by Banx@gmail.com
+INFO 2025-06-10 07:36:23,710 basehttp 66393 6146125824 "PATCH /api/sales/27/payment-status/ HTTP/1.1" 200 528
+INFO 2025-06-10 07:36:26,356 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3147
+INFO 2025-06-10 07:37:08,420 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3147
+INFO 2025-06-10 07:37:24,554 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3147
+INFO 2025-06-10 07:39:11,965 basehttp 66393 6146125824 "GET /api/products/?active_only=true HTTP/1.1" 200 5709
+INFO 2025-06-10 07:39:31,335 basehttp 66393 6146125824 "POST /api/sales/ HTTP/1.1" 201 447
+INFO 2025-06-10 07:39:33,614 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3595
+INFO 2025-06-10 07:39:39,661 api_views 66393 6146125824 Sale 31 payment status updated from 'Unpaid' to 'paid' by Banx@gmail.com
+INFO 2025-06-10 07:39:39,663 basehttp 66393 6146125824 "PATCH /api/sales/31/payment-status/ HTTP/1.1" 200 502
+INFO 2025-06-10 07:39:43,538 basehttp 66393 6146125824 "GET /api/sales/26/ HTTP/1.1" 200 585
+INFO 2025-06-10 07:39:45,578 basehttp 66393 6146125824 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3593
