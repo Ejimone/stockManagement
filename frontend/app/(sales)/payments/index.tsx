@@ -17,14 +17,18 @@ import { useFocusEffect } from "@react-navigation/native";
 import {
   getPayments,
   getPaymentSummary,
+  getSales,
   displayPdfReceipt,
   Payment,
   PaymentSummary,
   PaymentFilters,
+  Sale,
 } from "../../../services/api";
 import { formatCurrency, formatDateTime } from "../../../utils/formatters";
+import { useAuth } from "../../../contexts/AuthContext";
 
 export default function SalespersonPaymentsScreen() {
+  const { user } = useAuth();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [summary, setSummary] = useState<PaymentSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,6 +43,89 @@ export default function SalespersonPaymentsScreen() {
   const [filterSaleStatus, setFilterSaleStatus] = useState("");
   const [filterDateFrom, setFilterDateFrom] = useState("");
   const [filterDateTo, setFilterDateTo] = useState("");
+
+  // Modal states for detailed views
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalData, setModalData] = useState<any[]>([]);
+  const [modalType, setModalType] = useState<
+    "payments" | "sales" | "customers"
+  >("payments");
+
+  // Click handlers for summary cards
+  const handleTotalPaymentsClick = async () => {
+    try {
+      setModalTitle("All Payments");
+      setModalType("payments");
+      const response = await getPayments({
+        ...filters,
+        status: "completed",
+      });
+      setModalData(response.results || response);
+      setModalVisible(true);
+    } catch (error) {
+      Alert.alert("Error", "Failed to load payments data");
+    }
+  };
+
+  const handleOutstandingPaymentsClick = async () => {
+    try {
+      setModalTitle("Outstanding Credit Sales");
+      setModalType("sales");
+      const response = await getSales({
+        payment_status: "unpaid",
+        salesperson: user?.id,
+      });
+      setModalData(response.results || response);
+      setModalVisible(true);
+    } catch (error) {
+      Alert.alert("Error", "Failed to load outstanding sales");
+    }
+  };
+
+  const handlePartialPaymentsClick = async () => {
+    try {
+      setModalTitle("Partial Payment Sales");
+      setModalType("sales");
+      const response = await getSales({
+        payment_status: "partial",
+        salesperson: user?.id,
+      });
+      setModalData(response.results || response);
+      setModalVisible(true);
+    } catch (error) {
+      Alert.alert("Error", "Failed to load partial payment sales");
+    }
+  };
+
+  const handleCreditSalesClick = async () => {
+    try {
+      setModalTitle("All Credit Sales");
+      setModalType("sales");
+      const response = await getSales({
+        payment_method: "Credit",
+        salesperson: user?.id,
+      });
+      setModalData(response.results || response);
+      setModalVisible(true);
+    } catch (error) {
+      Alert.alert("Error", "Failed to load credit sales");
+    }
+  };
+
+  const handleCustomersWithDebtClick = () => {
+    if (
+      summary?.customers_with_debt &&
+      summary.customers_with_debt.length > 0
+    ) {
+      setModalTitle("Customers with Outstanding Debt");
+      setModalType("customers");
+      setModalData(summary.customers_with_debt);
+      setModalVisible(true);
+    } else {
+      Alert.alert("Info", "No customers have outstanding debt");
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -181,35 +268,105 @@ export default function SalespersonPaymentsScreen() {
     }
   };
 
+  const getPaymentStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "paid":
+        return "#34C759";
+      case "partial":
+        return "#FF9500";
+      case "unpaid":
+        return "#FF3B30";
+      default:
+        return "#8E8E93";
+    }
+  };
+
   const renderSummaryCard = () => (
     <View style={styles.summaryCard}>
       <Text style={styles.summaryTitle}>My Payment Summary</Text>
       <View style={styles.summaryGrid}>
-        <View style={styles.summaryItem}>
+        <TouchableOpacity
+          style={styles.summaryItem}
+          onPress={handleTotalPaymentsClick}
+        >
           <Text style={styles.summaryValue}>
             {formatCurrency(summary?.total_payments || 0)}
           </Text>
           <Text style={styles.summaryLabel}>Total Payments</Text>
-        </View>
-        <View style={styles.summaryItem}>
+          <Ionicons
+            name="chevron-forward"
+            size={16}
+            color="#007AFF"
+            style={styles.summaryIcon}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.summaryItem}
+          onPress={handleOutstandingPaymentsClick}
+        >
           <Text style={styles.summaryValue}>
             {formatCurrency(summary?.total_credits || 0)}
           </Text>
           <Text style={styles.summaryLabel}>Outstanding Credits</Text>
-        </View>
-        <View style={styles.summaryItem}>
+          <Ionicons
+            name="chevron-forward"
+            size={16}
+            color="#007AFF"
+            style={styles.summaryIcon}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.summaryItem}
+          onPress={handlePartialPaymentsClick}
+        >
           <Text style={styles.summaryValue}>
             {formatCurrency(summary?.total_partial_debts || 0)}
           </Text>
           <Text style={styles.summaryLabel}>Partial Payments</Text>
-        </View>
-        <View style={styles.summaryItem}>
+          <Ionicons
+            name="chevron-forward"
+            size={16}
+            color="#007AFF"
+            style={styles.summaryIcon}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.summaryItem}
+          onPress={handleCreditSalesClick}
+        >
           <Text style={styles.summaryValue}>
             {summary?.credit_sales_count || 0}
           </Text>
           <Text style={styles.summaryLabel}>Credit Sales</Text>
-        </View>
+          <Ionicons
+            name="chevron-forward"
+            size={16}
+            color="#007AFF"
+            style={styles.summaryIcon}
+          />
+        </TouchableOpacity>
       </View>
+
+      {summary?.customers_with_debt &&
+        summary.customers_with_debt.length > 0 && (
+          <TouchableOpacity
+            style={styles.customersDebtCard}
+            onPress={handleCustomersWithDebtClick}
+          >
+            <View style={styles.customersDebtHeader}>
+              <Text style={styles.customersDebtTitle}>
+                Customers with Outstanding Debt
+              </Text>
+              <Ionicons name="chevron-forward" size={20} color="#007AFF" />
+            </View>
+            <Text style={styles.customersDebtCount}>
+              {summary.customers_with_debt.length} customers owe money
+            </Text>
+          </TouchableOpacity>
+        )}
     </View>
   );
 
@@ -336,6 +493,127 @@ export default function SalespersonPaymentsScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Details Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{modalTitle}</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Ionicons name="close" size={24} color="#000" />
+              </TouchableOpacity>
+            </View>
+
+            <FlatList
+              data={modalData}
+              keyExtractor={(item, index) => `${modalType}-${item.id || index}`}
+              renderItem={({ item }) => {
+                if (modalType === "payments") {
+                  return (
+                    <TouchableOpacity
+                      style={styles.modalListItem}
+                      onPress={() => {
+                        setModalVisible(false);
+                        router.push(`/(sales)/payments/${item.id}` as any);
+                      }}
+                    >
+                      <View style={styles.modalItemHeader}>
+                        <Text style={styles.modalItemTitle}>
+                          {item.sale_customer || "Unknown Customer"}
+                        </Text>
+                        <Text style={styles.modalItemAmount}>
+                          {formatCurrency(item.amount)}
+                        </Text>
+                      </View>
+                      <Text style={styles.modalItemSubtitle}>
+                        {item.payment_method} •{" "}
+                        {formatDateTime(item.created_at)}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.modalItemStatus,
+                          { color: getStatusColor(item.status) },
+                        ]}
+                      >
+                        {item.status}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                } else if (modalType === "sales") {
+                  return (
+                    <TouchableOpacity
+                      style={styles.modalListItem}
+                      onPress={() => {
+                        setModalVisible(false);
+                        router.push(`/(sales)/sales/${item.id}` as any);
+                      }}
+                    >
+                      <View style={styles.modalItemHeader}>
+                        <Text style={styles.modalItemTitle}>
+                          {item.customer_name || "Unknown Customer"}
+                        </Text>
+                        <Text style={styles.modalItemAmount}>
+                          {formatCurrency(item.total_amount)}
+                        </Text>
+                      </View>
+                      <Text style={styles.modalItemSubtitle}>
+                        {item.payment_method} •{" "}
+                        {formatDateTime(item.created_at)}
+                      </Text>
+                      <View style={styles.modalItemStatusRow}>
+                        <Text
+                          style={[
+                            styles.modalItemStatus,
+                            {
+                              color: getPaymentStatusColor(item.payment_status),
+                            },
+                          ]}
+                        >
+                          {item.payment_status}
+                        </Text>
+                        {item.balance > 0 && (
+                          <Text style={styles.modalItemBalance}>
+                            Balance: {formatCurrency(item.balance)}
+                          </Text>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  );
+                } else if (modalType === "customers") {
+                  return (
+                    <View style={styles.modalListItem}>
+                      <View style={styles.modalItemHeader}>
+                        <Text style={styles.modalItemTitle}>
+                          {item.customer_name || "Unknown Customer"}
+                        </Text>
+                        <Text style={styles.modalItemAmount}>
+                          {formatCurrency(item.total_debt)}
+                        </Text>
+                      </View>
+                      <Text style={styles.modalItemSubtitle}>
+                        Phone: {item.customer_phone || "N/A"}
+                      </Text>
+                      <Text style={styles.modalItemSubtitle}>
+                        {item.sale_count} sale{item.sale_count !== 1 ? "s" : ""}{" "}
+                        with outstanding balance
+                      </Text>
+                    </View>
+                  );
+                }
+                return null;
+              }}
+              contentContainerStyle={styles.modalListContainer}
+              showsVerticalScrollIndicator={false}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -377,6 +655,11 @@ const styles = StyleSheet.create({
     width: "48%",
     alignItems: "center",
     marginBottom: 16,
+    backgroundColor: "#f8f9fa",
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
   },
   summaryValue: {
     fontSize: 20,
@@ -387,6 +670,32 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#666",
     textAlign: "center",
+    marginTop: 4,
+  },
+  summaryIcon: {
+    marginTop: 4,
+  },
+  customersDebtCard: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: "#fff3cd",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ffeaa7",
+  },
+  customersDebtHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  customersDebtTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#856404",
+  },
+  customersDebtCount: {
+    fontSize: 12,
+    color: "#856404",
     marginTop: 4,
   },
   paymentCard: {
@@ -558,6 +867,55 @@ const styles = StyleSheet.create({
   },
   applyButtonText: {
     color: "#fff",
+    fontWeight: "600",
+  },
+  modalListContainer: {
+    padding: 16,
+  },
+  modalListItem: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+  },
+  modalItemHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 8,
+  },
+  modalItemTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    flex: 1,
+  },
+  modalItemAmount: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#007AFF",
+  },
+  modalItemSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 4,
+  },
+  modalItemStatus: {
+    fontSize: 12,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+  },
+  modalItemStatusRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  modalItemBalance: {
+    fontSize: 12,
+    color: "#FF9500",
     fontWeight: "600",
   },
 });
