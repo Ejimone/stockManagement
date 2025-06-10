@@ -24,10 +24,11 @@ export default function SalesProductDetailScreen() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (id) {
+    if (id && id !== "search" && id !== "by-sku") {
+      // Only fetch by ID if it's a valid product ID
       fetchProductDetails();
     } else if (sku || preselectedSku) {
-      // If we have SKU instead of ID, we need to find the product
+      // If we have SKU, find the product by SKU
       fetchProductBySku((sku as string) || (preselectedSku as string));
     }
   }, [id, sku, preselectedSku]);
@@ -45,21 +46,22 @@ export default function SalesProductDetailScreen() {
       setIsLoading(false);
     }
   };
-
   const fetchProductBySku = async (productSku: string) => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Fetch all products and find by SKU
-      const response = await getProducts();
+      // Use the search parameter in the products API to find by SKU
+      const response = await getProducts({ search: productSku });
       const products = response.results || response;
+
+      // Find exact match by SKU
       const foundProduct = products.find((p: Product) => p.sku === productSku);
 
       if (foundProduct) {
         setProduct(foundProduct);
       } else {
-        setError("Product not found with the specified SKU");
+        setError(`Product not found with SKU: ${productSku}`);
       }
     } catch (err: any) {
       console.error("Failed to fetch product by SKU:", err);

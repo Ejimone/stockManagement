@@ -328,7 +328,7 @@ export default function SalesMyReportsScreen() {
           onPress: () => {
             router.push({
               pathname: "/(sales)/products/[id]",
-              params: { id: "search", sku: productSku },
+              params: { id: "by-sku", sku: productSku },
             });
           },
         },
