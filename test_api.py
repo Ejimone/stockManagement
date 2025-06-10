@@ -7,10 +7,10 @@ import json
 BASE_URL = "http://127.0.0.1:8000/api"
 
 def get_auth_token():
-    """Get auth token for test user"""
+    """Get auth token for Banx user"""
     login_data = {
-        "email": "test@example.com",
-        "password": "testpass123"
+        "email": "Banx@gmail.com", 
+        "password": "password123"
     }
     response = requests.post(f"{BASE_URL}/auth/login/", json=login_data)
     if response.status_code == 200:

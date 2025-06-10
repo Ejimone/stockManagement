@@ -56,12 +56,18 @@ export default function SalespersonPaymentsScreen() {
   const handleTotalPaymentsClick = async () => {
     try {
       setModalTitle("All Payments Received");
-      setModalType("payments");
-      // Get all payments without filters
-      const response = await getPayments({
-        status: "Completed",
+      setModalType("sales");
+      // Get all sales for this user (payments come from sales.amount_paid + payment records)
+      const response = await getSales({
+        salesperson: user?.id,
       });
-      setModalData(response.results || response);
+
+      // Filter to show only sales that have payments (amount_paid > 0)
+      const salesWithPayments = (response.results || response).filter(
+        (sale) => sale.amount_paid && sale.amount_paid > 0
+      );
+
+      setModalData(salesWithPayments);
       setModalVisible(true);
     } catch (error) {
       Alert.alert("Error", "Failed to load payments data");
@@ -71,15 +77,18 @@ export default function SalespersonPaymentsScreen() {
     try {
       setModalTitle("Outstanding Credits (₦1000+)");
       setModalType("sales");
-      // Get all unpaid sales without filters, then filter for credits over 1000
+      // Get all sales for this user and filter for credits over 1000
       const response = await getSales({
-        payment_status: "Unpaid",
         salesperson: user?.id,
       });
 
-      // Filter for credits over 1000
+      // Filter for credits over 1000 (both Unpaid and Partial)
       const largeCreditSales = (response.results || response).filter(
-        (sale) => sale.balance && sale.balance >= 1000
+        (sale) =>
+          sale.balance &&
+          sale.balance >= 1000 &&
+          (sale.payment_status === "Unpaid" ||
+            sale.payment_status === "Partial")
       );
 
       setModalData(largeCreditSales);

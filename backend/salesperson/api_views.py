@@ -497,11 +497,10 @@ def payment_summary(request):
     credit_sales_count = sales_queryset.filter(payment_method='Credit').count()
     partial_payments_count = sales_queryset.filter(payment_status='Partial').count()
     
-    # Calculate total credits over 1000
-    credits_over_1000 = sales_queryset.filter(
-        payment_status='Unpaid', 
-        balance__gte=1000
-    ).aggregate(total=Sum('balance'))['total'] or 0
+    # Calculate total credits over 1000 - include all outstanding debts if total > 1000
+    # Based on user feedback, this should include all outstanding debt if it's over 1000
+    total_outstanding_debt = total_credits + total_partial_debts
+    credits_over_1000 = total_outstanding_debt if total_outstanding_debt >= 1000 else 0
     
     # Debug logging
     print(f"Debug - User: {user.email}, Role: {user.role}")
@@ -511,6 +510,20 @@ def payment_summary(request):
     print(f"Debug - Credit sales count: {credit_sales_count}")
     print(f"Debug - Total partial debts: {total_partial_debts}")
     print(f"Debug - Credits over 1000: {credits_over_1000}")
+    
+    # Additional debug for credits over 1000
+    unpaid_over_1000 = sales_queryset.filter(payment_status='Unpaid', balance__gte=1000)
+    partial_over_1000 = sales_queryset.filter(payment_status='Partial', balance__gte=1000)
+    print(f"Debug - Unpaid sales over 1000 count: {unpaid_over_1000.count()}")
+    print(f"Debug - Partial sales over 1000 count: {partial_over_1000.count()}")
+    for sale in unpaid_over_1000:
+        print(f"  Unpaid sale {sale.id}: balance={sale.balance}")
+    for sale in partial_over_1000:
+        print(f"  Partial sale {sale.id}: balance={sale.balance}")
+    
+    # Show total outstanding debt calculation
+    print(f"Debug - Total outstanding debt: {total_outstanding_debt}")
+    print(f"Debug - Credits over 1000 (using total outstanding if >= 1000): {credits_over_1000}")
     
     # Top customers with debt
     customers_with_debt = sales_queryset.filter(
