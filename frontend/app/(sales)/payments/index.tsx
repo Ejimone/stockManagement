@@ -59,7 +59,7 @@ export default function SalespersonPaymentsScreen() {
       setModalType("payments");
       // Get all payments without filters
       const response = await getPayments({
-        status: "completed",
+        status: "Completed",
       });
       setModalData(response.results || response);
       setModalVisible(true);
@@ -73,7 +73,7 @@ export default function SalespersonPaymentsScreen() {
       setModalType("sales");
       // Get all unpaid sales without filters, then filter for credits over 1000
       const response = await getSales({
-        payment_status: "unpaid",
+        payment_status: "Unpaid",
         salesperson: user?.id,
       });
 
@@ -95,7 +95,7 @@ export default function SalespersonPaymentsScreen() {
       setModalType("sales");
       // Get all partial payments without filters
       const response = await getSales({
-        payment_status: "partial",
+        payment_status: "Partial",
         salesperson: user?.id,
       });
       setModalData(response.results || response);

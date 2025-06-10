@@ -3132,3 +3132,88 @@ INFO 2025-06-10 14:21:06,954 basehttp 21514 6166638592 "GET /api/sales/?payment_
 INFO 2025-06-10 14:21:10,624 basehttp 21514 6166638592 "GET /api/sales/?payment_status=partial&salesperson=9 HTTP/1.1" 200 52
 INFO 2025-06-10 14:21:16,808 basehttp 21514 6166638592 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 5664
 INFO 2025-06-10 14:21:22,141 basehttp 21514 6166638592 "GET /api/payments/?status=completed HTTP/1.1" 200 52
+INFO 2025-06-10 14:21:50,764 basehttp 21514 6166638592 "GET /api/sales/?payment_status=partial&salesperson=9 HTTP/1.1" 200 52
+INFO 2025-06-10 14:22:26,020 basehttp 21514 6166638592 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 5664
+INFO 2025-06-10 14:22:32,441 basehttp 21514 6166638592 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:22:32,451 basehttp 21514 6325039104 "GET /api/payments/summary/ HTTP/1.1" 200 243
+INFO 2025-06-10 14:22:58,984 basehttp 21514 6166638592 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 5664
+INFO 2025-06-10 14:23:00,545 basehttp 21514 6166638592 "GET /api/products/?active_only=true HTTP/1.1" 200 5676
+INFO 2025-06-10 14:23:11,559 basehttp 21514 6166638592 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 5664
+INFO 2025-06-10 14:23:15,743 basehttp 21514 6166638592 "GET /api/products/?active_only=true HTTP/1.1" 200 5676
+INFO 2025-06-10 14:23:50,182 basehttp 21514 6166638592 "POST /api/sales/ HTTP/1.1" 201 713
+INFO 2025-06-10 14:23:54,193 basehttp 21514 6166638592 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 6378
+INFO 2025-06-10 14:24:05,046 basehttp 21514 6166638592 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:24:05,054 basehttp 21514 6325039104 "GET /api/payments/summary/ HTTP/1.1" 200 243
+INFO 2025-06-10 14:24:06,675 basehttp 21514 6166638592 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:24:06,682 basehttp 21514 6325039104 "GET /api/payments/summary/ HTTP/1.1" 200 243
+INFO 2025-06-10 14:24:08,643 basehttp 21514 6166638592 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:24:08,656 basehttp 21514 6325039104 "GET /api/payments/summary/ HTTP/1.1" 200 243
+INFO 2025-06-10 14:24:10,069 basehttp 21514 6166638592 "GET /api/payments/?status=completed HTTP/1.1" 200 52
+INFO 2025-06-10 14:24:52,478 basehttp 21514 6166638592 "GET /api/sales/?payment_status=partial&salesperson=9 HTTP/1.1" 200 52
+INFO 2025-06-10 14:25:13,188 basehttp 21514 6166638592 "GET /api/sales/?payment_status=unpaid&salesperson=9 HTTP/1.1" 200 52
+INFO 2025-06-10 14:25:56,081 basehttp 21514 6166638592 "GET /api/sales/?payment_status=partial&salesperson=9 HTTP/1.1" 200 52
+INFO 2025-06-10 14:26:28,757 basehttp 21514 6166638592 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 6378
+INFO 2025-06-10 14:26:32,104 basehttp 21514 6166638592 "GET /api/sales/34/ HTTP/1.1" 200 438
+INFO 2025-06-10 14:26:34,311 basehttp 21514 6166638592 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 6378
+INFO 2025-06-10 14:26:36,192 basehttp 21514 6166638592 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3840
+INFO 2025-06-10 14:26:37,363 basehttp 21514 6166638592 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:26:37,370 basehttp 21514 6325039104 "GET /api/payments/summary/ HTTP/1.1" 200 243
+INFO 2025-06-10 14:26:39,291 basehttp 21514 6166638592 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:26:39,316 basehttp 21514 6166638592 "GET /api/payments/summary/ HTTP/1.1" 200 243
+INFO 2025-06-10 14:29:14,786 basehttp 21514 6325039104 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:29:14,805 basehttp 21514 6166638592 "GET /api/payments/summary/ HTTP/1.1" 200 243
+INFO 2025-06-10 14:29:32,919 basehttp 21514 6325039104 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:29:32,924 basehttp 21514 6166638592 "GET /api/payments/summary/ HTTP/1.1" 200 243
+INFO 2025-06-10 14:29:44,315 basehttp 21514 6166638592 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:29:44,321 basehttp 21514 6325039104 "GET /api/payments/summary/ HTTP/1.1" 200 243
+INFO 2025-06-10 14:29:45,803 basehttp 21514 6166638592 "GET /api/payments/?status=Completed HTTP/1.1" 200 52
+INFO 2025-06-10 14:30:03,375 autoreload 21514 8825560832 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 14:30:03,878 autoreload 24177 8825560832 Watching for file changes with StatReloader
+INFO 2025-06-10 14:30:12,213 basehttp 24177 6198456320 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 6378
+INFO 2025-06-10 14:30:16,472 autoreload 24177 8825560832 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 14:30:16,977 autoreload 24208 8825560832 Watching for file changes with StatReloader
+INFO 2025-06-10 14:30:25,377 autoreload 24208 8825560832 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 14:30:25,836 autoreload 24232 8825560832 Watching for file changes with StatReloader
+INFO 2025-06-10 14:30:42,248 basehttp 24232 6135132160 "GET /api/payments/?status=Completed HTTP/1.1" 200 52
+INFO 2025-06-10 14:30:42,748 basehttp 24232 6135132160 "GET /api/payments/?status=Completed HTTP/1.1" 200 52
+INFO 2025-06-10 14:30:49,050 autoreload 27612 8825560832 Watching for file changes with StatReloader
+INFO 2025-06-10 14:30:52,070 basehttp 24232 6135132160 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:30:52,087 basehttp 24232 6151958528 "GET /api/payments/summary/ HTTP/1.1" 200 339
+INFO 2025-06-10 14:30:56,500 basehttp 24232 6135132160 "GET /api/sales/?payment_status=Unpaid&salesperson=9 HTTP/1.1" 200 52
+INFO 2025-06-10 14:30:59,540 basehttp 24232 6135132160 "GET /api/sales/?payment_status=Partial&salesperson=9 HTTP/1.1" 200 765
+INFO 2025-06-10 14:31:18,945 autoreload 29330 8825560832 Watching for file changes with StatReloader
+INFO 2025-06-10 14:31:21,996 basehttp 29330 6164738048 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:31:22,003 basehttp 29330 6181564416 "GET /api/payments/summary/ HTTP/1.1" 200 339
+INFO 2025-06-10 14:31:37,838 basehttp 29330 6164738048 "GET /api/payments/?status=Completed HTTP/1.1" 200 52
+INFO 2025-06-10 14:31:42,684 basehttp 29330 6164738048 "GET /api/sales/?payment_status=Unpaid&salesperson=9 HTTP/1.1" 200 52
+WARNING 2025-06-10 14:31:48,530 log 29330 6198390784 Bad Request: /api/auth/login/
+WARNING 2025-06-10 14:31:48,530 basehttp 29330 6198390784 "POST /api/auth/login/ HTTP/1.1" 400 51
+WARNING 2025-06-10 14:31:48,835 log 29330 6215217152 Bad Request: /api/auth/login/
+WARNING 2025-06-10 14:31:48,835 basehttp 29330 6215217152 "POST /api/auth/login/ HTTP/1.1" 400 51
+WARNING 2025-06-10 14:31:49,138 log 29330 6232043520 Bad Request: /api/auth/login/
+WARNING 2025-06-10 14:31:49,139 basehttp 29330 6232043520 "POST /api/auth/login/ HTTP/1.1" 400 51
+WARNING 2025-06-10 14:32:12,666 log 29330 6198390784 Bad Request: /api/auth/login/
+WARNING 2025-06-10 14:32:12,667 basehttp 29330 6198390784 "POST /api/auth/login/ HTTP/1.1" 400 51
+WARNING 2025-06-10 14:32:12,968 log 29330 6215217152 Bad Request: /api/auth/login/
+WARNING 2025-06-10 14:32:12,968 basehttp 29330 6215217152 "POST /api/auth/login/ HTTP/1.1" 400 51
+WARNING 2025-06-10 14:32:13,272 log 29330 6232043520 Bad Request: /api/auth/login/
+WARNING 2025-06-10 14:32:13,272 basehttp 29330 6232043520 "POST /api/auth/login/ HTTP/1.1" 400 51
+INFO 2025-06-10 14:32:47,952 basehttp 29330 6248869888 "POST /api/auth/login/ HTTP/1.1" 200 592
+INFO 2025-06-10 14:32:47,962 basehttp 29330 6265696256 "GET /api/payments/summary/ HTTP/1.1" 200 236
+INFO 2025-06-10 14:32:48,267 basehttp 29330 6198390784 "POST /api/auth/login/ HTTP/1.1" 200 592
+INFO 2025-06-10 14:32:48,271 basehttp 29330 6215217152 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:32:48,276 basehttp 29330 6232043520 "GET /api/payments/?status=Completed HTTP/1.1" 200 52
+INFO 2025-06-10 14:32:48,580 basehttp 29330 6248869888 "POST /api/auth/login/ HTTP/1.1" 200 592
+INFO 2025-06-10 14:32:48,584 basehttp 29330 6265696256 "GET /api/sales/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:32:48,592 basehttp 29330 6282522624 "GET /api/sales/?payment_status=Unpaid HTTP/1.1" 200 52
+INFO 2025-06-10 14:32:48,596 basehttp 29330 6198390784 "GET /api/sales/?payment_status=Partial HTTP/1.1" 200 52
+INFO 2025-06-10 14:33:53,209 autoreload 29330 8825560832 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 14:33:53,671 autoreload 31986 8825560832 Watching for file changes with StatReloader
+INFO 2025-06-10 14:33:56,420 basehttp 31986 6139260928 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:33:56,427 basehttp 31986 6122434560 "GET /api/payments/summary/ HTTP/1.1" 200 339
+INFO 2025-06-10 14:33:57,325 basehttp 31986 6122434560 "GET /api/sales/?payment_status=Unpaid&salesperson=9 HTTP/1.1" 200 52
+INFO 2025-06-10 14:34:00,742 basehttp 31986 6122434560 "GET /api/sales/?payment_status=Partial&salesperson=9 HTTP/1.1" 200 765
+INFO 2025-06-10 14:34:05,910 basehttp 31986 6122434560 "GET /api/sales/36/ HTTP/1.1" 200 713
+INFO 2025-06-10 14:34:10,446 basehttp 31986 6122434560 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 14:34:10,452 basehttp 31986 6139260928 "GET /api/payments/summary/ HTTP/1.1" 200 339
+INFO 2025-06-10 14:34:12,673 basehttp 31986 6122434560 "GET /api/sales/?payment_status=Unpaid&salesperson=9 HTTP/1.1" 200 52

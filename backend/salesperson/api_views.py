@@ -486,8 +486,8 @@ def payment_summary(request):
     total_payments = payment_records_total + sales_amount_paid_total
     
     # Total credits and partial debts
-    total_credits = sales_queryset.filter(payment_status='unpaid').aggregate(total=Sum('balance'))['total'] or 0
-    total_partial_debts = sales_queryset.filter(payment_status='partial').aggregate(total=Sum('balance'))['total'] or 0
+    total_credits = sales_queryset.filter(payment_status='Unpaid').aggregate(total=Sum('balance'))['total'] or 0
+    total_partial_debts = sales_queryset.filter(payment_status='Partial').aggregate(total=Sum('balance'))['total'] or 0
     
     # Count statistics
     completed_payments = payments_queryset.filter(status='Completed').count()
@@ -495,11 +495,11 @@ def payment_summary(request):
     
     # Credit sales count should include all sales made on credit, regardless of payment status
     credit_sales_count = sales_queryset.filter(payment_method='Credit').count()
-    partial_payments_count = sales_queryset.filter(payment_status='partial').count()
+    partial_payments_count = sales_queryset.filter(payment_status='Partial').count()
     
     # Calculate total credits over 1000
     credits_over_1000 = sales_queryset.filter(
-        payment_status='unpaid', 
+        payment_status='Unpaid', 
         balance__gte=1000
     ).aggregate(total=Sum('balance'))['total'] or 0
     
@@ -514,7 +514,7 @@ def payment_summary(request):
     
     # Top customers with debt
     customers_with_debt = sales_queryset.filter(
-        payment_status__in=['unpaid', 'partial'],
+        payment_status__in=['Unpaid', 'Partial'],
         customer_name__isnull=False
     ).exclude(customer_name='').values(
         'customer_name', 'customer_phone'
