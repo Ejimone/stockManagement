@@ -198,6 +198,137 @@ export default function SalesSaleDetailScreen() {
         </View>
       )}
 
+      {/* Receipt Preview */}
+      <View style={styles.receiptSection}>
+        <Text style={styles.sectionTitle}>Receipt Preview</Text>
+        <View style={styles.receiptContainer}>
+          {/* Receipt Header */}
+          <View style={styles.receiptHeader}>
+            <Text style={styles.receiptTitle}>SALE RECEIPT</Text>
+            <Text style={styles.receiptId}>Receipt #{sale.id}</Text>
+            <Text style={styles.receiptDate}>
+              {sale.created_at
+                ? new Date(sale.created_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "Unknown date"}
+            </Text>
+          </View>
+
+          {/* Receipt Body */}
+          <View style={styles.receiptBody}>
+            {/* Customer Info */}
+            {(sale.customer_name || sale.customer_phone) && (
+              <View style={styles.receiptCustomer}>
+                <Text style={styles.receiptLabel}>CUSTOMER:</Text>
+                {sale.customer_name && (
+                  <Text style={styles.receiptValue}>{sale.customer_name}</Text>
+                )}
+                {sale.customer_phone && (
+                  <Text style={styles.receiptValue}>{sale.customer_phone}</Text>
+                )}
+              </View>
+            )}
+
+            {/* Salesperson */}
+            <View style={styles.receiptSalesperson}>
+              <Text style={styles.receiptLabel}>SERVED BY:</Text>
+              <Text style={styles.receiptValue}>
+                {sale.salesperson_name || `Staff ID: ${sale.salesperson}`}
+              </Text>
+            </View>
+
+            {/* Items */}
+            <View style={styles.receiptItems}>
+              <Text style={styles.receiptLabel}>ITEMS:</Text>
+              <View style={styles.receiptItemsHeader}>
+                <Text style={styles.receiptItemHeaderText}>Item</Text>
+                <Text style={styles.receiptItemHeaderText}>Qty</Text>
+                <Text style={styles.receiptItemHeaderText}>Price</Text>
+                <Text style={styles.receiptItemHeaderText}>Total</Text>
+              </View>
+              {sale.items?.map((item, index) => (
+                <View key={index} style={styles.receiptItemRow}>
+                  <Text style={styles.receiptItemName}>
+                    {item.product_name || `Product ${item.product}`}
+                  </Text>
+                  <Text style={styles.receiptItemQty}>{item.quantity}</Text>
+                  <Text style={styles.receiptItemPrice}>
+                    {formatPrice(item.price_at_sale)}
+                  </Text>
+                  <Text style={styles.receiptItemTotal}>
+                    {formatPrice(item.subtotal)}
+                  </Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Totals */}
+            <View style={styles.receiptTotals}>
+              <View style={styles.receiptTotalRow}>
+                <Text style={styles.receiptTotalLabel}>SUBTOTAL:</Text>
+                <Text style={styles.receiptTotalValue}>
+                  {formatPrice(sale.total_amount)}
+                </Text>
+              </View>
+              <View style={styles.receiptTotalRow}>
+                <Text style={styles.receiptTotalLabel}>AMOUNT PAID:</Text>
+                <Text style={styles.receiptTotalValue}>
+                  {formatPrice(sale.amount_paid)}
+                </Text>
+              </View>
+              {sale.balance && sale.balance > 0 && (
+                <View style={styles.receiptTotalRow}>
+                  <Text
+                    style={[styles.receiptTotalLabel, styles.receiptBalance]}
+                  >
+                    BALANCE DUE:
+                  </Text>
+                  <Text
+                    style={[styles.receiptTotalValue, styles.receiptBalance]}
+                  >
+                    {formatPrice(sale.balance)}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* Payment Method */}
+            <View style={styles.receiptPayment}>
+              <Text style={styles.receiptLabel}>PAYMENT METHOD:</Text>
+              <Text style={styles.receiptValue}>{sale.payment_method}</Text>
+              <Text style={styles.receiptLabel}>STATUS:</Text>
+              <Text
+                style={[
+                  styles.receiptValue,
+                  sale.payment_status === "paid"
+                    ? styles.receiptPaid
+                    : sale.payment_status === "partial"
+                    ? styles.receiptPartial
+                    : styles.receiptUnpaid,
+                ]}
+              >
+                {sale.payment_status?.toUpperCase()}
+              </Text>
+            </View>
+          </View>
+
+          {/* Receipt Footer */}
+          <View style={styles.receiptFooter}>
+            <Text style={styles.receiptThankYou}>
+              Thank you for your business!
+            </Text>
+            <Text style={styles.receiptFooterText}>
+              This is a valid receipt for your purchase
+            </Text>
+          </View>
+        </View>
+      </View>
+
       {/* Actions */}
       <View style={styles.actions}>
         <TouchableOpacity
@@ -336,5 +467,178 @@ const styles = StyleSheet.create({
     color: "#dc3545",
     textAlign: "center",
     marginBottom: 16,
+  },
+  // Receipt Preview Styles
+  receiptSection: {
+    backgroundColor: "#ffffff",
+    marginTop: 12,
+    padding: 16,
+  },
+  receiptContainer: {
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#e1e1e1",
+    borderRadius: 8,
+    padding: 20,
+    marginTop: 8,
+  },
+  receiptHeader: {
+    alignItems: "center",
+    borderBottomWidth: 2,
+    borderBottomColor: "#333333",
+    paddingBottom: 16,
+    marginBottom: 16,
+  },
+  receiptTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333333",
+    marginBottom: 4,
+  },
+  receiptId: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#666666",
+    marginBottom: 4,
+  },
+  receiptDate: {
+    fontSize: 14,
+    color: "#666666",
+  },
+  receiptBody: {
+    marginBottom: 16,
+  },
+  receiptCustomer: {
+    marginBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+    paddingBottom: 8,
+  },
+  receiptSalesperson: {
+    marginBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+    paddingBottom: 8,
+  },
+  receiptLabel: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#333333",
+    marginBottom: 4,
+    letterSpacing: 0.5,
+  },
+  receiptValue: {
+    fontSize: 14,
+    color: "#666666",
+    marginBottom: 2,
+  },
+  receiptItems: {
+    marginBottom: 16,
+  },
+  receiptItemsHeader: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "#333333",
+    paddingBottom: 8,
+    marginBottom: 8,
+    marginTop: 8,
+  },
+  receiptItemHeaderText: {
+    flex: 1,
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#333333",
+    textAlign: "center",
+  },
+  receiptItemRow: {
+    flexDirection: "row",
+    paddingVertical: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  receiptItemName: {
+    flex: 2,
+    fontSize: 12,
+    color: "#333333",
+    paddingRight: 4,
+  },
+  receiptItemQty: {
+    flex: 1,
+    fontSize: 12,
+    color: "#333333",
+    textAlign: "center",
+  },
+  receiptItemPrice: {
+    flex: 1,
+    fontSize: 12,
+    color: "#333333",
+    textAlign: "center",
+  },
+  receiptItemTotal: {
+    flex: 1,
+    fontSize: 12,
+    color: "#333333",
+    textAlign: "center",
+    fontWeight: "600",
+  },
+  receiptTotals: {
+    borderTopWidth: 2,
+    borderTopColor: "#333333",
+    paddingTop: 12,
+    marginBottom: 12,
+  },
+  receiptTotalRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 4,
+  },
+  receiptTotalLabel: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#333333",
+  },
+  receiptTotalValue: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#333333",
+  },
+  receiptBalance: {
+    color: "#dc3545",
+    fontSize: 16,
+  },
+  receiptPayment: {
+    borderTopWidth: 1,
+    borderTopColor: "#e1e1e1",
+    paddingTop: 12,
+    marginBottom: 12,
+  },
+  receiptPaid: {
+    color: "#28a745",
+    fontWeight: "bold",
+  },
+  receiptPartial: {
+    color: "#ffc107",
+    fontWeight: "bold",
+  },
+  receiptUnpaid: {
+    color: "#dc3545",
+    fontWeight: "bold",
+  },
+  receiptFooter: {
+    alignItems: "center",
+    borderTopWidth: 2,
+    borderTopColor: "#333333",
+    paddingTop: 16,
+  },
+  receiptThankYou: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333333",
+    marginBottom: 8,
+  },
+  receiptFooterText: {
+    fontSize: 12,
+    color: "#666666",
+    textAlign: "center",
   },
 });

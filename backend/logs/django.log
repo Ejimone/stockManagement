@@ -2438,3 +2438,29 @@ INFO 2025-06-10 06:47:47,287 basehttp 51997 6129135616 "GET /api/reports/compreh
 INFO 2025-06-10 06:47:50,613 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-06-03&date_to=2025-06-10 HTTP/1.1" 200 2273
 INFO 2025-06-10 06:47:53,658 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3584
 INFO 2025-06-10 06:47:55,766 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-06-03&date_to=2025-06-10 HTTP/1.1" 200 2273
+INFO 2025-06-10 06:53:05,090 basehttp 51997 6145961984 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 06:53:05,092 basehttp 51997 6129135616 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 06:55:46,284 autoreload 55053 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 06:56:17,296 autoreload 57615 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 06:56:38,419 basehttp 51997 6129135616 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 06:56:38,421 basehttp 51997 6145961984 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 06:56:38,851 basehttp 51997 6129135616 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 06:56:39,098 basehttp 51997 6129135616 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 06:56:42,141 basehttp 51997 6129135616 "GET /api/sales/29/ HTTP/1.1" 200 566
+INFO 2025-06-10 06:56:56,763 basehttp 51997 6129135616 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 06:56:59,109 basehttp 51997 6129135616 "GET /api/sales/29/ HTTP/1.1" 200 566
+INFO 2025-06-10 06:57:22,502 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3584
+INFO 2025-06-10 06:57:27,915 basehttp 51997 6129135616 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 06:57:31,482 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3584
+INFO 2025-06-10 06:57:43,769 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-06-03&date_to=2025-06-10 HTTP/1.1" 200 2273
+INFO 2025-06-10 06:57:44,698 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3584
+INFO 2025-06-10 06:57:45,638 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-06-03&date_to=2025-06-10 HTTP/1.1" 200 2273
+INFO 2025-06-10 06:57:46,670 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3584
+INFO 2025-06-10 06:57:47,610 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-06-03&date_to=2025-06-10 HTTP/1.1" 200 2273
+INFO 2025-06-10 06:58:10,298 basehttp 51997 6129135616 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 06:58:11,575 basehttp 51997 6129135616 "GET /api/sales/29/ HTTP/1.1" 200 566
+INFO 2025-06-10 06:58:42,011 basehttp 51997 6129135616 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 06:59:19,926 basehttp 51997 6129135616 "GET /api/sales/?date_from=2025-06-10&date_to=2025-06-10&salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 06:59:20,793 basehttp 51997 6129135616 "GET /api/sales/?date_from=2025-06-03&salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 06:59:21,541 basehttp 51997 6129135616 "GET /api/sales/?date_from=2025-05-11&salesperson=9 HTTP/1.1" 200 3169
+INFO 2025-06-10 06:59:23,693 basehttp 51997 6129135616 "GET /api/sales/?salesperson=9 HTTP/1.1" 200 3169
