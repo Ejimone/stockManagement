@@ -96,3 +96,25 @@ class IsAdminOrOwner(permissions.BasePermission):
             return obj.id == request.user.id
         
         return False
+
+
+class CanCreateProductButNotDelete(permissions.BasePermission):
+    """
+    Custom permission to allow authenticated users to read and create products,
+    but only Admin users can delete products.
+    """
+    
+    def has_permission(self, request, view):
+        # All authenticated users can view and create products
+        if request.method in ['GET', 'POST']:
+            return request.user and request.user.is_authenticated
+        
+        # Only Admin users can update/delete products
+        if request.method in ['PUT', 'PATCH', 'DELETE']:
+            return (
+                request.user and 
+                request.user.is_authenticated and 
+                request.user.role == 'Admin'
+            )
+        
+        return False

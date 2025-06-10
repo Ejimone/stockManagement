@@ -2,6 +2,13 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import * as tokenStorage from "./tokenStorage";
 import { User } from "../contexts/AuthContext"; // For User type
 import { Platform } from "react-native";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+
+// Platform-specific FileSystem check
+if (Platform.OS !== "web" && !FileSystem.downloadAsync) {
+  console.warn("FileSystem.downloadAsync is not available on this platform");
+}
 
 // Use either localhost for development on same machine, or device's local IP address
 // for testing on real devices, or your production backend URL
@@ -669,13 +676,57 @@ export const downloadAndSavePdfReceipt = async (
   saleId: string | number
 ): Promise<{ success: boolean; filePath?: string; error?: string }> => {
   try {
+    console.log("Starting PDF receipt download for sale:", saleId);
+
+    // Web platform fallback
+    if (Platform.OS === "web") {
+      console.log("Web platform detected, using browser download");
+      try {
+        const tokenData = await createPdfToken(saleId);
+        const downloadUrl = `${API_BASE_URL.replace("/api/", "")}${
+          tokenData.download_url
+        }`;
+
+        // For web, open the PDF in a new tab
+        if (typeof window !== "undefined") {
+          window.open(downloadUrl, "_blank");
+        } else {
+          throw new Error("Window object not available");
+        }
+
+        return {
+          success: true,
+          filePath: downloadUrl,
+        };
+      } catch (webError) {
+        console.error("Web download failed:", webError);
+        return {
+          success: false,
+          error:
+            "Failed to open PDF in browser: " +
+            (webError instanceof Error ? webError.message : "Unknown error"),
+        };
+      }
+    }
+
+    // Check if FileSystem.downloadAsync is available
+    if (!FileSystem.downloadAsync) {
+      throw new Error(
+        "FileSystem.downloadAsync is not available on this platform. Please check if expo-file-system is properly installed."
+      );
+    }
+
     // First, create a PDF token
     const tokenData = await createPdfToken(saleId);
+    console.log(
+      "PDF token created successfully:",
+      tokenData.token.substring(0, 8) + "..."
+    );
 
-    // Import required React Native modules
-    const { Platform } = await import("react-native");
-    const FileSystem = await import("expo-file-system");
-    const Sharing = await import("expo-sharing");
+    // Check if FileSystem is available
+    if (!FileSystem.documentDirectory) {
+      throw new Error("FileSystem.documentDirectory is not available");
+    }
 
     // Build the download URL (no authentication needed)
     const downloadUrl = `${API_BASE_URL.replace("/api/", "")}${
@@ -686,20 +737,37 @@ export const downloadAndSavePdfReceipt = async (
     const fileName = `receipt_sale_${saleId}_${Date.now()}.pdf`;
     const fileUri = `${FileSystem.documentDirectory}${fileName}`;
 
-    // Download the file
     console.log("Downloading PDF from:", downloadUrl);
+    console.log("Saving to:", fileUri);
+
+    // Download the file
     const downloadResult = await FileSystem.downloadAsync(downloadUrl, fileUri);
+    console.log("Download result:", downloadResult);
 
     if (downloadResult.status === 200) {
       console.log("PDF downloaded successfully to:", downloadResult.uri);
 
-      // Share/save the file
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(downloadResult.uri, {
-          mimeType: "application/pdf",
-          dialogTitle: "Save Receipt",
-          UTI: "com.adobe.pdf",
-        });
+      // Check if sharing is available and share the file
+      try {
+        const isAvailable = await Sharing.isAvailableAsync();
+        console.log("Sharing available:", isAvailable);
+
+        if (isAvailable) {
+          await Sharing.shareAsync(downloadResult.uri, {
+            mimeType: "application/pdf",
+            dialogTitle: "Save Receipt",
+            UTI: "com.adobe.pdf",
+          });
+          console.log("File shared successfully");
+        } else {
+          console.log("Sharing not available on this platform");
+        }
+      } catch (sharingError) {
+        console.error(
+          "Failed to share file, but download succeeded:",
+          sharingError
+        );
+        // Don't fail the entire operation if sharing fails
       }
 
       return {
@@ -707,6 +775,7 @@ export const downloadAndSavePdfReceipt = async (
         filePath: downloadResult.uri,
       };
     } else {
+      console.error("Download failed with status:", downloadResult.status);
       return {
         success: false,
         error: `Download failed with status: ${downloadResult.status}`,

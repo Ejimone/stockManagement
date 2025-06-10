@@ -10,7 +10,7 @@ import {
   RefreshControl,
   Alert,
 } from "react-native";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { getProducts, Product } from "../../../services/api";
 import { formatCurrency } from "../../../utils/formatters";
@@ -84,6 +84,13 @@ export default function SalesProductListScreen() {
   useEffect(() => {
     fetchProductsData(true);
   }, []);
+
+  // Refresh products when screen comes into focus (e.g., returning from create page)
+  useFocusEffect(
+    useCallback(() => {
+      fetchProductsData(true);
+    }, [])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -240,6 +247,23 @@ export default function SalesProductListScreen() {
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ title: "View Products" }} />
+
+      {/* Add Product Button */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity
+          style={styles.addProductButton}
+          onPress={() => router.push("/(sales)/products/create")}
+          activeOpacity={0.8}
+        >
+          <Ionicons
+            name="add-circle"
+            size={20}
+            color="#ffffff"
+            style={styles.buttonIcon}
+          />
+          <Text style={styles.addProductButtonText}>Add New Product</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
@@ -456,5 +480,25 @@ const styles = StyleSheet.create({
   },
   makeSaleButtonTextDisabled: {
     color: "#d1d5db",
+  },
+  headerContainer: {
+    padding: 16,
+    backgroundColor: "#ffffff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+  },
+  addProductButton: {
+    backgroundColor: "#10b981",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  addProductButtonText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

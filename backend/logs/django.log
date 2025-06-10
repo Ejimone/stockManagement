@@ -2275,3 +2275,166 @@ INFO 2025-06-10 06:18:10,848 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP
 INFO 2025-06-10 06:18:14,264 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 142
 INFO 2025-06-10 06:18:19,256 basehttp 18808 6158200832 "POST /api/sales/ HTTP/1.1" 201 588
 INFO 2025-06-10 06:18:22,359 basehttp 18808 6158200832 "POST /api/sales/26/pdf-token/ HTTP/1.1" 201 169
+INFO 2025-06-10 06:19:58,707 basehttp 18808 13035925504 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 06:19:58,711 basehttp 18808 6158200832 "GET /api/payments/summary/ HTTP/1.1" 200 214
+INFO 2025-06-10 06:19:59,279 basehttp 18808 6158200832 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 2780
+INFO 2025-06-10 06:20:00,016 basehttp 18808 6158200832 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 06:20:00,020 basehttp 18808 13035925504 "GET /api/payments/summary/ HTTP/1.1" 200 214
+INFO 2025-06-10 06:20:02,700 basehttp 18808 6158200832 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 06:20:02,702 basehttp 18808 13035925504 "GET /api/payments/summary/ HTTP/1.1" 200 214
+INFO 2025-06-10 06:20:05,533 basehttp 18808 6158200832 "GET /api/reports/comprehensive/?date_from=2025-06-03&date_to=2025-06-10 HTTP/1.1" 200 1469
+INFO 2025-06-10 06:20:08,178 basehttp 18808 6158200832 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 2780
+INFO 2025-06-10 06:20:08,349 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:20:08,350 basehttp 18808 13035925504 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:20:10,486 basehttp 18808 13035925504 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 06:20:10,490 basehttp 18808 6158200832 "GET /api/payments/summary/ HTTP/1.1" 200 214
+INFO 2025-06-10 06:20:14,326 basehttp 18808 13035925504 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 06:20:14,327 basehttp 18808 6158200832 "GET /api/payments/summary/ HTTP/1.1" 200 214
+INFO 2025-06-10 06:20:15,191 basehttp 18808 6158200832 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 2780
+INFO 2025-06-10 06:20:22,293 basehttp 18808 6158200832 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 2780
+INFO 2025-06-10 06:20:22,472 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:20:22,473 basehttp 18808 13035925504 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:20:29,966 basehttp 18808 6158200832 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:20:30,485 basehttp 18808 6158200832 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:20:34,437 basehttp 18808 6158200832 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:20:34,816 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:20:34,816 basehttp 18808 13035925504 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:21:05,244 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:21:05,404 basehttp 18808 13035925504 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:21:05,404 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:21:16,025 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:21:16,217 basehttp 18808 13035925504 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:21:16,217 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:21:25,369 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:21:25,547 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:21:25,549 basehttp 18808 13035925504 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:21:39,859 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:21:40,097 basehttp 18808 13035925504 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:21:40,098 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:21:45,395 basehttp 18808 6158200832 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:21:46,011 basehttp 18808 6158200832 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:22:04,647 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:22:08,864 basehttp 18808 6158200832 "GET /api/products/?active_only=true HTTP/1.1" 200 5739
+INFO 2025-06-10 06:22:10,110 basehttp 18808 6158200832 "GET /api/products/?active_only=true HTTP/1.1" 200 5739
+INFO 2025-06-10 06:22:10,332 basehttp 18808 13035925504 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:22:10,332 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:22:12,580 basehttp 18808 6158200832 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:22:13,117 basehttp 18808 6158200832 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:22:13,437 basehttp 18808 6158200832 "GET /api/products/?active_only=true HTTP/1.1" 200 5739
+INFO 2025-06-10 06:22:21,966 basehttp 18808 6158200832 "GET /api/products/?active_only=true HTTP/1.1" 200 5739
+INFO 2025-06-10 06:22:22,147 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:22:22,151 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:22:22,986 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:22:36,618 basehttp 18808 6158200832 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:22:37,141 basehttp 18808 6158200832 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:23:00,883 basehttp 18808 6158200832 "GET /api/products/?active_only=true HTTP/1.1" 200 5739
+INFO 2025-06-10 06:23:05,962 basehttp 18808 6158200832 "GET /api/products/?active_only=true HTTP/1.1" 200 5739
+INFO 2025-06-10 06:23:06,181 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:23:06,199 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 144
+INFO 2025-06-10 06:23:09,403 basehttp 18808 6158200832 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:23:09,936 basehttp 18808 6158200832 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:23:10,296 basehttp 18808 6158200832 "GET /api/products/?active_only=true HTTP/1.1" 200 5739
+INFO 2025-06-10 06:24:42,741 basehttp 18808 6158200832 "POST /api/sales/ HTTP/1.1" 201 478
+INFO 2025-06-10 06:25:05,179 basehttp 18808 13069578240 "GET /api/dashboard/ HTTP/1.1" 200 148
+INFO 2025-06-10 06:25:05,180 basehttp 18808 13052751872 "GET /api/dashboard/ HTTP/1.1" 200 148
+INFO 2025-06-10 06:25:08,422 basehttp 18808 13052751872 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:25:08,917 basehttp 18808 13052751872 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:25:10,462 basehttp 18808 13052751872 "GET /api/products/?active_only=true HTTP/1.1" 200 5739
+INFO 2025-06-10 06:26:25,340 basehttp 18808 13052751872 "POST /api/sales/ HTTP/1.1" 201 453
+INFO 2025-06-10 06:26:31,422 basehttp 18808 13052751872 "POST /api/sales/28/pdf-token/ HTTP/1.1" 201 169
+INFO 2025-06-10 06:26:31,441 basehttp 18808 13086404608 "GET /api/sales/28/pdf/5d99f4f2-6bde-474e-8f18-1fa777e9f882/ HTTP/1.1" 200 2504
+INFO 2025-06-10 06:27:11,305 basehttp 18808 13035925504 "GET /api/sales/ HTTP/1.1" 200 2162
+WARNING 2025-06-10 06:27:24,359 log 18808 13035925504 Forbidden: /api/users/
+WARNING 2025-06-10 06:27:24,359 basehttp 18808 13035925504 "GET /api/users/?role=Salesperson HTTP/1.1" 403 63
+WARNING 2025-06-10 06:27:28,262 log 18808 13035925504 Forbidden: /api/users/
+WARNING 2025-06-10 06:27:28,262 basehttp 18808 13035925504 "GET /api/users/?role=Salesperson HTTP/1.1" 403 63
+WARNING 2025-06-10 06:27:28,911 log 18808 13035925504 Forbidden: /api/users/
+WARNING 2025-06-10 06:27:28,911 basehttp 18808 13035925504 "GET /api/users/?role=Salesperson HTTP/1.1" 403 63
+WARNING 2025-06-10 06:27:29,230 log 18808 13035925504 Forbidden: /api/users/
+WARNING 2025-06-10 06:27:29,230 basehttp 18808 13035925504 "GET /api/users/?role=Salesperson HTTP/1.1" 403 63
+WARNING 2025-06-10 06:27:29,445 log 18808 13035925504 Forbidden: /api/users/
+WARNING 2025-06-10 06:27:29,445 basehttp 18808 13035925504 "GET /api/users/?role=Salesperson HTTP/1.1" 403 63
+INFO 2025-06-10 06:29:00,539 basehttp 18808 6158200832 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 06:29:00,539 basehttp 18808 13035925504 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 06:29:03,338 basehttp 18808 6158200832 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:29:03,851 basehttp 18808 6158200832 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:31:00,586 basehttp 18808 13052751872 "GET /admin/ HTTP/1.1" 200 12935
+INFO 2025-06-10 06:31:02,374 basehttp 18808 13052751872 "GET /admin/salesperson/sale/ HTTP/1.1" 200 29354
+INFO 2025-06-10 06:31:02,387 basehttp 18808 13052751872 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-10 06:31:09,179 basehttp 18808 13052751872 "GET /admin/salesperson/sale/ HTTP/1.1" 200 29354
+INFO 2025-06-10 06:31:09,191 basehttp 18808 13052751872 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-10 06:31:10,074 basehttp 18808 13052751872 "GET /admin/salesperson/sale/ HTTP/1.1" 200 29354
+INFO 2025-06-10 06:31:10,090 basehttp 18808 13052751872 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-10 06:31:10,764 basehttp 18808 13052751872 "GET /admin/salesperson/sale/ HTTP/1.1" 200 29354
+INFO 2025-06-10 06:31:10,779 basehttp 18808 13052751872 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-10 06:31:11,262 basehttp 18808 13052751872 "GET /admin/salesperson/sale/ HTTP/1.1" 200 29354
+INFO 2025-06-10 06:31:11,274 basehttp 18808 13052751872 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-10 06:31:32,763 basehttp 18808 6158200832 "GET /api/products/?active_only=true HTTP/1.1" 200 5739
+INFO 2025-06-10 06:31:43,297 basehttp 18808 6158200832 "POST /api/sales/ HTTP/1.1" 201 566
+INFO 2025-06-10 06:31:58,338 basehttp 18808 13052751872 "GET /admin/salesperson/sale/ HTTP/1.1" 200 29932
+INFO 2025-06-10 06:31:58,354 basehttp 18808 13052751872 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-10 06:31:59,209 basehttp 18808 13052751872 "GET /admin/salesperson/sale/ HTTP/1.1" 200 29932
+INFO 2025-06-10 06:31:59,229 basehttp 18808 13052751872 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+WARNING 2025-06-10 06:32:57,709 log 18808 6158200832 Not Found: /
+WARNING 2025-06-10 06:32:57,710 basehttp 18808 6158200832 "GET / HTTP/1.1" 404 2558
+INFO 2025-06-10 06:32:57,727 basehttp 18808 6158200832 "GET /api/ HTTP/1.1" 200 631
+WARNING 2025-06-10 06:32:57,904 log 18808 6158200832 Bad Request: /api/auth/login/
+WARNING 2025-06-10 06:32:57,904 basehttp 18808 6158200832 "POST /api/auth/login/ HTTP/1.1" 400 51
+WARNING 2025-06-10 06:33:22,726 log 18808 13069578240 Not Found: /
+WARNING 2025-06-10 06:33:22,726 basehttp 18808 13069578240 "GET / HTTP/1.1" 404 2558
+INFO 2025-06-10 06:33:22,742 basehttp 18808 13069578240 "GET /api/ HTTP/1.1" 200 631
+INFO 2025-06-10 06:33:22,919 basehttp 18808 13069578240 "POST /api/auth/login/ HTTP/1.1" 200 587
+INFO 2025-06-10 06:33:23,160 basehttp 18808 13069578240 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 06:33:23,163 basehttp 18808 13086404608 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 06:33:37,450 basehttp 18808 13069578240 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:33:37,986 basehttp 18808 13069578240 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:33:51,979 basehttp 18808 13069578240 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 06:34:19,068 basehttp 18808 13069578240 "GET /api/products/?active_only=true HTTP/1.1" 200 5739
+INFO 2025-06-10 06:34:24,674 basehttp 18808 13069578240 "GET /api/products/?active_only=true HTTP/1.1" 200 5739
+INFO 2025-06-10 06:37:49,801 autoreload 18808 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/permissions.py changed, reloading.
+INFO 2025-06-10 06:37:50,140 autoreload 50290 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 06:38:07,575 autoreload 50290 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 06:38:07,830 autoreload 50336 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 06:38:15,073 autoreload 50336 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 06:38:15,252 autoreload 50357 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 06:38:30,592 autoreload 50357 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/api_views.py changed, reloading.
+INFO 2025-06-10 06:38:30,855 autoreload 50396 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 06:39:00,428 basehttp 50396 6153203712 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 06:39:00,428 basehttp 50396 6136377344 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 06:39:53,588 autoreload 51658 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 06:41:48,106 autoreload 50396 8668733184 /Users/evidenceejimone/daddy/backend/salesperson/permissions.py changed, reloading.
+INFO 2025-06-10 06:41:48,411 autoreload 51997 8668733184 Watching for file changes with StatReloader
+INFO 2025-06-10 06:41:52,823 basehttp 51997 6129135616 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:41:52,823 basehttp 51997 6145961984 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:41:53,294 basehttp 51997 6129135616 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:42:40,649 basehttp 51997 6129135616 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:42:41,461 basehttp 51997 6129135616 "GET /api/products/?active_only=true HTTP/1.1" 200 5739
+INFO 2025-06-10 06:42:45,059 basehttp 51997 6129135616 "GET /api/products/?search= HTTP/1.1" 200 5730
+INFO 2025-06-10 06:44:41,747 basehttp 51997 6129135616 "POST /api/products/ HTTP/1.1" 201 268
+INFO 2025-06-10 06:44:43,858 basehttp 51997 6129135616 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 06:45:03,787 basehttp 51997 6129135616 "GET /api/products/?search=No HTTP/1.1" 200 320
+INFO 2025-06-10 06:45:04,620 basehttp 51997 6129135616 "GET /api/products/?search=Noth HTTP/1.1" 200 320
+INFO 2025-06-10 06:45:06,702 basehttp 51997 6129135616 "GET /api/products/?active_only=true HTTP/1.1" 200 5709
+INFO 2025-06-10 06:45:52,386 basehttp 51997 6129135616 "POST /api/sales/ HTTP/1.1" 201 439
+INFO 2025-06-10 06:45:56,171 basehttp 51997 6129135616 "GET /api/products/?search= HTTP/1.1" 200 5700
+INFO 2025-06-10 06:45:59,566 basehttp 51997 6129135616 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 06:46:02,028 basehttp 51997 6129135616 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 06:46:11,976 basehttp 51997 6129135616 "GET /api/dashboard/ HTTP/1.1" 200 150
+INFO 2025-06-10 06:46:31,145 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3584
+INFO 2025-06-10 06:46:34,028 basehttp 51997 6129135616 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 06:46:34,030 basehttp 51997 6145961984 "GET /api/payments/summary/ HTTP/1.1" 200 214
+INFO 2025-06-10 06:46:37,535 basehttp 51997 6129135616 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 06:46:37,540 basehttp 51997 6145961984 "GET /api/payments/summary/ HTTP/1.1" 200 214
+INFO 2025-06-10 06:46:38,971 basehttp 51997 6129135616 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 06:46:38,975 basehttp 51997 6145961984 "GET /api/payments/summary/ HTTP/1.1" 200 214
+INFO 2025-06-10 06:46:43,312 basehttp 51997 6129135616 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-06-10 06:46:43,317 basehttp 51997 6145961984 "GET /api/payments/summary/ HTTP/1.1" 200 214
+INFO 2025-06-10 06:46:48,039 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3584
+INFO 2025-06-10 06:47:28,773 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-06-03&date_to=2025-06-10 HTTP/1.1" 200 2273
+INFO 2025-06-10 06:47:37,617 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-03-12&date_to=2025-06-10 HTTP/1.1" 200 7004
+INFO 2025-06-10 06:47:42,677 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3584
+INFO 2025-06-10 06:47:44,623 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-06-03&date_to=2025-06-10 HTTP/1.1" 200 2273
+INFO 2025-06-10 06:47:47,287 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3584
+INFO 2025-06-10 06:47:50,613 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-06-03&date_to=2025-06-10 HTTP/1.1" 200 2273
+INFO 2025-06-10 06:47:53,658 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-05-11&date_to=2025-06-10 HTTP/1.1" 200 3584
+INFO 2025-06-10 06:47:55,766 basehttp 51997 6129135616 "GET /api/reports/comprehensive/?date_from=2025-06-03&date_to=2025-06-10 HTTP/1.1" 200 2273

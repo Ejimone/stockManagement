@@ -20,7 +20,7 @@ from .serializers import (
     SaleSerializer, PaymentSerializer, SalesReportSerializer,
     InventoryReportSerializer
 )
-from .permissions import IsAdminUser, IsAdminOrReadOnly, IsOwnerOrAdmin
+from .permissions import IsAdminUser, IsAdminOrReadOnly, IsOwnerOrAdmin, CanCreateProductButNotDelete
 from .pdf_utils import generate_sale_receipt_pdf
 
 logger = logging.getLogger(__name__)
@@ -115,7 +115,7 @@ class ProductListCreateView(generics.ListCreateAPIView):
     """List all products or create a new product"""
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [CanCreateProductButNotDelete]
     
     def get_queryset(self):
         """Filter products based on query parameters"""
@@ -154,7 +154,7 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete a product"""
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [CanCreateProductButNotDelete]
     
     def destroy(self, request, *args, **kwargs):
         """Soft delete by deactivating product instead of hard delete"""
