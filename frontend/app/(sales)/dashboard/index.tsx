@@ -8,7 +8,7 @@ import {
   RefreshControl,
   Button,
 } from "react-native";
-// Removed Stack import as title is handled by _layout.tsx, useRouter may not be needed.
+import { useRouter } from "expo-router";
 import { useAuth } from "../../../contexts/AuthContext"; // Adjust path as needed
 import { getDashboardStats } from "../../../services/api"; // Adjust path
 
@@ -45,7 +45,8 @@ const MetricCard: React.FC<{
 );
 
 export default function SalespersonDashboardScreen() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const router = useRouter();
 
   const [stats, setStats] = useState<SalespersonDashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -188,6 +189,21 @@ export default function SalespersonDashboardScreen() {
           </Text>
         )
       )}
+
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Logout"
+          onPress={async () => {
+            try {
+              await signOut();
+              router.replace("/(auth)/login");
+            } catch (error) {
+              console.error("Logout failed:", error);
+            }
+          }}
+          color="#ff3b30"
+        />
+      </View>
     </ScrollView>
   );
 }
@@ -281,5 +297,9 @@ const styles = StyleSheet.create({
   },
   buttonSpacing: {
     marginTop: 10,
+  },
+  buttonContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 24,
   },
 });

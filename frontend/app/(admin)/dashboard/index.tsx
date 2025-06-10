@@ -46,7 +46,7 @@ const MetricCard: React.FC<{
 );
 
 export default function AdminDashboardScreen() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const router = useRouter(); // For potential actions or navigation
 
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -201,12 +201,14 @@ export default function AdminDashboardScreen() {
       )}
       <View style={styles.buttonContainer}>
         <Button
-          title="Logout (Test)"
+          title="Logout"
           onPress={async () => {
-            const { signOut } = useAuth(); // This should be outside if useAuth is not available here due to how it's called
-            // For this example, assuming it's accessible or passed down.
-            // A real app might get signOut from context directly at the top level of the component.
-            // await signOut(); // This was for testing, actual logout button is in _layout or a settings screen
+            try {
+              await signOut();
+              router.replace("/(auth)/login");
+            } catch (error) {
+              console.error("Logout failed:", error);
+            }
           }}
           color="#ff3b30"
         />
