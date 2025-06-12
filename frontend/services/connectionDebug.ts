@@ -11,12 +11,19 @@ export const testConnection = async (
   try {
     console.log(`Testing connection to: ${url}`);
     // Using a timeout of 5 seconds to avoid waiting too long
-    const response = await axios.get(url, { timeout: 5000 });
+    const response = await axios.get(url, {
+      timeout: 5000,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
     return {
       success: true,
       message: `Connection successful. Status: ${
         response.status
-      }, Data: ${JSON.stringify(response.data).substring(0, 100)}...`,
+      }, Data: ${JSON.stringify(response.data).substring(0, 200)}...`,
     };
   } catch (error: any) {
     // Log detailed error information for debugging
@@ -58,16 +65,44 @@ export const debugConnection = async (): Promise<void> => {
     "http://127.0.0.1:8000/api/",
     "http://10.0.2.2:8000/",
     "http://10.0.2.2:8000/api/",
+    "http://172.16.0.59:8000/", // Current IP
+    "http://172.16.0.59:8000/api/", // Current IP with API
   ];
 
   console.log("📡 Testing multiple backend URLs...");
+  let workingUrl: string | null = null;
+
   for (const url of baseUrls) {
     try {
       const result = await testConnection(url);
-      console.log(`${url}: ${result.success ? "✅" : "❌"} ${result.message}`);
+      const status = result.success ? "✅" : "❌";
+      console.log(`${url}: ${status} ${result.message}`);
+
+      if (result.success && !workingUrl) {
+        workingUrl = url;
+        console.log(`🎯 Found working URL: ${url}`);
+      }
     } catch (err) {
       console.log(`${url}: ❌ Error during test`);
     }
+  }
+
+  if (workingUrl) {
+    console.log(
+      `✅ Connection debug completed - Working URL found: ${workingUrl}`
+    );
+  } else {
+    console.log("❌ Connection debug completed - No working URLs found");
+    console.log("💡 Suggestions:");
+    console.log(
+      "1. Make sure Django server is running: python3 manage.py runserver 0.0.0.0:8000"
+    );
+    console.log(
+      "2. Check if you're using the correct platform (iOS Simulator vs Android Emulator vs Physical Device)"
+    );
+    console.log("3. For Android Emulator, use 10.0.2.2:8000");
+    console.log("4. For iOS Simulator, use localhost:8000");
+    console.log("5. For Physical Device, use your computer's IP address");
   }
 
   console.log("🛠️ Connection debug completed");

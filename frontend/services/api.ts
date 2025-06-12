@@ -10,14 +10,83 @@ if (Platform.OS !== "web" && !FileSystem.downloadAsync) {
   console.warn("FileSystem.downloadAsync is not available on this platform");
 }
 
-// Use either localhost for development on same machine, or device's local IP address
-// for testing on real devices, or your production backend URL
-const API_BASE_URL =
-  Platform.OS === "web"
-    ? "http://localhost:8000/api/"
-    : Platform.OS === "ios"
-    ? "http://localhost:8000/api/"
-    : "http://10.0.2.2:8000/api/"; // For Android emulator (points to host machine's localhost)
+// Dynamic API URL detection for different platforms and environments
+const getInitialApiBaseUrl = (): string => {
+  if (Platform.OS === "web") {
+    return "http://localhost:8000/api/";
+  }
+
+  // For React Native (iOS/Android)
+  // Default to Android emulator address which is usually more reliable
+  return "http://10.0.2.2:8000/api/";
+};
+
+// Use a proper initial API URL
+const API_BASE_URL = getInitialApiBaseUrl();
+
+// Smart API URL detection - finds working backend URL automatically
+const detectWorkingApiUrl = async (): Promise<string> => {
+  const possibleUrls = [
+    "http://10.0.2.2:8000/api/", // Android Emulator (primary)
+    "http://172.16.0.59:8000/api/", // Current local IP
+    "http://localhost:8000/api/", // iOS Simulator, Web
+    "http://127.0.0.1:8000/api/", // Alternative localhost
+  ];
+
+  console.log("🔍 Auto-detecting working API URL...");
+
+  for (const url of possibleUrls) {
+    try {
+      console.log(`Testing API endpoint: ${url}`);
+      // Test the actual API endpoint (not just the base URL)
+      const response = await axios.get(url, {
+        timeout: 5000,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status === 200 && response.data) {
+        console.log(`✅ Found working API URL: ${url}`);
+        console.log(`📊 API Response:`, response.data);
+        return url;
+      } else {
+        console.log(`⚠️ URL ${url} responded with status ${response.status}`);
+      }
+    } catch (error: any) {
+      let errorMsg = error.message;
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ECONNABORTED") {
+          errorMsg = "Timeout";
+        } else if (error.response) {
+          errorMsg = `Status ${error.response.status}`;
+        } else if (error.request) {
+          errorMsg = "No response/Network Error";
+        }
+      }
+      console.log(`❌ Failed to connect to: ${url} - ${errorMsg}`);
+    }
+  }
+
+  const fallbackUrl = getInitialApiBaseUrl();
+  console.log(
+    `⚠️ No working URL automatically detected with axios.get, using fallback: ${fallbackUrl}`
+  );
+  return fallbackUrl;
+};
+
+// Store the detected URL
+let detectedApiUrl: string | null = null;
+
+// Function to get the current API URL (detected or default)
+const getCurrentApiUrl = async (): Promise<string> => {
+  if (!detectedApiUrl) {
+    detectedApiUrl = await detectWorkingApiUrl();
+    console.log(`🔌 Using API URL: ${detectedApiUrl}`);
+  }
+  return detectedApiUrl;
+};
 
 // Error response type from backend (adjust if needed)
 export interface ApiErrorResponse {
@@ -42,15 +111,21 @@ export interface PaginatedResponse<T> {
 
 // --- Axios Client Setup with Interceptors ---
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  // baseURL will be set dynamically by the request interceptor
   headers: {
     "Content-Type": "application/json",
   },
+  timeout: 15000, // 15 second default timeout
 });
 
-// Request Interceptor: Add token to headers for non-auth requests
+// Request Interceptor: Add token to headers and set dynamic baseURL
 apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
+    // Set the dynamic baseURL for each request
+    if (!config.baseURL) {
+      config.baseURL = await getCurrentApiUrl();
+    }
+
     const authEndpoints = ["/auth/login/", "/auth/refresh/", "/auth/register/"];
     if (
       config.url &&
@@ -175,12 +250,14 @@ export const loginUser = async (
   email_address: string,
   password_str: string
 ): Promise<LoginApiResponse> => {
+  // Get the dynamic API URL before making the login request
+  const apiUrl = await getCurrentApiUrl();
   console.log(
-    `Attempting to login with email: ${email_address} to URL: ${API_BASE_URL}auth/login/`
+    `Attempting to login with email: ${email_address} to URL: ${apiUrl}auth/login/`
   );
   try {
     const response = await axios.post<LoginApiResponse>(
-      `${API_BASE_URL}auth/login/`,
+      `${apiUrl}auth/login/`,
       {
         email: email_address,
         password: password_str,
@@ -591,22 +668,34 @@ export const getDashboardStats = async (
   useFallback: boolean = true
 ): Promise<any> => {
   try {
-    console.log("Fetching dashboard stats...");
-    // Replace 'any' with specific DashboardStats type
-    const response = await apiClient.get<any>("/dashboard/");
-    console.log("Dashboard stats response:", response.data);
+    console.log("📊 Fetching dashboard stats...");
+    console.log("📡 API Base URL:", API_BASE_URL);
+
+    // Validate network connection first
+    const isConnected = await validateNetworkConnection();
+    if (!isConnected) {
+      throw new Error("Network connection validation failed");
+    }
+
+    // Use retry logic for the dashboard request
+    const response = await retryWithBackoff(async () => {
+      console.log("🔄 Making dashboard API request...");
+      return await apiClient.get<any>("/dashboard/");
+    });
+
+    console.log("✅ Dashboard stats response:", response.data);
     return response.data;
   } catch (error: any) {
-    console.error("Dashboard stats error:", error.message);
-    console.error("Full error:", error);
+    console.error("❌ Dashboard stats error:", error.message);
+    console.error("🔍 Full error:", error);
 
     if (error.response) {
-      console.error("Response data:", error.response.data);
-      console.error("Response status:", error.response.status);
+      console.error("📄 Response data:", error.response.data);
+      console.error("📊 Response status:", error.response.status);
     }
 
     if (useFallback) {
-      console.warn("Using mock dashboard data as fallback");
+      console.warn("🔄 Using mock dashboard data as fallback");
 
       // Try to determine the user role
       try {
@@ -614,13 +703,13 @@ export const getDashboardStats = async (
         const storedUser = await tokenStorage.getUser();
         const role = (storedUser as any)?.role || "Salesperson";
 
-        console.log("Using fallback data for role:", role);
+        console.log("👤 Using fallback data for role:", role);
         // Return appropriate mock data based on user role
         return role === "Admin"
           ? mockDashboardStats.admin
           : mockDashboardStats.salesperson;
       } catch (e) {
-        console.error("Error getting user role for fallback data:", e);
+        console.error("❌ Error getting user role for fallback data:", e);
         // Default to Salesperson mock data if role can't be determined
         return mockDashboardStats.salesperson;
       }
@@ -862,6 +951,75 @@ export const displayPdfReceipt = async (
     const { Alert } = await import("react-native");
     Alert.alert("Error", "Could not generate PDF receipt");
   }
+};
+
+// Enhanced network debugging and retry logic
+const validateNetworkConnection = async (): Promise<boolean> => {
+  try {
+    console.log("🔍 Validating network connection...");
+
+    // Get the current API URL (detected or default)
+    const currentApiUrl = await getCurrentApiUrl();
+    console.log("Testing API endpoint:", currentApiUrl);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    // Test the actual API endpoint that should return 200
+    const response = await fetch(currentApiUrl, {
+      method: "GET",
+      signal: controller.signal,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    clearTimeout(timeoutId);
+
+    if (response.ok) {
+      console.log("✅ Network connection validated");
+      try {
+        const data = await response.json();
+        console.log("📊 API root response:", data);
+      } catch (e) {
+        console.log("📊 API responded but couldn't parse JSON");
+      }
+      return true;
+    } else {
+      console.log("❌ Network validation failed with status:", response.status);
+      return false;
+    }
+  } catch (error: any) {
+    console.log("❌ Network validation error:", error.message);
+    return false;
+  }
+};
+
+const retryWithBackoff = async <T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> => {
+  let lastError: Error;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🔄 Attempt ${attempt}/${maxRetries}`);
+      return await fn();
+    } catch (error: any) {
+      lastError = error;
+      console.log(`❌ Attempt ${attempt} failed:`, error.message);
+
+      if (attempt < maxRetries) {
+        const delay = baseDelay * Math.pow(2, attempt - 1);
+        console.log(`⏳ Waiting ${delay}ms before retry...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  throw lastError!;
 };
 
 // Export the configured apiClient if other parts of the app need to make calls with it directly
