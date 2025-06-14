@@ -58,15 +58,21 @@ export const debugConnection = async (): Promise<void> => {
   console.log("🛠️ Starting connection debug...");
 
   // Test multiple potential backend URLs to find which one works
+  // Priority order: Physical devices first, then emulators, then local development
   const baseUrls = [
-    "http://localhost:8000/",
-    "http://localhost:8000/api/",
-    "http://127.0.0.1:8000/",
-    "http://127.0.0.1:8000/api/",
-    "http://10.0.2.2:8000/",
-    "http://10.0.2.2:8000/api/",
-    "http://172.16.0.59:8000/", // Current IP
-    "http://172.16.0.59:8000/api/", // Current IP with API
+    // Physical device URLs (most common for real testing)
+    "http://172.16.0.59:8000/api/", // Local IP with API endpoint (preferred)
+    "http://172.16.0.59:8000/", // Local IP base
+
+    // Android Emulator URLs
+    "http://10.0.2.2:8000/api/", // Android emulator with API endpoint
+    "http://10.0.2.2:8000/", // Android emulator base
+
+    // Local development URLs
+    "http://localhost:8000/api/", // Local with API endpoint
+    "http://localhost:8000/", // Local base
+    "http://127.0.0.1:8000/api/", // Alternative local with API
+    "http://127.0.0.1:8000/", // Alternative local base
   ];
 
   console.log("📡 Testing multiple backend URLs...");
@@ -98,11 +104,19 @@ export const debugConnection = async (): Promise<void> => {
       "1. Make sure Django server is running: python3 manage.py runserver 0.0.0.0:8000"
     );
     console.log(
-      "2. Check if you're using the correct platform (iOS Simulator vs Android Emulator vs Physical Device)"
+      "2. For PHYSICAL DEVICE: Your computer and phone must be on the same WiFi network"
     );
-    console.log("3. For Android Emulator, use 10.0.2.2:8000");
-    console.log("4. For iOS Simulator, use localhost:8000");
-    console.log("5. For Physical Device, use your computer's IP address");
+    console.log(
+      "3. For PHYSICAL DEVICE: Use your computer's IP address (172.16.0.59:8000)"
+    );
+    console.log("4. For Android Emulator: Use 10.0.2.2:8000");
+    console.log("5. For iOS Simulator: Use localhost:8000");
+    console.log(
+      "6. Check your computer's firewall settings - port 8000 must be accessible"
+    );
+    console.log(
+      "7. Verify your computer's IP: ifconfig | grep 'inet ' | grep -v 127.0.0.1"
+    );
   }
 
   console.log("🛠️ Connection debug completed");

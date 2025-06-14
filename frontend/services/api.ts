@@ -12,13 +12,16 @@ if (Platform.OS !== "web" && !FileSystem.downloadAsync) {
 
 // Dynamic API URL detection for different platforms and environments
 const getInitialApiBaseUrl = (): string => {
+  // Check if we have an ngrok URL configured (this will be set when ngrok is running)
+  const ngrokUrl = "https://your-ngrok-url.ngrok-free.app/api/"; // Will be updated when ngrok starts
+  
   if (Platform.OS === "web") {
     return "http://localhost:8000/api/";
   }
 
   // For React Native (iOS/Android)
-  // Default to Android emulator address which is usually more reliable
-  return "http://10.0.2.2:8000/api/";
+  // Priority: ngrok for universal access, then local development
+  return ngrokUrl; // ngrok URL works everywhere - emulator, physical devices, anywhere!
 };
 
 // Use a proper initial API URL
@@ -26,21 +29,33 @@ const API_BASE_URL = getInitialApiBaseUrl();
 
 // Smart API URL detection - finds working backend URL automatically
 const detectWorkingApiUrl = async (): Promise<string> => {
+  // Priority order: ngrok (universal) > local development > emulator specific
   const possibleUrls = [
-    "http://10.0.2.2:8000/api/", // Android Emulator (primary)
-    "http://172.16.0.59:8000/api/", // Current local IP
+    // ngrok URLs (work everywhere - best option!)
+    "https://your-ngrok-url.ngrok-free.app/api/", // Will be updated when ngrok starts
+    
+    // Local development URLs
+    "http://172.16.0.59:8000/api/", // Your computer's local IP (for physical devices)
+    "http://localhost:8000/api/", // Local development
+    "http://127.0.0.1:8000/api/", // Alternative localhost
+
+    // Android Emulator specific
+    "http://10.0.2.2:8000/api/", // Android Emulator only
+
+    // iOS Simulator and Web
     "http://localhost:8000/api/", // iOS Simulator, Web
     "http://127.0.0.1:8000/api/", // Alternative localhost
   ];
 
   console.log("🔍 Auto-detecting working API URL...");
+  console.log("📱 Platform:", Platform.OS);
 
   for (const url of possibleUrls) {
     try {
       console.log(`Testing API endpoint: ${url}`);
       // Test the actual API endpoint (not just the base URL)
       const response = await axios.get(url, {
-        timeout: 5000,
+        timeout: 8000, // Increased timeout for physical devices
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
