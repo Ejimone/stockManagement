@@ -27,27 +27,25 @@ export const testConnection = async (
     };
   } catch (error: any) {
     // Log detailed error information for debugging
-    console.error("Connection test failed:", error);
-    let errorMessage = "Unknown error";
-
-    if (error.response) {
-      // Server responded with a status code outside the 2xx range
-      errorMessage = `Server error: ${error.response.status} - ${JSON.stringify(
-        error.response.data
-      )}`;
-    } else if (error.request) {
-      // Request was made but no response received
-      errorMessage =
-        "No response from server. The server may be down or the URL is incorrect.";
-    } else {
-      // Error in setting up the request
-      errorMessage = `Request error: ${error.message}`;
-    }
-
-    return {
-      success: false,
-      message: errorMessage,
-    };
+    // console.error("Connection test failed:", error);
+    // let errorMessage = "Unknown error";
+    // if (error.response) {
+    //   // Server responded with a status code outside the 2xx range
+    //   errorMessage = `Server error: ${error.response.status} - ${JSON.stringify(
+    //     error.response.data
+    //   )}`;
+    // } else if (error.request) {
+    //   // Request was made but no response received
+    //   errorMessage =
+    //     "No response from server. The server may be down or the URL is incorrect.";
+    // } else {
+    //   // Error in setting up the request
+    //   errorMessage = `Request error: ${error.message}`;
+    // }
+    // return {
+    //   success: false,
+    //   message: errorMessage,
+    // };
   }
 };
 
