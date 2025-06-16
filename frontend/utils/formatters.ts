@@ -25,12 +25,12 @@ export const formatPrice = (price: any): string => {
  * Formats a number as currency with the specified currency symbol
  *
  * @param value - The numeric value to format
- * @param currencySymbol - The currency symbol to use (default: $)
+ * @param currencySymbol - The currency symbol to use (default: ₦)
  * @returns A formatted currency string
  */
 export const formatCurrency = (
   value: any,
-  currencySymbol: string = "$"
+  currencySymbol: string = "₦"
 ): string => {
   return `${currencySymbol}${formatPrice(value)}`;
 };

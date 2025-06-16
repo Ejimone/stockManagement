@@ -128,7 +128,7 @@ export default function SalespersonDashboardScreen() {
 
   const formatCurrency = (value: number | undefined) => {
     if (typeof value !== "number") return "N/A";
-    return `$${value.toFixed(2)}`;
+    return `₦${value.toFixed(2)}`;
   };
 
   return (
