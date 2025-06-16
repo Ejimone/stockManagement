@@ -5,7 +5,6 @@
 
 NGROK_URL=""
 API_FILE="frontend/services/api.ts"
-DEBUG_FILE="frontend/services/connectionDebug.ts"
 
 # If no argument provided, try to auto-detect from ngrok
 if [ $# -eq 0 ]; then
@@ -41,14 +40,8 @@ if [ ! -f "$API_FILE" ]; then
     exit 1
 fi
 
-if [ ! -f "$DEBUG_FILE" ]; then
-    echo "❌ Debug file not found: $DEBUG_FILE"
-    exit 1
-fi
-
-# Create backups
+# Create backup
 cp "$API_FILE" "$API_FILE.backup.$(date +%Y%m%d_%H%M%S)"
-cp "$DEBUG_FILE" "$DEBUG_FILE.backup.$(date +%Y%m%d_%H%M%S)"
 
 # Update the ngrok URL in the ngrok-only configuration
 sed -i.tmp "s|const ngrokUrl = \".*\";|const ngrokUrl = \"${NGROK_API_URL}\";|g" "$API_FILE"
@@ -56,15 +49,11 @@ sed -i.tmp "s|const ngrokUrl = \".*\";|const ngrokUrl = \"${NGROK_API_URL}\";|g"
 # Also update in detectWorkingApiUrl function
 sed -i.tmp "s|const ngrokUrl = \"https://.*\.ngrok[^\"]*\";|const ngrokUrl = \"${NGROK_API_URL}\";|g" "$API_FILE"
 
-# Update the ngrok URL in connectionDebug.ts
-sed -i.tmp "s|const CURRENT_NGROK_URL = \".*\";|const CURRENT_NGROK_URL = \"${NGROK_API_URL}\";|g" "$DEBUG_FILE"
-
-# Clean up temp files
+# Clean up temp file
 rm "$API_FILE.tmp" 2>/dev/null || true
-rm "$DEBUG_FILE.tmp" 2>/dev/null || true
 
 echo "✅ ngrok-only configuration updated!"
-echo "📱 Both api.ts and connectionDebug.ts now use: $NGROK_API_URL"
+echo "📱 Your React Native app will now use: $NGROK_API_URL"
 echo ""
 echo "🧪 Test the URL:"
 echo "curl $NGROK_API_URL"
