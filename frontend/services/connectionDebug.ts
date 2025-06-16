@@ -52,34 +52,20 @@ export const testConnection = async (
 };
 
 /**
- * Debug helper to test different URLs and configurations
+ * Debug helper to test ngrok-only configuration
  */
 export const debugConnection = async (): Promise<void> => {
-  console.log("🛠️ Starting connection debug...");
+  console.log("🛠️ Starting ngrok-only connection debug...");
 
   // Test multiple potential backend URLs to find which one works
-  // Priority order: Physical devices first, then emulators, then local development
+  // NGROK-ONLY configuration - works on all devices!
   const baseUrls = [
-    // ngrok URLs (work everywhere!)
-    "https://3c2e-59-145-142-18.ngrok-free.app/api/", // ngrok tunnel
-    "https://3c2e-59-145-142-18.ngrok-free.app/", // ngrok base
-    
-    // Physical device URLs (most common for real testing)
-    "http://172.16.0.59:8000/api/", // Local IP with API endpoint (preferred)
-    "http://172.16.0.59:8000/", // Local IP base
-
-    // Android Emulator URLs
-    "http://10.0.2.2:8000/api/", // Android emulator with API endpoint
-    "http://10.0.2.2:8000/", // Android emulator base
-
-    // Local development URLs
-    "http://localhost:8000/api/", // Local with API endpoint
-    "http://localhost:8000/", // Local base
-    "http://127.0.0.1:8000/api/", // Alternative local with API
-    "http://127.0.0.1:8000/", // Alternative local base
+    // ngrok URLs (work everywhere: emulator, physical devices, web!)
+    "https://658a-59-145-142-18.ngrok-free.app/api/", // ngrok tunnel with API endpoint
+    "https://658a-59-145-142-18.ngrok-free.app/", // ngrok base URL
   ];
 
-  console.log("📡 Testing multiple backend URLs...");
+  console.log("📡 Testing ngrok-only backend URLs...");
   let workingUrl: string | null = null;
 
   for (const url of baseUrls) {
@@ -99,31 +85,28 @@ export const debugConnection = async (): Promise<void> => {
 
   if (workingUrl) {
     console.log(
-      `✅ Connection debug completed - Working URL found: ${workingUrl}`
+      `✅ ngrok-only connection debug completed - Working URL found: ${workingUrl}`
     );
+    console.log("🌐 Your app can now connect from any device via ngrok!");
   } else {
-    console.log("❌ Connection debug completed - No working URLs found");
-    console.log("💡 Suggestions:");
+    console.log(
+      "❌ ngrok-only connection debug completed - No working URLs found"
+    );
+    console.log("💡 Troubleshooting suggestions:");
     console.log(
       "1. Make sure Django server is running: python3 manage.py runserver 0.0.0.0:8000"
     );
+    console.log("2. Make sure ngrok tunnel is active: ngrok http 8000");
     console.log(
-      "2. For PHYSICAL DEVICE: Your computer and phone must be on the same WiFi network"
+      "3. Check ngrok status: curl http://localhost:4040/api/tunnels"
     );
+    console.log("4. Update ngrok URLs: ./update-ngrok-config.sh");
     console.log(
-      "3. For PHYSICAL DEVICE: Use your computer's IP address (172.16.0.59:8000)"
-    );
-    console.log("4. For Android Emulator: Use 10.0.2.2:8000");
-    console.log("5. For iOS Simulator: Use localhost:8000");
-    console.log(
-      "6. Check your computer's firewall settings - port 8000 must be accessible"
-    );
-    console.log(
-      "7. Verify your computer's IP: ifconfig | grep 'inet ' | grep -v 127.0.0.1"
+      "5. Test API directly: curl https://YOUR-NGROK-URL.ngrok-free.app/api/"
     );
   }
 
-  console.log("🛠️ Connection debug completed");
+  console.log("🛠️ ngrok-only connection debug completed");
 };
 
 export default { testConnection, debugConnection };

@@ -4,7 +4,7 @@
  */
 
 const testNgrokConnection = async () => {
-  const ngrokUrl = "https://3c2e-59-145-142-18.ngrok-free.app/api/";
+  const ngrokUrl = "https://658a-59-145-142-18.ngrok-free.app/api/";
 
   console.log("🧪 Testing ngrok-only configuration...");
   console.log("🌐 ngrok URL:", ngrokUrl);

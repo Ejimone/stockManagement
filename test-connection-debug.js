@@ -1,56 +1,48 @@
-import axios from "axios";
+#!/usr/bin/env node
 
-// Current ngrok URL - update this when your ngrok tunnel changes
+/**
+ * Test script for the ngrok-only connectionDebug functionality
+ * This script simulates calling the connectionDebug function to verify it only tests ngrok URLs
+ */
+
+// Mock the connectionDebug functionality
 const CURRENT_NGROK_URL = "https://3c2e-59-145-142-18.ngrok-free.app/api/";
 
-/**
- * Get the current ngrok URL being used for debugging
- */
-export const getCurrentNgrokUrl = (): string => {
-  return CURRENT_NGROK_URL;
-};
-
-/**
- * A utility to test API connectivity
- * @param url The URL to test connectivity to
- * @returns Promise with the result of the connection test
- */
-export const testConnection = async (
-  url: string
-): Promise<{ success: boolean; message: string }> => {
+const testConnection = async (url) => {
   try {
     console.log(`Testing connection to: ${url}`);
-    // Using a timeout of 5 seconds to avoid waiting too long
-    const response = await axios.get(url, {
-      timeout: 5000,
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    const response = await fetch(url, {
+      method: "GET",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
+
+    const data = await response.text();
 
     return {
       success: true,
       message: `Connection successful. Status: ${
         response.status
-      }, Data: ${JSON.stringify(response.data).substring(0, 200)}...`,
+      }, Data: ${data.substring(0, 200)}...`,
     };
-  } catch (error: any) {
-    // Log detailed error information for debugging
-    console.error("Connection test failed:", error);
+  } catch (error) {
     let errorMessage = "Unknown error";
 
-    if (error.response) {
-      // Server responded with a status code outside the 2xx range
-      errorMessage = `Server error: ${error.response.status} - ${JSON.stringify(
-        error.response.data
-      )}`;
-    } else if (error.request) {
-      // Request was made but no response received
+    if (error.name === "AbortError") {
+      errorMessage = "Request timeout - server took too long to respond";
+    } else if (error.message.includes("fetch")) {
       errorMessage =
         "No response from server. The server may be down or the URL is incorrect.";
     } else {
-      // Error in setting up the request
       errorMessage = `Request error: ${error.message}`;
     }
 
@@ -61,13 +53,8 @@ export const testConnection = async (
   }
 };
 
-/**
- * Debug helper to test the current ngrok URL
- * This function now only tests the ngrok URL since we've transitioned to ngrok-only setup
- */
-export const debugConnection = async (): Promise<void> => {
+const debugConnection = async () => {
   console.log("🛠️ Starting ngrok connection debug...");
-
   console.log("📡 Testing ngrok backend URL...");
 
   try {
@@ -109,4 +96,18 @@ export const debugConnection = async (): Promise<void> => {
   console.log("🛠️ Ngrok connection debug completed");
 };
 
-export default { testConnection, debugConnection, getCurrentNgrokUrl };
+// Run the test
+console.log("🧪 Testing ngrok-only connectionDebug functionality...");
+console.log("========================================================");
+debugConnection().then(() => {
+  console.log("========================================================");
+  console.log("✅ Connection debug test completed!");
+  console.log("");
+  console.log("📝 Notes:");
+  console.log("• This script now ONLY tests the ngrok URL");
+  console.log("• No more testing of localhost/emulator URLs");
+  console.log("• Clean error-free logs for better developer experience");
+  console.log(
+    "• Use ./update-ngrok-config.sh to update URLs when ngrok changes"
+  );
+});
