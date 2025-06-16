@@ -60,6 +60,10 @@ export const debugConnection = async (): Promise<void> => {
   // Test multiple potential backend URLs to find which one works
   // Priority order: Physical devices first, then emulators, then local development
   const baseUrls = [
+    // ngrok URLs (work everywhere!)
+    "https://3c2e-59-145-142-18.ngrok-free.app/api/", // ngrok tunnel
+    "https://3c2e-59-145-142-18.ngrok-free.app/", // ngrok base
+    
     // Physical device URLs (most common for real testing)
     "http://172.16.0.59:8000/api/", // Local IP with API endpoint (preferred)
     "http://172.16.0.59:8000/", // Local IP base

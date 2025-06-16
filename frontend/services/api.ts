@@ -12,83 +12,62 @@ if (Platform.OS !== "web" && !FileSystem.downloadAsync) {
 
 // Dynamic API URL detection for different platforms and environments
 const getInitialApiBaseUrl = (): string => {
-  // Check if we have an ngrok URL configured (this will be set when ngrok is running)
-  const ngrokUrl = "https://your-ngrok-url.ngrok-free.app/api/"; // Will be updated when ngrok starts
-  
-  if (Platform.OS === "web") {
-    return "http://localhost:8000/api/";
-  }
+  // ngrok URL - CURRENT ACTIVE TUNNEL (ngrok-only configuration)
+  // This works everywhere: emulator, physical devices, web, anywhere with internet!
+  const ngrokUrl = "https://3c2e-59-145-142-18.ngrok-free.app/api/";
 
-  // For React Native (iOS/Android)
-  // Priority: ngrok for universal access, then local development
-  return ngrokUrl; // ngrok URL works everywhere - emulator, physical devices, anywhere!
+  console.log("🌐 Using ngrok-only configuration:", ngrokUrl);
+  return ngrokUrl;
 };
 
 // Use a proper initial API URL
 const API_BASE_URL = getInitialApiBaseUrl();
 
-// Smart API URL detection - finds working backend URL automatically
+// Smart API URL detection - ngrok-only configuration
 const detectWorkingApiUrl = async (): Promise<string> => {
-  // Priority order: ngrok (universal) > local development > emulator specific
-  const possibleUrls = [
-    // ngrok URLs (work everywhere - best option!)
-    "https://your-ngrok-url.ngrok-free.app/api/", // Will be updated when ngrok starts
-    
-    // Local development URLs
-    "http://172.16.0.59:8000/api/", // Your computer's local IP (for physical devices)
-    "http://localhost:8000/api/", // Local development
-    "http://127.0.0.1:8000/api/", // Alternative localhost
+  // NGROK-ONLY: Use current active ngrok tunnel exclusively
+  const ngrokUrl = "https://3c2e-59-145-142-18.ngrok-free.app/api/";
 
-    // Android Emulator specific
-    "http://10.0.2.2:8000/api/", // Android Emulator only
-
-    // iOS Simulator and Web
-    "http://localhost:8000/api/", // iOS Simulator, Web
-    "http://127.0.0.1:8000/api/", // Alternative localhost
-  ];
-
-  console.log("🔍 Auto-detecting working API URL...");
+  console.log("🔍 Testing ngrok-only configuration...");
   console.log("📱 Platform:", Platform.OS);
+  console.log(`🌐 ngrok URL: ${ngrokUrl}`);
 
-  for (const url of possibleUrls) {
-    try {
-      console.log(`Testing API endpoint: ${url}`);
-      // Test the actual API endpoint (not just the base URL)
-      const response = await axios.get(url, {
-        timeout: 8000, // Increased timeout for physical devices
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
+  try {
+    console.log(`Testing API endpoint: ${ngrokUrl}`);
+    const response = await axios.get(ngrokUrl, {
+      timeout: 10000, // Longer timeout for ngrok
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
 
-      if (response.status === 200 && response.data) {
-        console.log(`✅ Found working API URL: ${url}`);
-        console.log(`📊 API Response:`, response.data);
-        return url;
-      } else {
-        console.log(`⚠️ URL ${url} responded with status ${response.status}`);
-      }
-    } catch (error: any) {
-      let errorMsg = error.message;
-      if (axios.isAxiosError(error)) {
-        if (error.code === "ECONNABORTED") {
-          errorMsg = "Timeout";
-        } else if (error.response) {
-          errorMsg = `Status ${error.response.status}`;
-        } else if (error.request) {
-          errorMsg = "No response/Network Error";
-        }
-      }
-      console.log(`❌ Failed to connect to: ${url} - ${errorMsg}`);
+    if (response.status === 200 && response.data) {
+      console.log(`✅ ngrok connection successful: ${ngrokUrl}`);
+      console.log(`📊 API Response:`, response.data);
+      return ngrokUrl;
+    } else {
+      console.log(`⚠️ ngrok URL responded with status ${response.status}`);
+      throw new Error(`ngrok URL returned status ${response.status}`);
     }
-  }
+  } catch (error: any) {
+    let errorMsg = error.message;
+    if (axios.isAxiosError(error)) {
+      if (error.code === "ECONNABORTED") {
+        errorMsg = "Timeout";
+      } else if (error.response) {
+        errorMsg = `Status ${error.response.status}`;
+      } else if (error.request) {
+        errorMsg = "No response/Network Error";
+      }
+    }
+    console.log(`❌ ngrok connection failed: ${ngrokUrl} - ${errorMsg}`);
 
-  const fallbackUrl = getInitialApiBaseUrl();
-  console.log(
-    `⚠️ No working URL automatically detected with axios.get, using fallback: ${fallbackUrl}`
-  );
-  return fallbackUrl;
+    // Since we're ngrok-only, throw error instead of falling back
+    throw new Error(
+      `ngrok connection failed: ${errorMsg}. Please check your ngrok tunnel is running.`
+    );
+  }
 };
 
 // Store the detected URL
