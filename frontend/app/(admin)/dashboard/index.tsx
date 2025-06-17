@@ -7,10 +7,13 @@ import {
   ActivityIndicator,
   RefreshControl,
   Button,
+  Alert,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { useAuth } from "../../../contexts/AuthContext"; // Adjust path as needed
 import { getDashboardStats } from "../../../services/api"; // Adjust path
+import { usePaymentNotifications } from "../../../hooks/usePaymentNotifications";
+import { PaymentNotification } from "../../../services/notificationService";
 
 // Define the expected structure of dashboard stats
 interface DashboardStats {
@@ -53,6 +56,17 @@ export default function AdminDashboardScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Enable real-time payment notifications for admin
+  const { isPolling } = usePaymentNotifications({
+    enabled: true,
+    showAlert: true,
+    onNewPayment: (payment: PaymentNotification) => {
+      console.log("💰 Admin received payment notification:", payment);
+      // Optionally refresh dashboard stats when new payment comes in
+      fetchStats();
+    },
+  });
 
   const fetchStats = async () => {
     try {
@@ -145,6 +159,14 @@ export default function AdminDashboardScreen() {
       <Text style={styles.welcomeMessage}>
         Welcome, {user?.email || "Admin"}!
       </Text>
+
+      {/* Real-time notification status */}
+      <View style={styles.notificationStatus}>
+        <Text style={styles.notificationText}>
+          🔔 Real-time Notifications: {isPolling ? "🟢 Active" : "🔴 Inactive"}
+        </Text>
+      </View>
+
       {error && (
         <Text style={[styles.errorText, { marginBottom: 10 }]}>
           Error: {error} (Retrying might show cached data or new data)
@@ -238,6 +260,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
     borderBottomColor: "#E0E0E0",
+  },
+  notificationStatus: {
+    backgroundColor: "#F0F8FF",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0E0E0",
+  },
+  notificationText: {
+    fontSize: 14,
+    color: "#333",
+    fontWeight: "400",
   },
   card: {
     backgroundColor: "#FFFFFF",

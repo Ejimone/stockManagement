@@ -1,5 +1,6 @@
 import { SplashScreen, Stack, useRouter, useSegments } from "expo-router";
 import { AuthProvider, useAuth } from "../contexts/AuthContext"; // Adjusted path
+import { ToastProvider } from "../components/ui/Toast"; // Add toast provider
 import React, { useEffect } from "react";
 import { ActivityIndicator, View, StyleSheet } from "react-native";
 
@@ -66,7 +67,9 @@ const InitialLayout = () => {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <InitialLayout />
+      <ToastProvider>
+        <InitialLayout />
+      </ToastProvider>
     </AuthProvider>
   );
 }

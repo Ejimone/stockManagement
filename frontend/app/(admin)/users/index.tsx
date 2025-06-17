@@ -194,7 +194,7 @@ export default function AdminUsersScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Manage Salespersons</Text>
+        <Text style={styles.title}></Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => router.push("/(admin)/users/add")}
