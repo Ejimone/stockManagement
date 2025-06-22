@@ -14,7 +14,7 @@ if (Platform.OS !== "web" && !FileSystem.downloadAsync) {
 const getInitialApiBaseUrl = (): string => {
   // ngrok URL - CURRENT ACTIVE TUNNEL (ngrok-only configuration)
   // This works everywhere: emulator, physical devices, web, anywhere with internet!
-  const ngrokUrl = "https://e88a-59-145-142-18.ngrok-free.app/api/";
+  const ngrokUrl = "https://921c-125-17-13-54.ngrok-free.app/api/";
 
   console.log("🌐 Using ngrok-only configuration:", ngrokUrl);
   return ngrokUrl;
@@ -26,7 +26,7 @@ const API_BASE_URL = getInitialApiBaseUrl();
 // Smart API URL detection - ngrok-only configuration
 const detectWorkingApiUrl = async (): Promise<string> => {
   // NGROK-ONLY: Use current active ngrok tunnel exclusively
-  const ngrokUrl = "https://e88a-59-145-142-18.ngrok-free.app/api/";
+  const ngrokUrl = "https://921c-125-17-13-54.ngrok-free.app/api/";
 
   console.log("🔍 Testing ngrok-only configuration...");
   console.log("📱 Platform:", Platform.OS);
