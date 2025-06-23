@@ -219,16 +219,6 @@ export default function AdminDashboardScreen() {
               }
             />
           )}
-          {stats.pending_payments !== undefined && (
-            <MetricCard
-              label="Pending Payments Value"
-              value={formatCurrency(stats.pending_payments)}
-              context="Total from unpaid sales"
-              icon={
-                <FontAwesome name="credit-card" size={30} color="#F57C00" />
-              }
-            />
-          )}
         </>
       ) : (
         !isLoading && (
