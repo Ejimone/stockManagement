@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,9 @@ import {
   RefreshControl,
   Alert,
   TextInput,
+  Platform,
+  Keyboard,
+  Animated,
 } from "react-native";
 import { Stack, useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,6 +22,9 @@ import { useAuth } from "../../../contexts/AuthContext";
 export default function SalesMySalesScreen() {
   const { user } = useAuth();
   const router = useRouter();
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const searchBarPosition = useRef(new Animated.Value(0)).current;
 
   const [sales, setSales] = useState<Sale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +32,43 @@ export default function SalesMySalesScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [dateFilter, setDateFilter] = useState("all"); // all, today, week, month
+
+  // Keyboard listeners for smooth animation
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      (event) => {
+        const keyboardHeight = event.endCoordinates.height;
+        setKeyboardHeight(keyboardHeight);
+
+        // Animate search bar up when keyboard appears
+        Animated.timing(searchBarPosition, {
+          toValue: -keyboardHeight + (Platform.OS === "ios" ? 34 : 0), // Account for safe area on iOS
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardHeight(0);
+
+        // Animate search bar back to bottom
+        Animated.timing(searchBarPosition, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener?.remove();
+      keyboardDidHideListener?.remove();
+    };
+  }, [searchBarPosition]);
 
   // Fetch sales when screen loads or comes into focus
   useFocusEffect(
@@ -372,29 +415,6 @@ export default function SalesMySalesScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Create New Sale Button */}
-      <View style={styles.createButtonContainer}>
-        <TouchableOpacity
-          style={styles.createSaleButton}
-          onPress={handleCreateNewSale}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="add-circle" size={20} color="#ffffff" />
-          <Text style={styles.createSaleButtonText}>Create New Sale</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search by customer, sale ID, or payment method..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholderTextColor="#9ca3af"
-        />
-      </View>
-
       {/* Date Filters */}
       {renderDateFilter()}
 
@@ -425,11 +445,41 @@ export default function SalesMySalesScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListEmptyComponent={renderEmptyState}
-        contentContainerStyle={
-          filteredSales.length === 0 ? styles.emptyListContainer : undefined
-        }
+        contentContainerStyle={[
+          filteredSales.length === 0 ? styles.emptyListContainer : undefined,
+          { paddingBottom: keyboardHeight > 0 ? keyboardHeight + 80 : 100 }, // Dynamic padding for floating bar
+        ]}
         showsVerticalScrollIndicator={false}
       />
+
+      {/* Floating Bottom Bar with Search and New Sale Button */}
+      <Animated.View
+        style={[
+          styles.floatingBar,
+          {
+            transform: [{ translateY: searchBarPosition }],
+          },
+        ]}
+      >
+        <View style={styles.searchContainerFloating}>
+          <TextInput
+            style={styles.searchInputFloating}
+            placeholder="Search by customer, sale ID, payment..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
+            placeholderTextColor="#9ca3af"
+          />
+        </View>
+        <TouchableOpacity
+          style={styles.addFloatingButton}
+          onPress={handleCreateNewSale}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.addFloatingButtonText}>+</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 }
@@ -438,7 +488,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8f9fa",
-    paddingTop: 50, // Added top margin for header-less pages
+    paddingTop: 80, // Increased top margin for better spacing
   },
   searchContainer: {
     padding: 16,
@@ -694,5 +744,61 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#ffffff",
     marginLeft: 8,
+  },
+  floatingBar: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingBottom: Platform.OS === "ios" ? 34 : 12, // Account for safe area on iOS
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#e1e1e1",
+  },
+  searchContainerFloating: {
+    flex: 1,
+    marginRight: 12,
+  },
+  searchInputFloating: {
+    backgroundColor: "#f8f8f8",
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 8,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  addFloatingButton: {
+    backgroundColor: "#3b82f6",
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  addFloatingButtonText: {
+    color: "#ffffff",
+    fontSize: 24,
+    fontWeight: "bold",
   },
 });

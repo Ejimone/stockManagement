@@ -1,14 +1,19 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
   FlatList,
+  TextInput,
   TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
   Alert,
   RefreshControl,
+  Platform,
+  Keyboard,
+  KeyboardAvoidingView,
+  Animated,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { getSales, deleteSale, Sale } from "../../../services/api";
@@ -25,6 +30,10 @@ interface PaginatedSalesResponse {
 export default function AdminSalesScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const searchBarPosition = useRef(new Animated.Value(0)).current;
 
   const [sales, setSales] = useState<Sale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +42,43 @@ export default function AdminSalesScreen() {
   const [deletingSaleId, setDeletingSaleId] = useState<string | number | null>(
     null
   );
+
+  // Keyboard listeners for smooth animation
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      (event) => {
+        const keyboardHeight = event.endCoordinates.height;
+        setKeyboardHeight(keyboardHeight);
+
+        // Animate search bar up when keyboard appears
+        Animated.timing(searchBarPosition, {
+          toValue: -keyboardHeight + (Platform.OS === "ios" ? 34 : 0), // Account for safe area on iOS
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardHeight(0);
+
+        // Animate search bar back to bottom
+        Animated.timing(searchBarPosition, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener?.remove();
+      keyboardDidHideListener?.remove();
+    };
+  }, [searchBarPosition]);
 
   const fetchSales = useCallback(async (reset: boolean = false) => {
     try {
@@ -100,6 +146,21 @@ export default function AdminSalesScreen() {
       ]
     );
   };
+
+  // Filter sales based on search query
+  const filteredSales = sales.filter((sale) =>
+    searchQuery
+      ? sale.customer_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        sale.salesperson_name
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        sale.id.toString().includes(searchQuery) ||
+        sale.payment_method
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        sale.payment_status?.toLowerCase().includes(searchQuery.toLowerCase())
+      : true
+  );
 
   const renderSaleItem = ({ item }: { item: Sale }) => {
     const saleDate = item.created_at
@@ -194,35 +255,56 @@ export default function AdminSalesScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Sales Management</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => router.push("/(admin)/sales/create")}
-        >
-          <Text style={styles.addButtonText}>+ New Sale</Text>
-        </TouchableOpacity>
-      </View>
-
       {/* Sales List */}
       <FlatList
-        data={sales}
+        data={filteredSales}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderSaleItem}
         contentContainerStyle={[
           styles.listContainer,
-          sales.length === 0 ? styles.emptyListContainer : null,
+          filteredSales.length === 0 ? styles.emptyListContainer : null,
+          { paddingBottom: keyboardHeight > 0 ? keyboardHeight + 80 : 100 }, // Dynamic padding for floating bar
         ]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No sales found.</Text>
+            <Text style={styles.emptyText}>
+              {searchQuery
+                ? "No sales found matching your search."
+                : "No sales found."}
+            </Text>
           </View>
         }
       />
+
+      {/* Floating Bottom Bar with Search and New Sale Button */}
+      <Animated.View
+        style={[
+          styles.floatingBar,
+          {
+            transform: [{ translateY: searchBarPosition }],
+          },
+        ]}
+      >
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search sales by customer, ID, payment..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
+          />
+        </View>
+        <TouchableOpacity
+          style={styles.addFloatingButton}
+          onPress={() => router.push("/(admin)/sales/create")}
+        >
+          <Text style={styles.addFloatingButtonText}>+</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 }
@@ -231,7 +313,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-    paddingTop: 50, // Added top margin for header-less pages
+    paddingTop: 80, // Increased top margin for better spacing
   },
   centerContainer: {
     flex: 1,
@@ -239,30 +321,61 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#f5f5f5",
   },
-  header: {
+  floatingBar: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
     backgroundColor: "#ffffff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e1e1e1",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingBottom: Platform.OS === "ios" ? 34 : 12, // Account for safe area on iOS
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#e1e1e1",
   },
-  title: {
+  searchContainer: {
+    flex: 1,
+    marginRight: 12,
+  },
+  searchInput: {
+    backgroundColor: "#f8f8f8",
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 8,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  addFloatingButton: {
+    backgroundColor: "#007AFF",
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  addFloatingButtonText: {
+    color: "#ffffff",
     fontSize: 24,
     fontWeight: "bold",
-    color: "#333333",
-  },
-  addButton: {
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  addButtonText: {
-    color: "#ffffff",
-    fontWeight: "600",
-    fontSize: 16,
   },
   listContainer: {
     padding: 16,
