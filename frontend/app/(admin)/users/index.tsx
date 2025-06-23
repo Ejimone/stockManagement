@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useFocusEffect } from "@react-navigation/native"; // Added to refresh on focus
 import {
   View,
@@ -10,6 +10,10 @@ import {
   StyleSheet,
   Alert,
   RefreshControl,
+  Platform,
+  Keyboard,
+  KeyboardAvoidingView,
+  Animated,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { getUsers, deleteUser } from "../../../services/api";
@@ -24,6 +28,9 @@ interface PaginatedUsersResponse {
 
 export default function AdminUsersScreen() {
   const router = useRouter();
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const searchBarPosition = useRef(new Animated.Value(0)).current;
 
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +40,43 @@ export default function AdminUsersScreen() {
   const [deletingUserId, setDeletingUserId] = useState<string | number | null>(
     null
   );
+
+  // Keyboard listeners for smooth animation
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      (event) => {
+        const keyboardHeight = event.endCoordinates.height;
+        setKeyboardHeight(keyboardHeight);
+
+        // Animate search bar up when keyboard appears
+        Animated.timing(searchBarPosition, {
+          toValue: -keyboardHeight + (Platform.OS === "ios" ? 34 : 0), // Account for safe area on iOS
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardHeight(0);
+
+        // Animate search bar back to bottom
+        Animated.timing(searchBarPosition, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener?.remove();
+      keyboardDidHideListener?.remove();
+    };
+  }, [searchBarPosition]);
 
   const fetchUsers = useCallback(async (reset: boolean = false) => {
     try {
@@ -192,27 +236,6 @@ export default function AdminUsersScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}></Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => router.push("/(admin)/users/add")}
-        >
-          <Text style={styles.addButtonText}>+ Add User</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Search */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search users by name or email..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
-
       {/* Users List */}
       <FlatList
         data={filteredUsers}
@@ -221,6 +244,7 @@ export default function AdminUsersScreen() {
         contentContainerStyle={[
           styles.listContainer,
           filteredUsers.length === 0 ? styles.emptyListContainer : null,
+          { paddingBottom: keyboardHeight > 0 ? keyboardHeight + 80 : 100 }, // Dynamic padding for floating bar
         ]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
@@ -235,6 +259,33 @@ export default function AdminUsersScreen() {
           </View>
         }
       />
+
+      {/* Floating Bottom Bar with Search and Add Button */}
+      <Animated.View
+        style={[
+          styles.floatingBar,
+          {
+            transform: [{ translateY: searchBarPosition }],
+          },
+        ]}
+      >
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search user by name, email..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
+          />
+        </View>
+        <TouchableOpacity
+          style={styles.addFloatingButton}
+          onPress={() => router.push("/(admin)/users/add")}
+        >
+          <Text style={styles.addFloatingButtonText}>+</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 }
@@ -243,7 +294,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-    paddingTop: 50, // Added top margin for header-less pages
+    paddingTop: 80, // Increased top margin for better spacing
   },
   centerContainer: {
     flex: 1,
@@ -251,45 +302,61 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#f5f5f5",
   },
-  header: {
+  floatingBar: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
     backgroundColor: "#ffffff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e1e1e1",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333333",
-  },
-  addButton: {
-    backgroundColor: "#007AFF",
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  addButtonText: {
-    color: "#ffffff",
-    fontWeight: "600",
-    fontSize: 16,
+    paddingVertical: 12,
+    paddingBottom: Platform.OS === "ios" ? 34 : 12, // Account for safe area on iOS
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#e1e1e1",
   },
   searchContainer: {
-    padding: 16,
-    backgroundColor: "#ffffff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e1e1e1",
+    flex: 1,
+    marginRight: 12,
   },
   searchInput: {
     backgroundColor: "#f8f8f8",
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: 8,
     fontSize: 16,
     borderWidth: 1,
     borderColor: "#ddd",
+  },
+  addFloatingButton: {
+    backgroundColor: "#007AFF",
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  addFloatingButtonText: {
+    color: "#ffffff",
+    fontSize: 24,
+    fontWeight: "bold",
   },
   listContainer: {
     padding: 16,
