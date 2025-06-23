@@ -115,125 +115,132 @@ export default function AdminAddProductScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
-      {/* Title is set by _layout.tsx, but can be overridden here if needed */}
-      {/* <Stack.Screen options={{ title: 'Add New Product' }} /> */}
+    <ScrollView
+      style={styles.container}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.formContainer}>
+        <Text style={styles.pageTitle}>Add New Product</Text>
 
-      {errors.general && errors.general.trim() && (
-        <Text key="general-error" style={styles.errorTextGeneral}>
-          {errors.general}
-        </Text>
-      )}
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>
-          Product Name <Text style={styles.requiredAsterisk}>*</Text>
-        </Text>
-        <TextInput
-          style={[styles.input, errors.productName ? styles.inputError : null]}
-          placeholder="e.g., Wireless Mouse"
-          value={productName}
-          onChangeText={setProductName}
-          editable={!isLoading}
-        />
-        {errors.productName && errors.productName.trim() && (
-          <Text key="productName-error" style={styles.errorText}>
-            {errors.productName}
+        {errors.general && errors.general.trim() && (
+          <Text key="general-error" style={styles.errorTextGeneral}>
+            {errors.general}
           </Text>
         )}
-      </View>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Description</Text>
-        <TextInput
-          style={[
-            styles.input,
-            styles.textArea,
-            errors.description ? styles.inputError : null,
-          ]}
-          placeholder="e.g., High precision optical mouse with ergonomic design."
-          value={description}
-          onChangeText={setDescription}
-          multiline
-          numberOfLines={4}
-          editable={!isLoading}
-        />
-        {errors.description && errors.description.trim() && (
-          <Text style={styles.errorText}>{errors.description}</Text>
-        )}
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>
-          SKU <Text style={styles.requiredAsterisk}>*</Text>
-        </Text>
-        <TextInput
-          style={[styles.input, errors.sku ? styles.inputError : null]}
-          placeholder="e.g., WM-1023-BLK"
-          value={sku}
-          onChangeText={setSku}
-          autoCapitalize="characters"
-          editable={!isLoading}
-        />
-        {errors.sku && errors.sku.trim() && (
-          <Text style={styles.errorText}>{errors.sku}</Text>
-        )}
-      </View>
-
-      <View style={styles.row}>
-        <View style={[styles.inputGroup, styles.halfWidth]}>
+        <View style={styles.inputGroup}>
           <Text style={styles.label}>
-            Price <Text style={styles.requiredAsterisk}>*</Text>
-          </Text>
-          <TextInput
-            style={[styles.input, errors.price ? styles.inputError : null]}
-            placeholder="e.g., 29.99"
-            value={price}
-            onChangeText={setPrice}
-            keyboardType="numeric"
-            editable={!isLoading}
-          />
-          {errors.price && errors.price.trim() && (
-            <Text key="price-error" style={styles.errorText}>
-              {errors.price}
-            </Text>
-          )}
-        </View>
-
-        <View style={[styles.inputGroup, styles.halfWidth]}>
-          <Text style={styles.label}>
-            Stock Quantity <Text style={styles.requiredAsterisk}>*</Text>
+            Product Name <Text style={styles.requiredAsterisk}>*</Text>
           </Text>
           <TextInput
             style={[
               styles.input,
-              errors.stockQuantity ? styles.inputError : null,
+              errors.productName ? styles.inputError : null,
             ]}
-            placeholder="e.g., 150"
-            value={stockQuantity}
-            onChangeText={setStockQuantity}
-            keyboardType="numeric"
+            placeholder="e.g., Wireless Mouse"
+            value={productName}
+            onChangeText={setProductName}
             editable={!isLoading}
           />
-          {errors.stockQuantity && errors.stockQuantity.trim() && (
-            <Text style={styles.errorText}>{errors.stockQuantity}</Text>
+          {errors.productName && errors.productName.trim() && (
+            <Text key="productName-error" style={styles.errorText}>
+              {errors.productName}
+            </Text>
           )}
         </View>
-      </View>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>
-          Category <Text style={styles.requiredAsterisk}>*</Text>
-        </Text>
-        {/* Using TextInput for category as discussed. Replace with Picker for better UX if categories are predefined. */}
-        <TextInput
-          style={[styles.input, errors.category ? styles.inputError : null]}
-          placeholder="e.g., Electronics, Office Supplies"
-          value={category}
-          onChangeText={setCategory}
-          editable={!isLoading}
-        />
-        {/* 
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Description</Text>
+          <TextInput
+            style={[
+              styles.input,
+              styles.textArea,
+              errors.description ? styles.inputError : null,
+            ]}
+            placeholder="e.g., High precision optical mouse with ergonomic design."
+            value={description}
+            onChangeText={setDescription}
+            multiline
+            numberOfLines={4}
+            editable={!isLoading}
+          />
+          {errors.description && errors.description.trim() && (
+            <Text style={styles.errorText}>{errors.description}</Text>
+          )}
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>
+            SKU <Text style={styles.requiredAsterisk}>*</Text>
+          </Text>
+          <TextInput
+            style={[styles.input, errors.sku ? styles.inputError : null]}
+            placeholder="e.g., WM-1023-BLK"
+            value={sku}
+            onChangeText={setSku}
+            autoCapitalize="characters"
+            editable={!isLoading}
+          />
+          {errors.sku && errors.sku.trim() && (
+            <Text style={styles.errorText}>{errors.sku}</Text>
+          )}
+        </View>
+
+        <View style={styles.row}>
+          <View style={[styles.inputGroup, styles.halfWidth]}>
+            <Text style={styles.label}>
+              Price <Text style={styles.requiredAsterisk}>*</Text>
+            </Text>
+            <TextInput
+              style={[styles.input, errors.price ? styles.inputError : null]}
+              placeholder="e.g., 29.99"
+              value={price}
+              onChangeText={setPrice}
+              keyboardType="numeric"
+              editable={!isLoading}
+            />
+            {errors.price && errors.price.trim() && (
+              <Text key="price-error" style={styles.errorText}>
+                {errors.price}
+              </Text>
+            )}
+          </View>
+
+          <View style={[styles.inputGroup, styles.halfWidth]}>
+            <Text style={styles.label}>
+              Stock Quantity <Text style={styles.requiredAsterisk}>*</Text>
+            </Text>
+            <TextInput
+              style={[
+                styles.input,
+                errors.stockQuantity ? styles.inputError : null,
+              ]}
+              placeholder="e.g., 150"
+              value={stockQuantity}
+              onChangeText={setStockQuantity}
+              keyboardType="numeric"
+              editable={!isLoading}
+            />
+            {errors.stockQuantity && errors.stockQuantity.trim() && (
+              <Text style={styles.errorText}>{errors.stockQuantity}</Text>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>
+            Category <Text style={styles.requiredAsterisk}>*</Text>
+          </Text>
+          {/* Using TextInput for category as discussed. Replace with Picker for better UX if categories are predefined. */}
+          <TextInput
+            style={[styles.input, errors.category ? styles.inputError : null]}
+            placeholder="e.g., Electronics, Office Supplies"
+            value={category}
+            onChangeText={setCategory}
+            editable={!isLoading}
+          />
+          {/* 
         Example for Picker:
         <Picker selectedValue={category} onValueChange={(itemValue) => setCategory(itemValue)} style={styles.input}>
           <Picker.Item label="Select Category..." value="" />
@@ -241,38 +248,44 @@ export default function AdminAddProductScreen() {
           <Picker.Item label="Books" value="books" />
         </Picker> 
         */}
-        {errors.category && errors.category.trim() && (
-          <Text style={styles.errorText}>{errors.category}</Text>
-        )}
-      </View>
+          {errors.category && errors.category.trim() && (
+            <Text style={styles.errorText}>{errors.category}</Text>
+          )}
+        </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[
-            styles.button,
-            styles.cancelButton,
-            isLoading && styles.disabledButton,
-          ]}
-          onPress={() => router.back()}
-          disabled={isLoading}
-        >
-          <Text style={[styles.buttonText, styles.cancelButtonText]}>
-            Cancel
-          </Text>
-        </TouchableOpacity>
-        <View style={{ width: 10 }} />
-        {isLoading ? (
-          <ActivityIndicator size="small" color="#007BFF" />
-        ) : (
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={[styles.button, styles.saveButton]}
-            onPress={handleSaveProduct}
+            style={[
+              styles.button,
+              styles.cancelButton,
+              isLoading && styles.disabledButton,
+            ]}
+            onPress={() => router.back()}
+            disabled={isLoading}
           >
-            <Text style={[styles.buttonText, styles.saveButtonText]}>
-              Save Product
+            <Text style={[styles.buttonText, styles.cancelButtonText]}>
+              Cancel
             </Text>
           </TouchableOpacity>
-        )}
+          <View style={{ width: 10 }} />
+          <TouchableOpacity
+            style={[
+              styles.button,
+              styles.saveButton,
+              isLoading && styles.disabledButton,
+            ]}
+            onPress={handleSaveProduct}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <Text style={[styles.buttonText, styles.saveButtonText]}>
+                Save Product
+              </Text>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
@@ -281,22 +294,99 @@ export default function AdminAddProductScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    backgroundColor: "#F8F9FA",
+  },
+  formContainer: {
+    flex: 1,
+    marginTop: 60, // Add top margin
+    marginHorizontal: 16,
+    paddingVertical: 24,
+    paddingHorizontal: 16,
     backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#2C3E50",
+    marginBottom: 24,
+    textAlign: "center",
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#34495E",
+    marginBottom: 8,
+  },
+  requiredAsterisk: {
+    color: "#E74C3C",
+  },
+  input: {
+    backgroundColor: "#F8F9FA",
+    height: 50,
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    color: "#2C3E50",
+  },
+  inputError: {
+    borderColor: "#E74C3C",
+    borderWidth: 1,
+  },
+  textArea: {
+    height: 120,
+    textAlignVertical: "top",
+    paddingTop: 16,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  halfWidth: {
+    flex: 0.48,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 32,
+    marginBottom: 20,
+    paddingBottom: Platform.OS === "ios" ? 20 : 0,
   },
   button: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    minWidth: 120,
+    minWidth: 140,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   saveButton: {
-    backgroundColor: "#007BFF",
+    backgroundColor: "#3498DB",
   },
   cancelButton: {
-    backgroundColor: "#6C757D",
+    backgroundColor: "#95A5A6",
   },
   buttonText: {
     fontSize: 16,
@@ -311,60 +401,20 @@ const styles = StyleSheet.create({
   disabledButton: {
     opacity: 0.6,
   },
-  inputGroup: {
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#495057", // Darker gray for labels
-    marginBottom: 6,
-  },
-  requiredAsterisk: {
-    color: "red",
-  },
-  input: {
-    backgroundColor: "#F8F9FA", // Lighter input background
-    height: 50, // Standard height
-    borderRadius: 8, // More rounded corners
-    paddingHorizontal: 15,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: "#CED4DA", // Standard border color
-  },
-  inputError: {
-    borderColor: "#DC3545", // Red border for errors
-  },
-  textArea: {
-    height: 100, // Taller for multiline input
-    textAlignVertical: "top", // Align text to top for multiline
-    paddingTop: 12, // Adjust padding for multiline
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  halfWidth: {
-    flex: 0.48, // Take slightly less than half to allow for spacing
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "flex-end", // Align buttons to the right
-    marginTop: 25,
-    marginBottom: 20, // Extra margin at bottom
-    paddingBottom: Platform.OS === "ios" ? 20 : 0, // Padding for iOS home indicator
-  },
   errorText: {
-    color: "#DC3545",
-    fontSize: 13, // Slightly smaller error text
-    marginTop: 4,
+    color: "#E74C3C",
+    fontSize: 13,
+    marginTop: 6,
+    marginLeft: 4,
   },
   errorTextGeneral: {
-    color: "#DC3545",
+    color: "#E74C3C",
     fontSize: 15,
     textAlign: "center",
-    marginBottom: 15,
+    marginBottom: 20,
     fontWeight: "500",
+    backgroundColor: "#FADBD8",
+    padding: 10,
+    borderRadius: 8,
   },
-  // Styles for Button component are limited, use TouchableOpacity for custom buttons
 });

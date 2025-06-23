@@ -10,6 +10,7 @@ import {
   Alert,
   RefreshControl,
   Button,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { getProducts, deleteProduct, Product } from "../../../services/api"; // Adjust path
@@ -25,6 +26,7 @@ interface PaginationInfo {
 
 export default function AdminProductsScreen() {
   const router = useRouter();
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -208,30 +210,12 @@ export default function AdminProductsScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchFilterContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search products by name, SKU..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          clearButtonMode="while-editing"
-        />
-        {/* Placeholder for Filter Buttons/UI */}
-        <View style={styles.filterControls}>
-          <Text style={styles.filterPlaceholderText}>
-            Filters: (Category, Stock Status) - UI TBD
-          </Text>
-          {/* Example: <Button title="Filter by Category" onPress={() => {}}/> */}
+      {error && !refreshing && (
+        <View style={styles.errorDisplay}>
+          <Text style={styles.errorText}>Error: {error}</Text>
+          <Button title="Retry" onPress={() => fetchProductsData(true)} />
         </View>
-      </View>
-
-      {error &&
-        !refreshing && ( // Show error prominently if it occurs and not during a refresh
-          <View style={styles.errorDisplay}>
-            <Text style={styles.errorText}>Error: {error}</Text>
-            <Button title="Retry" onPress={() => fetchProductsData(true)} />
-          </View>
-        )}
+      )}
 
       <FlatList
         data={products}
@@ -253,10 +237,33 @@ export default function AdminProductsScreen() {
             colors={["#007AFF"]}
           />
         }
-        // ListFooterComponent={renderListFooter} // Enable when pagination logic is more robust
-        // onEndReached={handleLoadMore} // Enable with onEndReachedThreshold
-        // onEndReachedThreshold={0.5}
       />
+
+      {/* Floating bottom bar */}
+      <View
+        style={[
+          styles.floatingBottomBar,
+          isSearchFocused && styles.floatingBottomBarRaised,
+        ]}
+      >
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.floatingSearchInput}
+            placeholder="Search products by name, SKU..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            clearButtonMode="while-editing"
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
+          />
+        </View>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => router.push("/(admin)/products/add")}
+        >
+          <Text style={styles.addButtonText}>+</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -264,8 +271,8 @@ export default function AdminProductsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F9FA", // Light background
-    paddingTop: 50, // Added top margin for header-less pages
+    backgroundColor: "#F8F9FA",
+    paddingTop: 50,
   },
   loadingContainer: {
     flex: 1,
@@ -296,7 +303,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   listContentContainer: {
-    paddingBottom: 20, // Space at the bottom of the list
+    paddingBottom: 90, // Increased to accommodate floating bar
   },
   productItemContainer: {
     backgroundColor: "#FFFFFF",
@@ -393,5 +400,57 @@ const styles = StyleSheet.create({
   loadMoreButtonText: {
     color: "#FFFFFF",
     fontSize: 16,
+  },
+  floatingBottomBar: {
+    position: "absolute",
+    bottom: 20,
+    left: 15,
+    right: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    zIndex: 1000,
+  },
+  floatingBottomBarRaised: {
+    bottom: Platform.select({
+      ios: 300, // Adjust this value based on keyboard height
+      android: 20,
+    }),
+    transform: [{ translateY: Platform.OS === "ios" ? -100 : 0 }],
+  },
+  searchContainer: {
+    flex: 1,
+    marginRight: 10,
+  },
+  floatingSearchInput: {
+    height: 40,
+    backgroundColor: "#F0F2F5",
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    fontSize: 16,
+  },
+  addButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: "#007BFF",
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  addButtonText: {
+    color: "#FFFFFF",
+    fontSize: 24,
+    fontWeight: "bold",
   },
 });
