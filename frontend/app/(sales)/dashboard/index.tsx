@@ -17,6 +17,9 @@ import { useAuth } from "../../../contexts/AuthContext";
 import {
   getDashboardStats,
   getSales,
+  getSalesReport,
+  getPayments,
+  getComprehensiveReports,
   Sale as APISale,
 } from "../../../services/api";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -115,15 +118,138 @@ export default function SalespersonDashboardScreen() {
   const [modalData, setModalData] = useState<APISale[]>([]);
   const [modalLoading, setModalLoading] = useState(false);
 
-  const fetchSalespersonStats = async () => {
+  // Raw data states for calculations
+  const [allSales, setAllSales] = useState<APISale[]>([]);
+  const [todaySales, setTodaySales] = useState<APISale[]>([]);
+  const [monthSales, setMonthSales] = useState<APISale[]>([]);
+  const [pendingSales, setPendingSales] = useState<APISale[]>([]);
+
+  // Recent activity from comprehensive reports
+  const [recentActivity, setRecentActivity] = useState<{
+    sales: any[];
+    payments: any[];
+  }>({ sales: [], payments: [] });
+
+  const fetchComprehensiveData = async () => {
     try {
-      console.log("Sales dashboard: Attempting to fetch stats");
+      console.log(
+        "Sales dashboard: Fetching comprehensive data using getComprehensiveReports"
+      );
       setError(null);
-      const data = await getDashboardStats();
-      console.log("Sales dashboard: Stats fetched successfully:", data);
-      setStats(data as SalespersonDashboardStats);
+
+      const today = new Date();
+      const todayStr = today.toISOString().split("T")[0];
+
+      const firstDayOfMonth = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        1
+      );
+      const monthStartStr = firstDayOfMonth.toISOString().split("T")[0];
+
+      // Fetch comprehensive reports data - this gives us everything including recent activity
+      const comprehensiveData = await getComprehensiveReports({
+        date_from: monthStartStr,
+        date_to: todayStr,
+      });
+
+      console.log("Comprehensive data received:", comprehensiveData);
+
+      // Extract recent activity (this is the key data structure from Reports page)
+      if (comprehensiveData.recent_activity) {
+        setRecentActivity({
+          sales: comprehensiveData.recent_activity.sales || [],
+          payments: comprehensiveData.recent_activity.payments || [],
+        });
+      }
+
+      // Also fetch today's data specifically for "today" metrics
+      const todayComprehensiveData = await getComprehensiveReports({
+        date_from: todayStr,
+        date_to: todayStr,
+      });
+
+      console.log(
+        "Today's comprehensive data received:",
+        todayComprehensiveData
+      );
+
+      // Also fetch individual sales data for modal functionality
+      const [todayResponse, monthResponse, pendingResponse] = await Promise.all(
+        [
+          getSales({
+            date_from: todayStr,
+            date_to: todayStr,
+            salesperson: user?.id,
+          }).catch((err) => {
+            console.warn("Today's sales failed:", err);
+            return { results: [] };
+          }),
+          getSales({
+            date_from: monthStartStr,
+            date_to: todayStr,
+            salesperson: user?.id,
+          }).catch((err) => {
+            console.warn("Month's sales failed:", err);
+            return { results: [] };
+          }),
+          getSales({
+            payment_status: "unpaid",
+            salesperson: user?.id,
+          }).catch((err) => {
+            console.warn("Pending sales failed:", err);
+            return { results: [] };
+          }),
+        ]
+      );
+
+      // Store raw data for modal display
+      const todaySalesData = todayResponse?.results || [];
+      const monthSalesData = monthResponse?.results || [];
+      const pendingSalesData = pendingResponse?.results || [];
+
+      setTodaySales(todaySalesData);
+      setMonthSales(monthSalesData);
+      setPendingSales(pendingSalesData);
+      setAllSales([...monthSalesData, ...pendingSalesData]);
+
+      // Use the same approach as Reports page - get stats from comprehensive reports
+      const calculatedStats: SalespersonDashboardStats = {
+        // Today's metrics from today's comprehensive report
+        my_sales_today: todayComprehensiveData?.sales_summary?.total_sales || 0,
+        my_revenue_today:
+          todayComprehensiveData?.sales_summary?.total_revenue || 0,
+        // Month's metrics from month comprehensive report
+        my_sales_this_month: comprehensiveData?.sales_summary?.total_sales || 0,
+        my_revenue_this_month:
+          comprehensiveData?.sales_summary?.total_revenue || 0,
+        // Pending from credit summary
+        my_pending_sales:
+          comprehensiveData?.credit_summary?.total_unpaid_sales || 0,
+        my_pending_amount:
+          comprehensiveData?.credit_summary?.total_outstanding_balance || 0,
+      };
+
+      setStats(calculatedStats);
+
+      console.log("Sales dashboard: Comprehensive data fetched successfully");
+      console.log(
+        "Recent activity sales:",
+        comprehensiveData.recent_activity?.sales?.length || 0
+      );
+      console.log(
+        "Recent activity payments:",
+        comprehensiveData.recent_activity?.payments?.length || 0
+      );
+      console.log(
+        "Today's sales summary:",
+        todayComprehensiveData?.sales_summary
+      );
+      console.log("Month's sales summary:", comprehensiveData?.sales_summary);
+      console.log("Credit summary:", comprehensiveData?.credit_summary);
+      console.log("Calculated stats:", calculatedStats);
     } catch (err: any) {
-      console.error("Failed to fetch salesperson dashboard stats:", err);
+      console.error("Failed to fetch comprehensive dashboard data:", err);
 
       let errorMessage =
         "Failed to fetch your dashboard data. Please try again.";
@@ -153,43 +279,86 @@ export default function SalespersonDashboardScreen() {
   const fetchDetailedSales = async (type: "today" | "month" | "pending") => {
     setModalLoading(true);
     try {
-      const today = new Date();
-      let params: any = {};
+      let salesData: APISale[] = [];
 
       switch (type) {
         case "today":
-          const todayStr = today.toISOString().split("T")[0];
-          params = { date_from: todayStr, date_to: todayStr };
+          salesData = todaySales;
           setModalTitle("My Sales Today");
           break;
         case "month":
-          const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-          const lastDay = new Date(
-            today.getFullYear(),
-            today.getMonth() + 1,
-            0
-          );
-          params = {
-            date_from: firstDay.toISOString().split("T")[0],
-            date_to: lastDay.toISOString().split("T")[0],
-          };
+          salesData = monthSales;
           setModalTitle("My Sales This Month");
           break;
         case "pending":
-          params = { payment_status: "unpaid" };
+          salesData = pendingSales;
           setModalTitle("My Pending Sales");
           break;
       }
 
-      if (user?.id) {
-        params.salesperson = user.id;
+      // If local data is empty, try to fetch fresh data
+      if (salesData.length === 0) {
+        console.log(`No local ${type} data, fetching fresh data...`);
+
+        const today = new Date();
+        let params: any = {};
+
+        switch (type) {
+          case "today":
+            const todayStr = today.toISOString().split("T")[0];
+            params = { date_from: todayStr, date_to: todayStr };
+            break;
+          case "month":
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(
+              today.getFullYear(),
+              today.getMonth() + 1,
+              0
+            );
+            params = {
+              date_from: firstDay.toISOString().split("T")[0],
+              date_to: lastDay.toISOString().split("T")[0],
+            };
+            break;
+          case "pending":
+            params = { payment_status: "unpaid" };
+            break;
+        }
+
+        if (user?.id) {
+          params.salesperson = user.id;
+        }
+
+        const response = await getSales(params);
+        salesData = response.results || [];
+
+        // Update local state with fresh data
+        switch (type) {
+          case "today":
+            setTodaySales(salesData);
+            break;
+          case "month":
+            setMonthSales(salesData);
+            break;
+          case "pending":
+            setPendingSales(salesData);
+            break;
+        }
       }
 
-      const response = await getSales(params);
-      setModalData(response.results || []);
+      setModalData(salesData);
       setModalVisible(true);
     } catch (error) {
       console.error("Failed to fetch detailed sales:", error);
+      // Still show modal with empty data or existing local data
+      setModalData(
+        type === "today"
+          ? todaySales
+          : type === "month"
+          ? monthSales
+          : pendingSales
+      );
+      setModalVisible(true);
     } finally {
       setModalLoading(false);
     }
@@ -197,12 +366,12 @@ export default function SalespersonDashboardScreen() {
 
   useEffect(() => {
     setIsLoading(true);
-    fetchSalespersonStats();
+    fetchComprehensiveData();
   }, []);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    fetchSalespersonStats();
+    fetchComprehensiveData();
   }, []);
 
   if (isLoading && !refreshing) {
@@ -221,7 +390,7 @@ export default function SalespersonDashboardScreen() {
         <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity
           style={styles.retryButton}
-          onPress={fetchSalespersonStats}
+          onPress={fetchComprehensiveData}
         >
           <MaterialIcons name="refresh" size={20} color="#FFFFFF" />
           <Text style={styles.retryButtonText}>Retry</Text>
@@ -255,6 +424,21 @@ export default function SalespersonDashboardScreen() {
         <Text style={styles.saleDate}>{formatDate(item.created_at || "")}</Text>
       </View>
 
+      {/* Customer Information */}
+      {(item.customer_name || item.customer_phone) && (
+        <View style={styles.customerSection}>
+          <Text style={styles.customerSectionTitle}>Customer Details:</Text>
+          {item.customer_name && (
+            <Text style={styles.customerInfo}>Name: {item.customer_name}</Text>
+          )}
+          {item.customer_phone && (
+            <Text style={styles.customerInfo}>
+              Phone: {item.customer_phone}
+            </Text>
+          )}
+        </View>
+      )}
+
       <View style={styles.saleDetails}>
         <View style={styles.saleRow}>
           <Text style={styles.saleLabel}>Total Amount:</Text>
@@ -267,18 +451,28 @@ export default function SalespersonDashboardScreen() {
           <Text style={styles.saleValue}>{item.payment_method || "N/A"}</Text>
         </View>
         <View style={styles.saleRow}>
+          <Text style={styles.saleLabel}>Amount Paid:</Text>
+          <Text style={styles.saleValue}>
+            {formatCurrency(item.amount_paid || 0)}
+          </Text>
+        </View>
+        <View style={styles.saleRow}>
           <Text style={styles.saleLabel}>Status:</Text>
           <View
             style={[
               styles.statusBadge,
               {
                 backgroundColor:
-                  item.payment_status === "paid" ? "#4CAF50" : "#FF9800",
+                  item.payment_status === "paid"
+                    ? "#4CAF50"
+                    : item.payment_status === "partial"
+                    ? "#FF9800"
+                    : "#F44336",
               },
             ]}
           >
             <Text style={styles.statusText}>
-              {(item.payment_status || "unknown").toUpperCase()}
+              {(item.payment_status || "unpaid").toUpperCase()}
             </Text>
           </View>
         </View>
@@ -303,6 +497,11 @@ export default function SalespersonDashboardScreen() {
             </Text>
           </View>
         ))}
+        {(!item.products_sold || item.products_sold.length === 0) && (
+          <Text style={styles.noProductsText}>
+            No product details available
+          </Text>
+        )}
       </View>
     </View>
   );
@@ -336,11 +535,9 @@ export default function SalespersonDashboardScreen() {
         {stats ? (
           <View style={styles.metricsContainer}>
             <MetricCard
-              label="Total Revenue"
-              value={formatCurrency(
-                stats.my_revenue_today + stats.my_revenue_this_month
-              )}
-              context="All time earnings"
+              label="Total Revenue This Month"
+              value={formatCurrency(stats.my_revenue_this_month)}
+              context="Month's total earnings"
               icon={
                 <MaterialIcons
                   name="account-balance-wallet"
@@ -348,12 +545,7 @@ export default function SalespersonDashboardScreen() {
                   color="#4CAF50"
                 />
               }
-              onPress={() => {
-                // Show combined revenue details
-                setModalTitle("Total Revenue Breakdown");
-                setModalData([]);
-                setModalVisible(true);
-              }}
+              onPress={() => fetchDetailedSales("month")}
             />
 
             <MetricCard
@@ -405,6 +597,140 @@ export default function SalespersonDashboardScreen() {
               </Text>
             </View>
           )
+        )}
+
+        {/* Recent Activity Section */}
+        {(recentActivity.sales.length > 0 ||
+          recentActivity.payments.length > 0) && (
+          <View style={styles.recentActivityContainer}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Recent Activity</Text>
+              <TouchableOpacity onPress={() => router.push("/(sales)/reports")}>
+                <Text style={styles.viewAllText}>View All</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Recent Sales */}
+            {recentActivity.sales.slice(0, 3).map((sale, index) => (
+              <TouchableOpacity
+                key={`sale-${sale.id}`}
+                style={styles.recentSaleCard}
+                onPress={() => {
+                  setModalTitle(`Sale #${sale.id} Details`);
+                  setModalData([sale]);
+                  setModalVisible(true);
+                }}
+              >
+                <View style={styles.recentSaleHeader}>
+                  <Text style={styles.recentSaleId}>Sale #{sale.id}</Text>
+                  <Text style={styles.recentSaleAmount}>
+                    {formatCurrency(sale.total_amount)}
+                  </Text>
+                </View>
+                <View style={styles.recentSaleDetails}>
+                  <Text style={styles.recentSaleDate}>
+                    {formatDate(sale.created_at || "")}
+                  </Text>
+                  <View
+                    style={[
+                      styles.recentSaleStatus,
+                      {
+                        backgroundColor:
+                          sale.payment_status === "paid"
+                            ? "#E8F5E8"
+                            : sale.payment_status === "partial"
+                            ? "#FFF3E0"
+                            : "#FFE8E8",
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.recentSaleStatusText,
+                        {
+                          color:
+                            sale.payment_status === "paid"
+                              ? "#4CAF50"
+                              : sale.payment_status === "partial"
+                              ? "#FF9800"
+                              : "#F44336",
+                        },
+                      ]}
+                    >
+                      {(sale.payment_status || "unpaid").toUpperCase()}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.recentSaleFooter}>
+                  {sale.customer_name && (
+                    <Text style={styles.recentSaleCustomer}>
+                      Customer: {sale.customer_name}
+                    </Text>
+                  )}
+                  {sale.products_sold && sale.products_sold.length > 0 && (
+                    <Text style={styles.recentSaleProducts}>
+                      {sale.products_sold.length} product
+                      {sale.products_sold.length !== 1 ? "s" : ""}
+                    </Text>
+                  )}
+                </View>
+              </TouchableOpacity>
+            ))}
+
+            {/* Recent Payments */}
+            {recentActivity.payments.slice(0, 2).map((payment, index) => (
+              <TouchableOpacity
+                key={`payment-${payment.id}`}
+                style={[styles.recentSaleCard, styles.recentPaymentCard]}
+              >
+                <View style={styles.recentSaleHeader}>
+                  <Text style={styles.recentSaleId}>
+                    <MaterialIcons name="payment" size={16} color="#4CAF50" />{" "}
+                    Payment #{payment.id}
+                  </Text>
+                  <Text style={[styles.recentSaleAmount, { color: "#4CAF50" }]}>
+                    {formatCurrency(payment.amount)}
+                  </Text>
+                </View>
+                <View style={styles.recentSaleDetails}>
+                  <Text style={styles.recentSaleDate}>
+                    {formatDate(payment.created_at || "")}
+                  </Text>
+                  <View
+                    style={[
+                      styles.recentSaleStatus,
+                      { backgroundColor: "#E8F5E8" },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.recentSaleStatusText,
+                        { color: "#4CAF50" },
+                      ]}
+                    >
+                      RECEIVED
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.recentSaleFooter}>
+                  <Text style={styles.recentSaleCustomer}>
+                    For Sale #{payment.sale_id} • {payment.payment_method}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+
+            {/* No Recent Activity */}
+            {recentActivity.sales.length === 0 &&
+              recentActivity.payments.length === 0 && (
+                <View style={styles.noDataContainer}>
+                  <MaterialIcons name="history" size={48} color="#CCCCCC" />
+                  <Text style={styles.noDataText}>
+                    No recent activity to display.
+                  </Text>
+                </View>
+              )}
+          </View>
         )}
 
         <TouchableOpacity
@@ -833,5 +1159,120 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666",
     textAlign: "center",
+  },
+
+  // Recent Activity Styles
+  recentActivityContainer: {
+    margin: 16,
+    marginTop: 8,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1A1A1A",
+  },
+  viewAllText: {
+    fontSize: 14,
+    color: "#007AFF",
+    fontWeight: "600",
+  },
+  recentSaleCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: "#F0F0F0",
+  },
+  recentSaleHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  recentSaleId: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1A1A1A",
+  },
+  recentSaleAmount: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#4CAF50",
+  },
+  recentSaleDetails: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  recentSaleDate: {
+    fontSize: 12,
+    color: "#666",
+  },
+  recentSaleStatus: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  recentSaleStatusText: {
+    fontSize: 10,
+    fontWeight: "600",
+  },
+  recentSaleProducts: {
+    fontSize: 12,
+    color: "#888",
+    fontStyle: "italic",
+  },
+  recentSaleFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  recentSaleCustomer: {
+    fontSize: 12,
+    color: "#666",
+    flex: 1,
+  },
+  recentPaymentCard: {
+    borderLeftWidth: 3,
+    borderLeftColor: "#4CAF50",
+  },
+  // Customer section styles
+  customerSection: {
+    backgroundColor: "#F8F9FA",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  customerSectionTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 6,
+  },
+  customerInfo: {
+    fontSize: 13,
+    color: "#555",
+    marginBottom: 2,
+  },
+  noProductsText: {
+    fontSize: 12,
+    color: "#999",
+    fontStyle: "italic",
+    textAlign: "center",
+    marginTop: 8,
   },
 });
