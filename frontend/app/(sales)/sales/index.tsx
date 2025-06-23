@@ -350,7 +350,6 @@ export default function SalesMySalesScreen() {
   if (isLoading && sales.length === 0 && !refreshing) {
     return (
       <View style={styles.loadingContainer}>
-        <Stack.Screen options={{ title: "My Sales" }} />
         <ActivityIndicator size="large" color="#3b82f6" />
         <Text style={styles.loadingText}>Loading sales...</Text>
       </View>
@@ -360,7 +359,6 @@ export default function SalesMySalesScreen() {
   if (error && sales.length === 0) {
     return (
       <View style={styles.errorContainer}>
-        <Stack.Screen options={{ title: "My Sales" }} />
         <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity
           style={styles.retryButton}
@@ -374,8 +372,6 @@ export default function SalesMySalesScreen() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: "My Sales" }} />
-
       {/* Create New Sale Button */}
       <View style={styles.createButtonContainer}>
         <TouchableOpacity
@@ -442,6 +438,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8f9fa",
+    paddingTop: 50, // Added top margin for header-less pages
   },
   searchContainer: {
     padding: 16,

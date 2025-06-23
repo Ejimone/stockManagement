@@ -265,6 +265,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F8F9FA", // Light background
+    paddingTop: 50, // Added top margin for header-less pages
   },
   loadingContainer: {
     flex: 1,

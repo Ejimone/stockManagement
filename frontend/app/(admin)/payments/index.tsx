@@ -263,7 +263,7 @@ export default function AdminPaymentsScreen() {
     <View style={styles.container}>
       <Stack.Screen
         options={{
-          title: "Payments & Credits",
+          headerShown: false,
           headerRight: () => (
             <View style={styles.headerButtons}>
               <TouchableOpacity
@@ -488,6 +488,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
+    paddingTop: 50, // Added top margin for header-less pages
   },
   headerButtons: {
     flexDirection: "row",

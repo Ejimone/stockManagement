@@ -188,7 +188,7 @@ export default function AdminProductDetailScreen() {
     >
       <Stack.Screen
         options={{
-          title: `Edit Product`,
+          headerShown: false,
           headerRight: () => (
             <TouchableOpacity onPress={handleSave} disabled={isSaving}>
               <Text

@@ -121,8 +121,6 @@ export default function CreateProductScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Stack.Screen options={{ title: "Add New Product" }} />
-
       <View style={styles.form}>
         {/* Product Name */}
         <View style={styles.inputGroup}>

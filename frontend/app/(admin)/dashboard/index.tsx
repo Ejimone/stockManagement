@@ -153,7 +153,7 @@ export default function AdminDashboardScreen() {
         />
       }
     >
-      <Text style={styles.welcomeMessage}>{user?.email || "Admin"}!</Text>
+      {/*      <Text style={styles.welcomeMessage}>Welcome, {user?.email || "Admin"}!</Text>*/}
 
       {/* Real-time notification status */}
       <View style={styles.notificationStatus}>
@@ -261,6 +261,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5", // Light grey background
+    paddingTop: 50, // Added top margin for header-less pages
   },
   scrollView: {
     // This style is not directly used on ScrollView tag, but good to keep if refactoring

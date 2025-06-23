@@ -276,8 +276,6 @@ export default function AdminCreateSaleScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Stack.Screen options={{ title: "Create New Sale" }} />
-
       {/* Product Search */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Add Products</Text>
@@ -440,6 +438,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingTop: 50, // Added top margin for header-less pages
   },
   section: {
     padding: 16,

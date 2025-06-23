@@ -70,7 +70,7 @@ export default function SalespersonPaymentDetailScreen() {
     <View style={styles.container}>
       <Stack.Screen
         options={{
-          title: `Payment #${payment.id}`,
+          headerShown: false,
         }}
       />
 

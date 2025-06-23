@@ -122,8 +122,6 @@ export default function AdminAddUserScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Stack.Screen options={{ title: "Add Salesperson" }} />
-
       {/* Loading overlay when creating user */}
       {isLoading && (
         <View style={styles.loadingOverlay}>
@@ -253,6 +251,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingTop: 50, // Added top margin for header-less pages
   },
   formContainer: {
     padding: 16,

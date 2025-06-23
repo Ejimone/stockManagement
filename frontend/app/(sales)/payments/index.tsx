@@ -417,8 +417,7 @@ export default function SalespersonPaymentsScreen() {
     <View style={styles.container}>
       <Stack.Screen
         options={{
-          title: "My Payment Summary",
-          headerShown: true,
+          headerShown: false,
           headerRight: () => (
             <TouchableOpacity
               style={styles.headerButton}
@@ -728,6 +727,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
+    paddingTop: 50, // Added top margin for header-less pages
   },
   headerButton: {
     marginRight: 16,

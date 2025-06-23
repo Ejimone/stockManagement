@@ -1,11 +1,11 @@
-import { Stack } from 'expo-router';
+import { Stack } from "expo-router";
 
 export default function AdminSalesStackLayout() {
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ title: 'Sales List' }} />
-      <Stack.Screen name="create" options={{ title: 'Create New Sale' }} />
-      <Stack.Screen name="[id]" options={{ title: 'Sale Details' }} />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="create" options={{ headerShown: false }} />
+      <Stack.Screen name="[id]" options={{ headerShown: false }} />
     </Stack>
   );
 }

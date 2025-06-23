@@ -8,7 +8,7 @@ export default function SalesTabLayout() {
       screenOptions={{
         tabBarActiveTintColor: "#007AFF",
         tabBarInactiveTintColor: "#8E8E93",
-        headerShown: true,
+        headerShown: false,
       }}
     >
       <Tabs.Screen

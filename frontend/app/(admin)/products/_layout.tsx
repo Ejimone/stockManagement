@@ -1,5 +1,5 @@
-import { Stack, useRouter } from 'expo-router';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { Stack, useRouter } from "expo-router";
+import { TouchableOpacity, Text, StyleSheet } from "react-native";
 // Consider using an icon library for a better UX
 // import { Ionicons } from '@expo/vector-icons';
 
@@ -10,11 +10,11 @@ export default function AdminProductsStackLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Products',
+          headerShown: false,
           headerRight: () => (
             <TouchableOpacity
               style={styles.headerButton}
-              onPress={() => router.push('/(admin)/products/add')}
+              onPress={() => router.push("/(admin)/products/add")}
             >
               {/* <Ionicons name="add-circle-outline" size={28} color="#007AFF" /> */}
               <Text style={styles.headerButtonText}>Add</Text>
@@ -25,14 +25,14 @@ export default function AdminProductsStackLayout() {
       <Stack.Screen
         name="add"
         options={{
-          title: 'Add New Product',
+          headerShown: false,
           // presentation: 'modal', // Optional: if you want it to slide up
         }}
       />
       <Stack.Screen
         name="[id]"
         options={{
-          title: 'Product Details', // Can be dynamically set in the screen component too
+          headerShown: false, // Can be dynamically set in the screen component too
           // presentation: 'modal', // Optional
         }}
       />
@@ -46,8 +46,8 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   headerButtonText: {
-    color: '#007AFF', // iOS default blue
+    color: "#007AFF", // iOS default blue
     fontSize: 17, // Standard iOS header button text size
-    fontWeight: '600', // A bit bolder for emphasis
+    fontWeight: "600", // A bit bolder for emphasis
   },
 });

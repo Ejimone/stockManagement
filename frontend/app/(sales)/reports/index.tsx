@@ -640,7 +640,6 @@ export default function SalesMyReportsScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <Stack.Screen options={{ title: "My Reports" }} />
         <Text style={styles.loadingText}>Loading reports...</Text>
       </View>
     );
@@ -653,7 +652,6 @@ export default function SalesMyReportsScreen() {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      <Stack.Screen options={{ title: "My Reports" }} />
       {renderPeriodSelector()}
       {renderSalesChart()}
       {renderSummaryCards()}
@@ -670,6 +668,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8f9fa",
+    paddingTop: 50, // Added top margin for header-less pages
   },
   loadingContainer: {
     flex: 1,

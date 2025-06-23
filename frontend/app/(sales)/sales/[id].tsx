@@ -172,8 +172,6 @@ export default function SalesSaleDetailScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Stack.Screen options={{ title: `Sale #${sale.id}` }} />
-
       {/* Sale Header */}
       <View style={styles.saleHeader}>
         <Text style={styles.saleId}>Sale #{sale.id}</Text>
@@ -449,6 +447,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
+    paddingTop: 50, // Added top margin for header-less pages
   },
   centerContainer: {
     flex: 1,

@@ -8,7 +8,7 @@ export default function AdminTabLayout() {
       screenOptions={{
         tabBarActiveTintColor: "#007AFF",
         tabBarInactiveTintColor: "#8E8E93",
-        headerShown: true,
+        headerShown: false,
       }}
     >
       <Tabs.Screen

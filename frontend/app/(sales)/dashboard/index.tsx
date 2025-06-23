@@ -141,7 +141,9 @@ export default function SalespersonDashboardScreen() {
         />
       }
     >
-      <Text style={styles.welcomeMessage}>{user?.email || "Salesperson"}!</Text>
+      <Text style={styles.welcomeMessage}>
+        Welcome, {user?.email || "Salesperson"}!
+      </Text>
       {error && (
         <Text style={[styles.errorText, { marginBottom: 10 }]}>
           Error: {error}
@@ -176,7 +178,7 @@ export default function SalespersonDashboardScreen() {
               <MaterialCommunityIcons name="cart" size={32} color="#1565C0" />
             }
           />
-          {/* {stats.my_pending_sales !== undefined && (
+          {stats.my_pending_sales !== undefined && (
             <MetricCard
               label="My Pending Sales (Count)"
               value={stats.my_pending_sales.toString()}
@@ -195,7 +197,7 @@ export default function SalespersonDashboardScreen() {
               value={formatCurrency(stats.my_pending_amount)}
               icon={<FontAwesome name="money" size={30} color="#F57C00" />}
             />
-          )} */}
+          )}
         </>
       ) : (
         !isLoading && (
@@ -228,6 +230,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5",
+    paddingTop: 50, // Added top margin for header-less pages
   },
   welcomeMessage: {
     fontSize: 18,

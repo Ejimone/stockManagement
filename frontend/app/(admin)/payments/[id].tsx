@@ -110,7 +110,7 @@ export default function PaymentDetailScreen() {
     <View style={styles.container}>
       <Stack.Screen
         options={{
-          title: `Payment #${payment.id}`,
+          headerShown: false,
           headerRight: () => (
             <TouchableOpacity
               style={styles.headerButton}

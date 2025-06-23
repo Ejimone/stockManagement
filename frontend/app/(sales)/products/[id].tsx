@@ -100,7 +100,6 @@ export default function SalesProductDetailScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <Stack.Screen options={{ title: "Product Details" }} />
         <ActivityIndicator size="large" color="#3b82f6" />
         <Text style={styles.loadingText}>Loading product details...</Text>
       </View>
@@ -110,7 +109,6 @@ export default function SalesProductDetailScreen() {
   if (error || !product) {
     return (
       <View style={styles.errorContainer}>
-        <Stack.Screen options={{ title: "Product Details" }} />
         <Ionicons name="alert-circle" size={64} color="#ef4444" />
         <Text style={styles.errorText}>{error || "Product not found"}</Text>
         <TouchableOpacity
@@ -127,7 +125,7 @@ export default function SalesProductDetailScreen() {
     <ScrollView style={styles.container}>
       <Stack.Screen
         options={{
-          title: product.name || "Product Details",
+          headerShown: false,
           headerTitleStyle: { fontSize: 16 },
         }}
       />
@@ -266,6 +264,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8f9fa",
+    paddingTop: 50, // Added top margin for header-less pages
   },
   loadingContainer: {
     flex: 1,

@@ -222,6 +222,7 @@ export default function SalesProductListScreen() {
   if (isLoading && products.length === 0 && !refreshing) {
     return (
       <View style={styles.loadingContainer}>
+        {/* <Stack.Screen options={{ title: "View Products" }} /> */}
         <ActivityIndicator size="large" color="#007AFF" />
         <Text style={styles.loadingText}>Loading products...</Text>
       </View>
@@ -244,7 +245,6 @@ export default function SalesProductListScreen() {
 
   return (
     <View style={styles.container}>
-
       {/* Add Product Button */}
       <View style={styles.headerContainer}>
         <TouchableOpacity
@@ -295,6 +295,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8f9fa",
+    paddingTop: 50, // Added top margin for header-less pages
   },
   searchContainer: {
     padding: 16,

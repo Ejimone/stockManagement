@@ -181,8 +181,6 @@ export default function AdminUserDetailScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Stack.Screen options={{ title: "Edit User" }} />
-
       <View style={styles.field}>
         <Text style={styles.label}>Email *</Text>
         <TextInput
@@ -308,6 +306,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: "#fff",
+    paddingTop: 50, // Added top margin for header-less pages
   },
   centerContainer: {
     flex: 1,
