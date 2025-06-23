@@ -140,14 +140,13 @@ export default function SalespersonDashboardScreen() {
       const today = new Date();
       const todayStr = today.toISOString().split("T")[0];
 
-      const firstDayOfMonth = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        1
-      );
-      const monthStartStr = firstDayOfMonth.toISOString().split("T")[0];
+      // Use the same date logic as "My Sales" page for consistency
+      // "Month" filter = last 30 days (not current calendar month)
+      const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const monthStartStr = monthAgo.toISOString().split("T")[0];
 
       // Fetch comprehensive reports data - this gives us everything including recent activity
+      // Use last 30 days to match "My Sales" page exactly
       const comprehensiveData = await getComprehensiveReports({
         date_from: monthStartStr,
         date_to: todayStr,
@@ -174,9 +173,10 @@ export default function SalespersonDashboardScreen() {
         todayComprehensiveData
       );
 
-      // Also fetch individual sales data for modal functionality
+      // Fetch individual sales data using the SAME logic as "My Sales" page
       const [todayResponse, monthResponse, pendingResponse] = await Promise.all(
         [
+          // Today's sales - same as "My Sales" page today filter
           getSales({
             date_from: todayStr,
             date_to: todayStr,
@@ -185,14 +185,15 @@ export default function SalespersonDashboardScreen() {
             console.warn("Today's sales failed:", err);
             return { results: [] };
           }),
+          // Month's sales - same as "My Sales" page month filter (last 30 days)
           getSales({
-            date_from: monthStartStr,
-            date_to: todayStr,
+            date_from: monthStartStr, // Last 30 days, not current month
             salesperson: user?.id,
           }).catch((err) => {
             console.warn("Month's sales failed:", err);
             return { results: [] };
           }),
+          // Pending sales - same as "My Sales" page
           getSales({
             payment_status: "unpaid",
             salesperson: user?.id,
@@ -219,7 +220,7 @@ export default function SalespersonDashboardScreen() {
         my_sales_today: todayComprehensiveData?.sales_summary?.total_sales || 0,
         my_revenue_today:
           todayComprehensiveData?.sales_summary?.total_revenue || 0,
-        // Month's metrics from month comprehensive report
+        // Month's metrics from last 30 days comprehensive report (matching "My Sales" page)
         my_sales_this_month: comprehensiveData?.sales_summary?.total_sales || 0,
         my_revenue_this_month:
           comprehensiveData?.sales_summary?.total_revenue || 0,
@@ -245,9 +246,19 @@ export default function SalespersonDashboardScreen() {
         "Today's sales summary:",
         todayComprehensiveData?.sales_summary
       );
-      console.log("Month's sales summary:", comprehensiveData?.sales_summary);
+      console.log(
+        "Month's sales summary (last 30 days):",
+        comprehensiveData?.sales_summary
+      );
       console.log("Credit summary:", comprehensiveData?.credit_summary);
       console.log("Calculated stats:", calculatedStats);
+      console.log(
+        "Month date range:",
+        monthStartStr,
+        "to",
+        todayStr,
+        "(last 30 days - same as My Sales page)"
+      );
     } catch (err: any) {
       console.error("Failed to fetch comprehensive dashboard data:", err);
 
@@ -288,7 +299,7 @@ export default function SalespersonDashboardScreen() {
           break;
         case "month":
           salesData = monthSales;
-          setModalTitle("My Sales This Month");
+          setModalTitle("My Sales (Last 30 Days)");
           break;
         case "pending":
           salesData = pendingSales;
@@ -309,16 +320,11 @@ export default function SalespersonDashboardScreen() {
             params = { date_from: todayStr, date_to: todayStr };
             break;
           case "month":
-            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-            const lastDay = new Date(
-              today.getFullYear(),
-              today.getMonth() + 1,
-              0
+            // Use the SAME logic as "My Sales" page - last 30 days, not current month
+            const monthAgo = new Date(
+              today.getTime() - 30 * 24 * 60 * 60 * 1000
             );
-            params = {
-              date_from: firstDay.toISOString().split("T")[0],
-              date_to: lastDay.toISOString().split("T")[0],
-            };
+            params = { date_from: monthAgo.toISOString().split("T")[0] };
             break;
           case "pending":
             params = { payment_status: "unpaid" };
@@ -535,9 +541,9 @@ export default function SalespersonDashboardScreen() {
         {stats ? (
           <View style={styles.metricsContainer}>
             <MetricCard
-              label="Total Revenue This Month"
+              label="Total Revenue (Last 30 Days)"
               value={formatCurrency(stats.my_revenue_this_month)}
-              context="Month's total earnings"
+              context="Last 30 days earnings"
               icon={
                 <MaterialIcons
                   name="account-balance-wallet"
@@ -557,7 +563,7 @@ export default function SalespersonDashboardScreen() {
             />
 
             <MetricCard
-              label="My Sales This Month"
+              label="My Sales (Last 30 Days)"
               value={stats.my_sales_this_month?.toString() || "0"}
               context={`Revenue: ${formatCurrency(
                 stats.my_revenue_this_month
