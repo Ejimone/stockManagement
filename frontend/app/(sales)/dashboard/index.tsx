@@ -6,14 +6,23 @@ import {
   StyleSheet,
   ActivityIndicator,
   RefreshControl,
-  Button,
+  TouchableOpacity,
+  Modal,
+  FlatList,
+  Animated,
+  Dimensions,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useAuth } from "../../../contexts/AuthContext"; // Adjust path as needed
-import { getDashboardStats } from "../../../services/api"; // Adjust path
+import { useAuth } from "../../../contexts/AuthContext";
+import {
+  getDashboardStats,
+  getSales,
+  Sale as APISale,
+} from "../../../services/api";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 
 // Define the expected structure of Salesperson dashboard stats
 interface SalespersonDashboardStats {
@@ -21,27 +30,75 @@ interface SalespersonDashboardStats {
   my_revenue_today: number;
   my_sales_this_month: number;
   my_revenue_this_month: number;
-  my_pending_sales?: number; // Optional based on API
-  my_pending_amount?: number; // Optional based on API
-  // Add other stats as per your API response for a salesperson
+  my_pending_sales?: number;
+  my_pending_amount?: number;
 }
 
-// MetricCard component (copied structure from Admin Dashboard for this task)
+// Enhanced MetricCard component with click functionality
 const MetricCard: React.FC<{
   label: string;
   value: string | number;
   context?: string;
   icon?: React.ReactNode;
-}> = ({ label, value, context, icon }) => (
-  <View style={styles.card}>
-    <View style={styles.cardTextContainer}>
-      <Text style={styles.cardLabel}>{label}</Text>
-      <Text style={styles.cardValue}>{value}</Text>
-      {context && <Text style={styles.cardContext}>{context}</Text>}
-    </View>
-    {icon ? <View style={styles.cardIcon}>{icon}</View> : null}
-  </View>
-);
+  onPress?: () => void;
+  gradient?: string[];
+}> = ({ label, value, context, icon, onPress, gradient }) => {
+  const scaleAnim = new Animated.Value(1);
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 3,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const CardContent = (
+    <Animated.View
+      style={[
+        styles.card,
+        {
+          transform: [{ scale: scaleAnim }],
+          backgroundColor: gradient ? undefined : "#FFFFFF",
+        },
+      ]}
+    >
+      <View style={styles.cardTextContainer}>
+        <Text style={styles.cardLabel}>{label}</Text>
+        <Text style={styles.cardValue}>{value}</Text>
+        {context && <Text style={styles.cardContext}>{context}</Text>}
+        {onPress && (
+          <View style={styles.tapHint}>
+            <Text style={styles.tapHintText}>Tap for details</Text>
+            <MaterialIcons name="touch-app" size={14} color="#007AFF" />
+          </View>
+        )}
+      </View>
+      {icon && <View style={styles.cardIcon}>{icon}</View>}
+    </Animated.View>
+  );
+
+  return onPress ? (
+    <TouchableOpacity
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      activeOpacity={0.7}
+    >
+      {CardContent}
+    </TouchableOpacity>
+  ) : (
+    CardContent
+  );
+};
 
 export default function SalespersonDashboardScreen() {
   const { user, signOut } = useAuth();
@@ -52,18 +109,22 @@ export default function SalespersonDashboardScreen() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Modal states
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalData, setModalData] = useState<APISale[]>([]);
+  const [modalLoading, setModalLoading] = useState(false);
+
   const fetchSalespersonStats = async () => {
     try {
       console.log("Sales dashboard: Attempting to fetch stats");
       setError(null);
-      // Assuming getDashboardStats() returns salesperson-specific data when called by a salesperson
       const data = await getDashboardStats();
       console.log("Sales dashboard: Stats fetched successfully:", data);
-      setStats(data as SalespersonDashboardStats); // Cast or validate structure if API returns different types
+      setStats(data as SalespersonDashboardStats);
     } catch (err: any) {
       console.error("Failed to fetch salesperson dashboard stats:", err);
 
-      // Provide more detailed error information
       let errorMessage =
         "Failed to fetch your dashboard data. Please try again.";
 
@@ -89,6 +150,51 @@ export default function SalespersonDashboardScreen() {
     }
   };
 
+  const fetchDetailedSales = async (type: "today" | "month" | "pending") => {
+    setModalLoading(true);
+    try {
+      const today = new Date();
+      let params: any = {};
+
+      switch (type) {
+        case "today":
+          const todayStr = today.toISOString().split("T")[0];
+          params = { date_from: todayStr, date_to: todayStr };
+          setModalTitle("My Sales Today");
+          break;
+        case "month":
+          const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+          const lastDay = new Date(
+            today.getFullYear(),
+            today.getMonth() + 1,
+            0
+          );
+          params = {
+            date_from: firstDay.toISOString().split("T")[0],
+            date_to: lastDay.toISOString().split("T")[0],
+          };
+          setModalTitle("My Sales This Month");
+          break;
+        case "pending":
+          params = { payment_status: "unpaid" };
+          setModalTitle("My Pending Sales");
+          break;
+      }
+
+      if (user?.id) {
+        params.salesperson = user.id;
+      }
+
+      const response = await getSales(params);
+      setModalData(response.results || []);
+      setModalVisible(true);
+    } catch (error) {
+      console.error("Failed to fetch detailed sales:", error);
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
   useEffect(() => {
     setIsLoading(true);
     fetchSalespersonStats();
@@ -99,13 +205,11 @@ export default function SalespersonDashboardScreen() {
     fetchSalespersonStats();
   }, []);
 
-  // Screen title is set in frontend/app/(sales)/dashboard/_layout.tsx
-
   if (isLoading && !refreshing) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007AFF" />
-        <Text>Loading Your Dashboard...</Text>
+        <Text style={styles.loadingText}>Loading Your Dashboard...</Text>
       </View>
     );
   }
@@ -113,103 +217,198 @@ export default function SalespersonDashboardScreen() {
   if (error && !stats) {
     return (
       <View style={styles.errorContainer}>
+        <MaterialIcons name="error-outline" size={48} color="#FF6B6B" />
         <Text style={styles.errorText}>{error}</Text>
-        <View style={styles.buttonSpacing}>
-          <Button
-            title="Retry"
-            onPress={fetchSalespersonStats}
-            color="#007AFF"
-          />
-        </View>
+        <TouchableOpacity
+          style={styles.retryButton}
+          onPress={fetchSalespersonStats}
+        >
+          <MaterialIcons name="refresh" size={20} color="#FFFFFF" />
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   const formatCurrency = (value: number | undefined) => {
-    if (typeof value !== "number") return "N/A";
-    return `₦${value.toFixed(2)}`;
+    if (typeof value !== "number") return "₦0.00";
+    return `₦${value.toLocaleString("en-NG", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
   };
 
-  return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={["#007AFF"]}
-        />
-      }
-    >
-      <Text style={styles.welcomeMessage}>
-        Welcome, {user?.email || "Salesperson"}!
-      </Text>
-      {error && (
-        <Text style={[styles.errorText, { marginBottom: 10 }]}>
-          Error: {error}
-        </Text>
-      )}
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-NG", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
-      {stats ? (
-        <>
-          <MetricCard
-            label="My Revenue Today"
-            value={formatCurrency(stats.my_revenue_today)}
-            icon={<MaterialIcons name="today" size={32} color="#2E7D32" />}
+  const renderSaleItem = ({ item }: { item: APISale }) => (
+    <View style={styles.saleItem}>
+      <View style={styles.saleHeader}>
+        <Text style={styles.saleId}>Sale #{item.id}</Text>
+        <Text style={styles.saleDate}>{formatDate(item.created_at || "")}</Text>
+      </View>
+
+      <View style={styles.saleDetails}>
+        <View style={styles.saleRow}>
+          <Text style={styles.saleLabel}>Total Amount:</Text>
+          <Text style={styles.saleValue}>
+            {formatCurrency(item.total_amount)}
+          </Text>
+        </View>
+        <View style={styles.saleRow}>
+          <Text style={styles.saleLabel}>Payment Method:</Text>
+          <Text style={styles.saleValue}>{item.payment_method || "N/A"}</Text>
+        </View>
+        <View style={styles.saleRow}>
+          <Text style={styles.saleLabel}>Status:</Text>
+          <View
+            style={[
+              styles.statusBadge,
+              {
+                backgroundColor:
+                  item.payment_status === "paid" ? "#4CAF50" : "#FF9800",
+              },
+            ]}
+          >
+            <Text style={styles.statusText}>
+              {(item.payment_status || "unknown").toUpperCase()}
+            </Text>
+          </View>
+        </View>
+        {(item.balance || 0) > 0 && (
+          <View style={styles.saleRow}>
+            <Text style={styles.saleLabel}>Balance:</Text>
+            <Text style={[styles.saleValue, { color: "#FF6B6B" }]}>
+              {formatCurrency(item.balance || 0)}
+            </Text>
+          </View>
+        )}
+      </View>
+
+      <View style={styles.productsSection}>
+        <Text style={styles.productsSectionTitle}>Products Sold:</Text>
+        {(item.products_sold || []).map((product, index) => (
+          <View key={index} style={styles.productItem}>
+            <Text style={styles.productName}>{product.name}</Text>
+            <Text style={styles.productDetails}>
+              {product.quantity} × {formatCurrency(product.price_at_sale)} ={" "}
+              {formatCurrency(product.subtotal)}
+            </Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+
+  return (
+    <>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#007AFF"]}
+            tintColor="#007AFF"
           />
-          <MetricCard
-            label="My Sales Today"
-            value={stats.my_sales_today?.toString() || "0"}
-            icon={
-              <MaterialCommunityIcons name="basket" size={32} color="#1565C0" />
-            }
-          />
-          <MetricCard
-            label="My Revenue This Month"
-            value={formatCurrency(stats.my_revenue_this_month)}
-            icon={
-              <MaterialIcons name="attach-money" size={32} color="#2E7D32" />
-            }
-          />
-          <MetricCard
-            label="My Sales This Month"
-            value={stats.my_sales_this_month?.toString() || "0"}
-            icon={
-              <MaterialCommunityIcons name="cart" size={32} color="#1565C0" />
-            }
-          />
-          {stats.my_pending_sales !== undefined && (
+        }
+      >
+        <View style={styles.header}>
+          <Text style={styles.welcomeMessage}>
+            Welcome back, {user?.first_name || user?.email || "Salesperson"}! 👋
+          </Text>
+          <Text style={styles.subtitle}>Here's your sales overview</Text>
+        </View>
+
+        {error && (
+          <Text style={[styles.errorText, { marginBottom: 10 }]}>
+            Error: {error}
+          </Text>
+        )}
+
+        {stats ? (
+          <View style={styles.metricsContainer}>
             <MetricCard
-              label="My Pending Sales (Count)"
-              value={stats.my_pending_sales.toString()}
+              label="Total Revenue"
+              value={formatCurrency(
+                stats.my_revenue_today + stats.my_revenue_this_month
+              )}
+              context="All time earnings"
               icon={
                 <MaterialIcons
-                  name="pending-actions"
-                  size={32}
-                  color="#FFA000"
+                  name="account-balance-wallet"
+                  size={28}
+                  color="#4CAF50"
                 />
               }
+              onPress={() => {
+                // Show combined revenue details
+                setModalTitle("Total Revenue Breakdown");
+                setModalData([]);
+                setModalVisible(true);
+              }}
             />
-          )}
-          {stats.my_pending_amount !== undefined && (
-            <MetricCard
-              label="My Pending Sales (Amount)"
-              value={formatCurrency(stats.my_pending_amount)}
-              icon={<FontAwesome name="money" size={30} color="#F57C00" />}
-            />
-          )}
-        </>
-      ) : (
-        !isLoading && (
-          <Text style={styles.noDataText}>
-            No dashboard data available for you at the moment.
-          </Text>
-        )
-      )}
 
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Logout"
+            <MetricCard
+              label="My Sales Today"
+              value={stats.my_sales_today?.toString() || "0"}
+              context={`Revenue: ${formatCurrency(stats.my_revenue_today)}`}
+              icon={<MaterialIcons name="today" size={28} color="#2196F3" />}
+              onPress={() => fetchDetailedSales("today")}
+            />
+
+            <MetricCard
+              label="My Sales This Month"
+              value={stats.my_sales_this_month?.toString() || "0"}
+              context={`Revenue: ${formatCurrency(
+                stats.my_revenue_this_month
+              )}`}
+              icon={
+                <MaterialCommunityIcons
+                  name="calendar-month"
+                  size={28}
+                  color="#9C27B0"
+                />
+              }
+              onPress={() => fetchDetailedSales("month")}
+            />
+
+            {stats.my_pending_amount !== undefined && (
+              <MetricCard
+                label="My Pending Sales (Amount)"
+                value={formatCurrency(stats.my_pending_amount)}
+                context={`${stats.my_pending_sales || 0} pending sales`}
+                icon={
+                  <MaterialIcons
+                    name="pending-actions"
+                    size={28}
+                    color="#FF9800"
+                  />
+                }
+                onPress={() => fetchDetailedSales("pending")}
+              />
+            )}
+          </View>
+        ) : (
+          !isLoading && (
+            <View style={styles.noDataContainer}>
+              <MaterialIcons name="analytics" size={64} color="#CCCCCC" />
+              <Text style={styles.noDataText}>
+                No dashboard data available for you at the moment.
+              </Text>
+            </View>
+          )
+        )}
+
+        <TouchableOpacity
+          style={styles.logoutButton}
           onPress={async () => {
             try {
               await signOut();
@@ -218,114 +417,421 @@ export default function SalespersonDashboardScreen() {
               console.error("Logout failed:", error);
             }
           }}
-          color="#ff3b30"
-        />
-      </View>
-    </ScrollView>
+        >
+          <MaterialIcons name="logout" size={20} color="#FFFFFF" />
+          <Text style={styles.logoutButtonText}>Logout</Text>
+        </TouchableOpacity>
+      </ScrollView>
+
+      {/* Sales Details Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{modalTitle}</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <MaterialIcons name="close" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+
+            {modalLoading ? (
+              <View style={styles.modalLoading}>
+                <ActivityIndicator size="large" color="#007AFF" />
+                <Text style={styles.modalLoadingText}>Loading details...</Text>
+              </View>
+            ) : modalTitle === "Total Revenue Breakdown" ? (
+              <View style={styles.revenueBreakdown}>
+                <View style={styles.breakdownItem}>
+                  <Text style={styles.breakdownLabel}>Today's Revenue:</Text>
+                  <Text style={styles.breakdownValue}>
+                    {formatCurrency(stats?.my_revenue_today)}
+                  </Text>
+                </View>
+                <View style={styles.breakdownItem}>
+                  <Text style={styles.breakdownLabel}>
+                    This Month's Revenue:
+                  </Text>
+                  <Text style={styles.breakdownValue}>
+                    {formatCurrency(stats?.my_revenue_this_month)}
+                  </Text>
+                </View>
+                <View style={[styles.breakdownItem, styles.totalBreakdown]}>
+                  <Text style={styles.totalLabel}>Total Revenue:</Text>
+                  <Text style={styles.totalValue}>
+                    {formatCurrency(
+                      (stats?.my_revenue_today || 0) +
+                        (stats?.my_revenue_this_month || 0)
+                    )}
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <FlatList
+                data={modalData}
+                renderItem={renderSaleItem}
+                keyExtractor={(item) => item.id.toString()}
+                style={styles.modalList}
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+                  <View style={styles.emptyList}>
+                    <MaterialIcons
+                      name="receipt-long"
+                      size={48}
+                      color="#CCCCCC"
+                    />
+                    <Text style={styles.emptyListText}>
+                      No sales found for this period
+                    </Text>
+                  </View>
+                }
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
-// Styles (adapted from Admin Dashboard styles)
+// Enhanced styles for the new dashboard
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
-    paddingTop: 50, // Added top margin for header-less pages
-  },
-  welcomeMessage: {
-    fontSize: 18,
-    fontWeight: "500",
-    color: "#333",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "#FFFFFF",
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-  },
-  card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-    padding: 16,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  cardTextContainer: {
-    flex: 1,
-  },
-  cardLabel: {
-    fontSize: 14,
-    color: "#60758a",
-    marginBottom: 4,
-  },
-  cardValue: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#111418",
-  },
-  cardContext: {
-    fontSize: 12,
-    color: "#777",
-    marginTop: 4,
-  },
-  cardIconPlaceholder: {
-    width: 48,
-    height: 48,
-    backgroundColor: "#E0F2F7", // Different color for Salesperson dashboard icon bg
-    borderRadius: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: 12,
-  },
-  cardIcon: {
-    width: 48,
-    height: 48,
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: 12,
-    borderRadius: 24,
-  },
-  iconText: {
-    // Simple text as icon placeholder
-    fontSize: 24,
+    backgroundColor: "#F8F9FA",
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#F8F9FA",
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: "#666",
   },
   errorContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#F8F9FA",
   },
   errorText: {
     fontSize: 16,
-    color: "red",
+    color: "#DC3545",
     textAlign: "center",
-    marginBottom: 12,
+    marginVertical: 16,
+    lineHeight: 24,
+  },
+  retryButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#007AFF",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 16,
+  },
+  retryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+    marginLeft: 8,
+  },
+  header: {
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E5E5",
+  },
+  welcomeMessage: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    fontWeight: "400",
+  },
+  metricsContainer: {
+    padding: 16,
+  },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: "#F0F0F0",
+  },
+  cardTextContainer: {
+    flex: 1,
+  },
+  cardLabel: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 4,
+    fontWeight: "500",
+  },
+  cardValue: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    marginBottom: 4,
+  },
+  cardContext: {
+    fontSize: 12,
+    color: "#888",
+    fontStyle: "italic",
+  },
+  tapHint: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  tapHintText: {
+    fontSize: 12,
+    color: "#007AFF",
+    marginRight: 4,
+    fontWeight: "500",
+  },
+  cardIcon: {
+    width: 56,
+    height: 56,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F8F9FA",
+    borderRadius: 28,
+    marginLeft: 16,
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 60,
   },
   noDataText: {
     textAlign: "center",
-    marginTop: 30,
+    marginTop: 16,
+    fontSize: 16,
+    color: "#666",
+    lineHeight: 24,
+  },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#DC3545",
+    marginHorizontal: 20,
+    paddingVertical: 16,
+    borderRadius: 12,
+    marginTop: 20,
+    marginBottom: 40,
+  },
+  logoutButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+    marginLeft: 8,
+  },
+
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContainer: {
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "90%",
+    minHeight: "60%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E5E5",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1A1A1A",
+  },
+  closeButton: {
+    padding: 4,
+  },
+  modalLoading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 60,
+  },
+  modalLoadingText: {
+    marginTop: 16,
     fontSize: 16,
     color: "#666",
   },
-  buttonSpacing: {
-    marginTop: 10,
+  modalList: {
+    flex: 1,
   },
-  buttonContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 24,
+
+  // Revenue Breakdown Styles
+  revenueBreakdown: {
+    padding: 20,
+  },
+  breakdownItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F0F0F0",
+  },
+  breakdownLabel: {
+    fontSize: 16,
+    color: "#666",
+    fontWeight: "500",
+  },
+  breakdownValue: {
+    fontSize: 18,
+    color: "#1A1A1A",
+    fontWeight: "600",
+  },
+  totalBreakdown: {
+    borderBottomWidth: 0,
+    backgroundColor: "#F8F9FA",
+    marginHorizontal: -20,
+    paddingHorizontal: 20,
+    marginTop: 16,
+    borderRadius: 12,
+  },
+  totalLabel: {
+    fontSize: 18,
+    color: "#1A1A1A",
+    fontWeight: "700",
+  },
+  totalValue: {
+    fontSize: 24,
+    color: "#4CAF50",
+    fontWeight: "700",
+  },
+
+  // Sale Item Styles
+  saleItem: {
+    backgroundColor: "#FFFFFF",
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  saleHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  saleId: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#1A1A1A",
+  },
+  saleDate: {
+    fontSize: 12,
+    color: "#666",
+  },
+  saleDetails: {
+    marginBottom: 16,
+  },
+  saleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  saleLabel: {
+    fontSize: 14,
+    color: "#666",
+    fontWeight: "500",
+  },
+  saleValue: {
+    fontSize: 14,
+    color: "#1A1A1A",
+    fontWeight: "600",
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  statusText: {
+    fontSize: 12,
+    color: "#FFFFFF",
+    fontWeight: "600",
+  },
+  productsSection: {
+    borderTopWidth: 1,
+    borderTopColor: "#F0F0F0",
+    paddingTop: 12,
+  },
+  productsSectionTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1A1A1A",
+    marginBottom: 8,
+  },
+  productItem: {
+    marginBottom: 6,
+  },
+  productName: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#1A1A1A",
+  },
+  productDetails: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 2,
+  },
+  emptyList: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 60,
+  },
+  emptyListText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
   },
 });
