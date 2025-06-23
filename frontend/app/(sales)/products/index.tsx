@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,9 @@ import {
   StyleSheet,
   RefreshControl,
   Alert,
+  Platform,
+  Keyboard,
+  Animated,
 } from "react-native";
 import { Stack, useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,11 +22,52 @@ import { useAuth } from "../../../contexts/AuthContext";
 export default function SalesProductListScreen() {
   const { user, isAuthenticated, token } = useAuth();
   const router = useRouter();
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const searchBarPosition = useRef(new Animated.Value(0)).current;
+
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+
+  // Keyboard listeners for smooth animation
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      (event) => {
+        const keyboardHeight = event.endCoordinates.height;
+        setKeyboardHeight(keyboardHeight);
+
+        // Animate search bar up when keyboard appears
+        Animated.timing(searchBarPosition, {
+          toValue: -keyboardHeight + (Platform.OS === "ios" ? 34 : 0), // Account for safe area on iOS
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardHeight(0);
+
+        // Animate search bar back to bottom
+        Animated.timing(searchBarPosition, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener?.remove();
+      keyboardDidHideListener?.remove();
+    };
+  }, [searchBarPosition]);
 
   // Debug: Check authentication status
   useEffect(() => {
@@ -131,18 +175,27 @@ export default function SalesProductListScreen() {
 
   const renderProductItem = ({ item }: { item: Product }) => (
     <View style={styles.productItemContainer}>
-      <View style={styles.productInfo}>
-        <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.productSku}>SKU: {item.sku || "N/A"}</Text>
-        <Text style={styles.productDescription}>
-          {item.description || "No description available"}
+      <View style={styles.productHeader}>
+        <View style={styles.productMainInfo}>
+          <Text style={styles.productName}>{item.name}</Text>
+          <Text style={styles.productSku}>SKU: {item.sku || "N/A"}</Text>
+        </View>
+        <View style={styles.priceContainer}>
+          <Text style={styles.productPrice}>{formatCurrency(item.price)}</Text>
+        </View>
+      </View>
+
+      {item.description && (
+        <Text style={styles.productDescription} numberOfLines={2}>
+          {item.description}
         </Text>
-        <Text style={styles.productPrice}>
-          Price: {formatCurrency(item.price)}
-        </Text>
-        <View style={styles.stockContainer}>
-          <Text style={styles.productStock}>
-            Stock: {item.stock_quantity ?? "N/A"}
+      )}
+
+      <View style={styles.productFooter}>
+        <View style={styles.stockInfo}>
+          <Text style={styles.stockLabel}>Stock: </Text>
+          <Text style={styles.stockQuantity}>
+            {item.stock_quantity ?? "N/A"}
           </Text>
           <View
             style={[
@@ -157,13 +210,7 @@ export default function SalesProductListScreen() {
             </Text>
           </View>
         </View>
-        {item.category && (
-          <Text style={styles.productCategory}>Category: {item.category}</Text>
-        )}
-      </View>
 
-      {/* Make Sale Button */}
-      <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[
             styles.makeSaleButton,
@@ -174,9 +221,8 @@ export default function SalesProductListScreen() {
         >
           <Ionicons
             name={item.stock_quantity === 0 ? "ban-outline" : "cart-outline"}
-            size={18}
-            color={item.stock_quantity === 0 ? "#d1d5db" : "#ffffff"}
-            style={styles.buttonIcon}
+            size={16}
+            color={item.stock_quantity === 0 ? "#9ca3af" : "#ffffff"}
           />
           <Text
             style={[
@@ -184,10 +230,14 @@ export default function SalesProductListScreen() {
               item.stock_quantity === 0 && styles.makeSaleButtonTextDisabled,
             ]}
           >
-            {item.stock_quantity === 0 ? "Out of Stock" : "Make Sale"}
+            {item.stock_quantity === 0 ? "Out" : "Sell"}
           </Text>
         </TouchableOpacity>
       </View>
+
+      {item.category && (
+        <Text style={styles.productCategory}>{item.category}</Text>
+      )}
     </View>
   );
 
@@ -248,34 +298,6 @@ export default function SalesProductListScreen() {
     <View style={styles.container}>
       <Stack.Screen options={{ title: "View Products" }} />
 
-      {/* Add Product Button */}
-      <View style={styles.headerContainer}>
-        <TouchableOpacity
-          style={styles.addProductButton}
-          onPress={() => router.push("/(sales)/products/create")}
-          activeOpacity={0.8}
-        >
-          <Ionicons
-            name="add-circle"
-            size={20}
-            color="#ffffff"
-            style={styles.buttonIcon}
-          />
-          <Text style={styles.addProductButtonText}>Add New Product</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search products..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholderTextColor="#999"
-        />
-      </View>
-
       {/* Product List */}
       <FlatList
         data={products}
@@ -286,10 +308,40 @@ export default function SalesProductListScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListEmptyComponent={renderEmptyState}
-        contentContainerStyle={
-          products.length === 0 ? styles.emptyListContainer : undefined
-        }
+        contentContainerStyle={[
+          products.length === 0 ? styles.emptyListContainer : undefined,
+          { paddingBottom: keyboardHeight > 0 ? keyboardHeight + 80 : 100 }, // Dynamic padding for floating bar
+        ]}
       />
+
+      {/* Floating Bottom Bar with Search and Add Product Button */}
+      <Animated.View
+        style={[
+          styles.floatingBar,
+          {
+            transform: [{ translateY: searchBarPosition }],
+          },
+        ]}
+      >
+        <View style={styles.searchContainerFloating}>
+          <TextInput
+            style={styles.searchInputFloating}
+            placeholder="Search products..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
+            placeholderTextColor="#999"
+          />
+        </View>
+        <TouchableOpacity
+          style={styles.addFloatingButton}
+          onPress={() => router.push("/(sales)/products/create")}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.addFloatingButtonText}>+</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 }
@@ -298,6 +350,63 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8f9fa",
+    paddingTop: 80, // Increased top margin for better spacing
+  },
+  floatingBar: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingBottom: Platform.OS === "ios" ? 34 : 12, // Account for safe area on iOS
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#e1e1e1",
+  },
+  searchContainerFloating: {
+    flex: 1,
+    marginRight: 12,
+  },
+  searchInputFloating: {
+    backgroundColor: "#f8f8f8",
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 8,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  addFloatingButton: {
+    backgroundColor: "#10b981",
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  addFloatingButtonText: {
+    color: "#ffffff",
+    fontSize: 24,
+    fontWeight: "bold",
   },
   searchContainer: {
     padding: 16,
@@ -320,69 +429,94 @@ const styles = StyleSheet.create({
   productItemContainer: {
     backgroundColor: "#ffffff",
     marginHorizontal: 16,
-    marginVertical: 8,
-    borderRadius: 12,
+    marginVertical: 6,
+    borderRadius: 16,
     padding: 16,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 1,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.08,
+    shadowRadius: 2.84,
+    elevation: 3,
+  },
+  productHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 8,
+  },
+  productMainInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  priceContainer: {
+    alignItems: "flex-end",
+  },
+  productFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 12,
+  },
+  stockInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  stockLabel: {
+    fontSize: 14,
+    color: "#6b7280",
+    fontWeight: "500",
+  },
+  stockQuantity: {
+    fontSize: 14,
+    color: "#374151",
+    fontWeight: "600",
+    marginRight: 8,
   },
   productInfo: {
     flex: 1,
   },
   productName: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
     color: "#111827",
-    marginBottom: 4,
+    marginBottom: 2,
   },
   productSku: {
-    fontSize: 14,
-    color: "#6b7280",
-    marginBottom: 4,
+    fontSize: 13,
+    color: "#9ca3af",
+    fontWeight: "500",
   },
   productDescription: {
     fontSize: 14,
-    color: "#374151",
-    marginBottom: 8,
+    color: "#6b7280",
     lineHeight: 20,
+    marginBottom: 8,
   },
   productPrice: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: "700",
     color: "#059669",
-    marginBottom: 8,
-  },
-  stockContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 8,
-  },
-  productStock: {
-    fontSize: 14,
-    color: "#374151",
-    fontWeight: "500",
-  },
-  stockStatusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  stockStatusText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#ffffff",
   },
   productCategory: {
     fontSize: 12,
-    color: "#6b7280",
+    color: "#9ca3af",
     fontStyle: "italic",
+    marginTop: 8,
+    textAlign: "center",
+  },
+  stockStatusBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  stockStatusText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#ffffff",
   },
   loadingContainer: {
     flex: 1,
@@ -452,53 +586,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "500",
   },
-  buttonContainer: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#e5e7eb",
-  },
   makeSaleButton: {
     backgroundColor: "#3b82f6",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
+    minWidth: 80,
   },
   makeSaleButtonDisabled: {
-    backgroundColor: "#9ca3af",
-  },
-  buttonIcon: {
-    marginRight: 8,
+    backgroundColor: "#e5e7eb",
   },
   makeSaleButtonText: {
     color: "#ffffff",
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
+    marginLeft: 4,
   },
   makeSaleButtonTextDisabled: {
-    color: "#d1d5db",
-  },
-  headerContainer: {
-    padding: 16,
-    backgroundColor: "#ffffff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
-  },
-  addProductButton: {
-    backgroundColor: "#10b981",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  addProductButtonText: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "600",
+    color: "#9ca3af",
   },
 });
