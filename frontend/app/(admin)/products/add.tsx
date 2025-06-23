@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { createProduct } from "../../../services/api"; // Adjust path as needed
@@ -115,132 +116,138 @@ export default function AdminAddProductScreen() {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
+    <KeyboardAvoidingView
+      style={styles.mainContainer}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
     >
-      <View style={styles.formContainer}>
-        <Text style={styles.pageTitle}>Add New Product</Text>
+      <ScrollView
+        style={styles.container}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={styles.formContainer}>
+          <Text style={styles.pageTitle}>Add New Product</Text>
 
-        {errors.general && errors.general.trim() && (
-          <Text key="general-error" style={styles.errorTextGeneral}>
-            {errors.general}
-          </Text>
-        )}
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>
-            Product Name <Text style={styles.requiredAsterisk}>*</Text>
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              errors.productName ? styles.inputError : null,
-            ]}
-            placeholder="e.g., Wireless Mouse"
-            value={productName}
-            onChangeText={setProductName}
-            editable={!isLoading}
-          />
-          {errors.productName && errors.productName.trim() && (
-            <Text key="productName-error" style={styles.errorText}>
-              {errors.productName}
+          {errors.general && errors.general.trim() && (
+            <Text key="general-error" style={styles.errorTextGeneral}>
+              {errors.general}
             </Text>
           )}
-        </View>
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Description</Text>
-          <TextInput
-            style={[
-              styles.input,
-              styles.textArea,
-              errors.description ? styles.inputError : null,
-            ]}
-            placeholder="e.g., High precision optical mouse with ergonomic design."
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={4}
-            editable={!isLoading}
-          />
-          {errors.description && errors.description.trim() && (
-            <Text style={styles.errorText}>{errors.description}</Text>
-          )}
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>
-            SKU <Text style={styles.requiredAsterisk}>*</Text>
-          </Text>
-          <TextInput
-            style={[styles.input, errors.sku ? styles.inputError : null]}
-            placeholder="e.g., WM-1023-BLK"
-            value={sku}
-            onChangeText={setSku}
-            autoCapitalize="characters"
-            editable={!isLoading}
-          />
-          {errors.sku && errors.sku.trim() && (
-            <Text style={styles.errorText}>{errors.sku}</Text>
-          )}
-        </View>
-
-        <View style={styles.row}>
-          <View style={[styles.inputGroup, styles.halfWidth]}>
+          <View style={styles.inputGroup}>
             <Text style={styles.label}>
-              Price <Text style={styles.requiredAsterisk}>*</Text>
-            </Text>
-            <TextInput
-              style={[styles.input, errors.price ? styles.inputError : null]}
-              placeholder="e.g., 29.99"
-              value={price}
-              onChangeText={setPrice}
-              keyboardType="numeric"
-              editable={!isLoading}
-            />
-            {errors.price && errors.price.trim() && (
-              <Text key="price-error" style={styles.errorText}>
-                {errors.price}
-              </Text>
-            )}
-          </View>
-
-          <View style={[styles.inputGroup, styles.halfWidth]}>
-            <Text style={styles.label}>
-              Stock Quantity <Text style={styles.requiredAsterisk}>*</Text>
+              Product Name <Text style={styles.requiredAsterisk}>*</Text>
             </Text>
             <TextInput
               style={[
                 styles.input,
-                errors.stockQuantity ? styles.inputError : null,
+                errors.productName ? styles.inputError : null,
               ]}
-              placeholder="e.g., 150"
-              value={stockQuantity}
-              onChangeText={setStockQuantity}
-              keyboardType="numeric"
+              placeholder="e.g., Wireless Mouse"
+              value={productName}
+              onChangeText={setProductName}
               editable={!isLoading}
             />
-            {errors.stockQuantity && errors.stockQuantity.trim() && (
-              <Text style={styles.errorText}>{errors.stockQuantity}</Text>
+            {errors.productName && errors.productName.trim() && (
+              <Text key="productName-error" style={styles.errorText}>
+                {errors.productName}
+              </Text>
             )}
           </View>
-        </View>
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>
-            Category <Text style={styles.requiredAsterisk}>*</Text>
-          </Text>
-          {/* Using TextInput for category as discussed. Replace with Picker for better UX if categories are predefined. */}
-          <TextInput
-            style={[styles.input, errors.category ? styles.inputError : null]}
-            placeholder="e.g., Electronics, Office Supplies"
-            value={category}
-            onChangeText={setCategory}
-            editable={!isLoading}
-          />
-          {/* 
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Description</Text>
+            <TextInput
+              style={[
+                styles.input,
+                styles.textArea,
+                errors.description ? styles.inputError : null,
+              ]}
+              placeholder="e.g., High precision optical mouse with ergonomic design."
+              value={description}
+              onChangeText={setDescription}
+              multiline
+              numberOfLines={4}
+              editable={!isLoading}
+            />
+            {errors.description && errors.description.trim() && (
+              <Text style={styles.errorText}>{errors.description}</Text>
+            )}
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>
+              SKU <Text style={styles.requiredAsterisk}>*</Text>
+            </Text>
+            <TextInput
+              style={[styles.input, errors.sku ? styles.inputError : null]}
+              placeholder="e.g., WM-1023-BLK"
+              value={sku}
+              onChangeText={setSku}
+              autoCapitalize="characters"
+              editable={!isLoading}
+            />
+            {errors.sku && errors.sku.trim() && (
+              <Text style={styles.errorText}>{errors.sku}</Text>
+            )}
+          </View>
+
+          <View style={styles.row}>
+            <View style={[styles.inputGroup, styles.halfWidth]}>
+              <Text style={styles.label}>
+                Price <Text style={styles.requiredAsterisk}>*</Text>
+              </Text>
+              <TextInput
+                style={[styles.input, errors.price ? styles.inputError : null]}
+                placeholder="e.g., 29.99"
+                value={price}
+                onChangeText={setPrice}
+                keyboardType="numeric"
+                editable={!isLoading}
+              />
+              {errors.price && errors.price.trim() && (
+                <Text key="price-error" style={styles.errorText}>
+                  {errors.price}
+                </Text>
+              )}
+            </View>
+
+            <View style={[styles.inputGroup, styles.halfWidth]}>
+              <Text style={styles.label}>
+                Stock Quantity <Text style={styles.requiredAsterisk}>*</Text>
+              </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  errors.stockQuantity ? styles.inputError : null,
+                ]}
+                placeholder="e.g., 150"
+                value={stockQuantity}
+                onChangeText={setStockQuantity}
+                keyboardType="numeric"
+                editable={!isLoading}
+              />
+              {errors.stockQuantity && errors.stockQuantity.trim() && (
+                <Text style={styles.errorText}>{errors.stockQuantity}</Text>
+              )}
+            </View>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>
+              Category <Text style={styles.requiredAsterisk}>*</Text>
+            </Text>
+            {/* Using TextInput for category as discussed. Replace with Picker for better UX if categories are predefined. */}
+            <TextInput
+              style={[styles.input, errors.category ? styles.inputError : null]}
+              placeholder="e.g., Electronics, Office Supplies"
+              value={category}
+              onChangeText={setCategory}
+              editable={!isLoading}
+            />
+            {/* 
         Example for Picker:
         <Picker selectedValue={category} onValueChange={(itemValue) => setCategory(itemValue)} style={styles.input}>
           <Picker.Item label="Select Category..." value="" />
@@ -248,57 +255,65 @@ export default function AdminAddProductScreen() {
           <Picker.Item label="Books" value="books" />
         </Picker> 
         */}
-          {errors.category && errors.category.trim() && (
-            <Text style={styles.errorText}>{errors.category}</Text>
-          )}
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[
-              styles.button,
-              styles.cancelButton,
-              isLoading && styles.disabledButton,
-            ]}
-            onPress={() => router.back()}
-            disabled={isLoading}
-          >
-            <Text style={[styles.buttonText, styles.cancelButtonText]}>
-              Cancel
-            </Text>
-          </TouchableOpacity>
-          <View style={{ width: 10 }} />
-          <TouchableOpacity
-            style={[
-              styles.button,
-              styles.saveButton,
-              isLoading && styles.disabledButton,
-            ]}
-            onPress={handleSaveProduct}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#FFFFFF" size="small" />
-            ) : (
-              <Text style={[styles.buttonText, styles.saveButtonText]}>
-                Save Product
-              </Text>
+            {errors.category && errors.category.trim() && (
+              <Text style={styles.errorText}>{errors.category}</Text>
             )}
-          </TouchableOpacity>
+          </View>
+
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                styles.cancelButton,
+                isLoading && styles.disabledButton,
+              ]}
+              onPress={() => router.back()}
+              disabled={isLoading}
+            >
+              <Text style={[styles.buttonText, styles.cancelButtonText]}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+            <View style={{ width: 10 }} />
+            <TouchableOpacity
+              style={[
+                styles.button,
+                styles.saveButton,
+                isLoading && styles.disabledButton,
+              ]}
+              onPress={handleSaveProduct}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <Text style={[styles.buttonText, styles.saveButtonText]}>
+                  Save Product
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  mainContainer: {
     flex: 1,
     backgroundColor: "#F8F9FA",
   },
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20, // Reduced since buttons are now inside
+  },
   formContainer: {
     flex: 1,
-    marginTop: 60, // Add top margin
+    marginTop: 60,
     marginHorizontal: 16,
     paddingVertical: 24,
     paddingHorizontal: 16,
@@ -367,12 +382,11 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === "ios" ? 20 : 0,
   },
   button: {
+    flex: 1,
     paddingVertical: 14,
-    paddingHorizontal: 28,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    minWidth: 140,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

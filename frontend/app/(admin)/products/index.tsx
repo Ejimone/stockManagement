@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,9 @@ import {
   RefreshControl,
   Button,
   Platform,
+  Keyboard,
+  KeyboardAvoidingView,
+  Animated,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { getProducts, deleteProduct, Product } from "../../../services/api"; // Adjust path
@@ -27,6 +30,8 @@ interface PaginationInfo {
 export default function AdminProductsScreen() {
   const router = useRouter();
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const searchBarPosition = useRef(new Animated.Value(0)).current;
 
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -198,6 +203,50 @@ export default function AdminProductsScreen() {
     return null;
   };
 
+  useEffect(() => {
+    const keyboardWillShow = (e: any) => {
+      const keyboardHeight = e.endCoordinates.height;
+      setKeyboardHeight(keyboardHeight);
+
+      // Move the search bar up to stay above the keyboard
+      Animated.timing(searchBarPosition, {
+        toValue: -keyboardHeight + 40, // 40px above keyboard
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+    };
+
+    const keyboardWillHide = () => {
+      setKeyboardHeight(0);
+
+      // Move the search bar back to original position
+      Animated.timing(searchBarPosition, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+    };
+
+    const keyboardDidShow =
+      Platform.OS === "android" ? "keyboardDidShow" : "keyboardWillShow";
+    const keyboardDidHide =
+      Platform.OS === "android" ? "keyboardDidHide" : "keyboardWillHide";
+
+    const showSubscription = Keyboard.addListener(
+      keyboardDidShow,
+      keyboardWillShow
+    );
+    const hideSubscription = Keyboard.addListener(
+      keyboardDidHide,
+      keyboardWillHide
+    );
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, [searchBarPosition]);
+
   if (isLoading && products.length === 0 && !refreshing) {
     // Show full page loader only if no products are visible yet
     return (
@@ -209,7 +258,10 @@ export default function AdminProductsScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       {error && !refreshing && (
         <View style={styles.errorDisplay}>
           <Text style={styles.errorText}>Error: {error}</Text>
@@ -221,7 +273,10 @@ export default function AdminProductsScreen() {
         data={products}
         renderItem={renderProductItem}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.listContentContainer}
+        contentContainerStyle={[
+          styles.listContentContainer,
+          { paddingBottom: Math.max(keyboardHeight, 90) + 20 },
+        ]}
         ListEmptyComponent={() =>
           !isLoading &&
           !error && (
@@ -239,11 +294,12 @@ export default function AdminProductsScreen() {
         }
       />
 
-      {/* Floating bottom bar */}
-      <View
+      <Animated.View
         style={[
           styles.floatingBottomBar,
-          isSearchFocused && styles.floatingBottomBarRaised,
+          {
+            transform: [{ translateY: searchBarPosition }],
+          },
         ]}
       >
         <View style={styles.searchContainer}>
@@ -263,8 +319,8 @@ export default function AdminProductsScreen() {
         >
           <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
-      </View>
-    </View>
+      </Animated.View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -272,7 +328,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F8F9FA",
-    paddingTop: 50,
+    paddingTop: 80, // Increased top margin for better spacing
   },
   loadingContainer: {
     flex: 1,
@@ -403,7 +459,7 @@ const styles = StyleSheet.create({
   },
   floatingBottomBar: {
     position: "absolute",
-    bottom: 20,
+    bottom: 30, // Increased bottom margin for better visibility
     left: 15,
     right: 15,
     flexDirection: "row",
@@ -411,15 +467,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 25,
     paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingVertical: 12, // Slightly increased padding
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4, // Increased shadow for better depth
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8, // Increased elevation for Android
     zIndex: 1000,
   },
   floatingBottomBarRaised: {
