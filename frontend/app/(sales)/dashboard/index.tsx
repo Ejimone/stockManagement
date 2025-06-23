@@ -11,6 +11,7 @@ import {
   FlatList,
   Animated,
   Dimensions,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -20,6 +21,7 @@ import {
   getSalesReport,
   getPayments,
   getComprehensiveReports,
+  updateSalePaymentStatus,
   Sale as APISale,
 } from "../../../services/api";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -423,94 +425,224 @@ export default function SalespersonDashboardScreen() {
     });
   };
 
-  const renderSaleItem = ({ item }: { item: APISale }) => (
-    <View style={styles.saleItem}>
-      <View style={styles.saleHeader}>
-        <Text style={styles.saleId}>Sale #{item.id}</Text>
-        <Text style={styles.saleDate}>{formatDate(item.created_at || "")}</Text>
-      </View>
+  // Helper functions for payment status (copied from My Sales page)
+  const getPaymentStatusColor = (status?: string) => {
+    switch (status?.toLowerCase()) {
+      case "paid":
+        return "#22c55e";
+      case "partial":
+        return "#f59e0b";
+      case "unpaid":
+        return "#ef4444";
+      default:
+        return "#6b7280";
+    }
+  };
 
-      {/* Customer Information */}
-      {(item.customer_name || item.customer_phone) && (
-        <View style={styles.customerSection}>
-          <Text style={styles.customerSectionTitle}>Customer Details:</Text>
-          {item.customer_name && (
-            <Text style={styles.customerInfo}>Name: {item.customer_name}</Text>
+  const getPaymentStatusIcon = (status?: string) => {
+    switch (status?.toLowerCase()) {
+      case "paid":
+        return "checkmark-circle";
+      case "partial":
+        return "time";
+      case "unpaid":
+        return "close-circle";
+      default:
+        return "help-circle";
+    }
+  };
+
+  const formatDateForSales = (dateString?: string) => {
+    if (!dateString) return "Unknown";
+
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+
+    if (diffInHours < 24) {
+      return date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } else if (diffInHours < 168) {
+      // Less than a week
+      return date.toLocaleDateString([], {
+        weekday: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } else {
+      return date.toLocaleDateString([], {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+  };
+
+  const handleMarkAsPaid = async (sale: APISale, event: any) => {
+    // Prevent the TouchableOpacity press event from firing
+    event.stopPropagation();
+
+    // Do nothing if the sale is already paid
+    const isPaid = sale.payment_status?.toLowerCase() === "paid";
+    if (isPaid) {
+      return; // Exit early, no action for paid sales
+    }
+
+    try {
+      Alert.alert(
+        "Mark as Paid",
+        `Are you sure you want to mark Sale #${sale.id} as fully paid?`,
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Mark as Paid",
+            style: "default",
+            onPress: async () => {
+              try {
+                setModalLoading(true);
+                await updateSalePaymentStatus(sale.id);
+
+                // Update the sale in the local modal data
+                setModalData((prevSales) =>
+                  prevSales.map((s) =>
+                    s.id === sale.id
+                      ? {
+                          ...s,
+                          payment_status: "paid",
+                          amount_paid: s.total_amount,
+                          balance: 0,
+                        }
+                      : s
+                  )
+                );
+
+                Alert.alert("Success", "Sale marked as paid successfully!");
+              } catch (error: any) {
+                console.error("Failed to update payment status:", error);
+                Alert.alert(
+                  "Error",
+                  error.response?.data?.error ||
+                    "Failed to update payment status. Please try again."
+                );
+              } finally {
+                setModalLoading(false);
+              }
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      console.error("Error in handleMarkAsPaid:", error);
+    }
+  };
+
+  const handleSalePress = (sale: APISale) => {
+    setModalVisible(false);
+    router.push({
+      pathname: `/(sales)/sales/[id]`,
+      params: { id: sale.id.toString() },
+    });
+  };
+
+  // Render sale item exactly like My Sales page
+  const renderSaleItem = ({ item }: { item: APISale }) => {
+    const canMarkAsPaid =
+      item.payment_status?.toLowerCase() === "partial" ||
+      item.payment_status?.toLowerCase() === "unpaid";
+
+    return (
+      <TouchableOpacity
+        style={styles.saleCard}
+        onPress={() => handleSalePress(item)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.saleHeader}>
+          <View style={styles.saleInfo}>
+            <Text style={styles.saleId}>Sale #{item.id}</Text>
+            <Text style={styles.saleDate}>
+              {formatDateForSales(item.created_at)}
+            </Text>
+          </View>
+          <View style={styles.amountContainer}>
+            <Text style={styles.amount}>
+              {formatCurrency(item.total_amount || 0)}
+            </Text>
+            <View
+              style={[
+                styles.paymentStatus,
+                { backgroundColor: getPaymentStatusColor(item.payment_status) },
+              ]}
+            >
+              <Ionicons
+                name={getPaymentStatusIcon(item.payment_status) as any}
+                size={12}
+                color="#ffffff"
+              />
+              <Text style={styles.paymentStatusText}>
+                {item.payment_status || "Unknown"}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.saleDetails}>
+          {item.customer_name && item.customer_name.trim() && (
+            <Text style={styles.customerName}>
+              Customer: {item.customer_name}
+            </Text>
           )}
-          {item.customer_phone && (
-            <Text style={styles.customerInfo}>
-              Phone: {item.customer_phone}
-            </Text>
-          )}
+          <Text style={styles.paymentMethod}>
+            Payment: {item.payment_method || "Not specified"}
+          </Text>
+          {item.balance !== null &&
+            item.balance !== undefined &&
+            item.balance > 0 && (
+              <Text style={styles.balance}>
+                Balance: {formatCurrency(item.balance)}
+              </Text>
+            )}
         </View>
-      )}
 
-      <View style={styles.saleDetails}>
-        <View style={styles.saleRow}>
-          <Text style={styles.saleLabel}>Total Amount:</Text>
-          <Text style={styles.saleValue}>
-            {formatCurrency(item.total_amount)}
+        <View style={styles.saleFooter}>
+          <Text style={styles.itemCount}>
+            {item.items?.length || item.products_sold?.length || 0} item(s)
           </Text>
-        </View>
-        <View style={styles.saleRow}>
-          <Text style={styles.saleLabel}>Payment Method:</Text>
-          <Text style={styles.saleValue}>{item.payment_method || "N/A"}</Text>
-        </View>
-        <View style={styles.saleRow}>
-          <Text style={styles.saleLabel}>Amount Paid:</Text>
-          <Text style={styles.saleValue}>
-            {formatCurrency(item.amount_paid || 0)}
-          </Text>
-        </View>
-        <View style={styles.saleRow}>
-          <Text style={styles.saleLabel}>Status:</Text>
-          <View
-            style={[
-              styles.statusBadge,
-              {
-                backgroundColor:
-                  item.payment_status === "paid"
-                    ? "#4CAF50"
-                    : item.payment_status === "partial"
-                    ? "#FF9800"
-                    : "#F44336",
-              },
-            ]}
-          >
-            <Text style={styles.statusText}>
-              {(item.payment_status || "unpaid").toUpperCase()}
-            </Text>
+          <View style={styles.saleFooterActions}>
+            <TouchableOpacity
+              style={[
+                styles.markPaidButton,
+                {
+                  backgroundColor: canMarkAsPaid ? "#22c55e" : "#6b7280",
+                  opacity: canMarkAsPaid ? 1 : 0.6,
+                },
+              ]}
+              onPress={
+                canMarkAsPaid
+                  ? (event) => handleMarkAsPaid(item, event)
+                  : undefined
+              }
+              activeOpacity={canMarkAsPaid ? 0.8 : 1}
+              disabled={!canMarkAsPaid}
+            >
+              <Ionicons name="checkmark-circle" size={16} color="#ffffff" />
+              <Text style={styles.markPaidButtonText}>
+                {canMarkAsPaid
+                  ? "Mark as Paid"
+                  : `Status: ${item.payment_status || "Unknown"}`}
+              </Text>
+            </TouchableOpacity>
+            <Ionicons name="chevron-forward" size={16} color="#6b7280" />
           </View>
         </View>
-        {(item.balance || 0) > 0 && (
-          <View style={styles.saleRow}>
-            <Text style={styles.saleLabel}>Balance:</Text>
-            <Text style={[styles.saleValue, { color: "#FF6B6B" }]}>
-              {formatCurrency(item.balance || 0)}
-            </Text>
-          </View>
-        )}
-      </View>
-
-      <View style={styles.productsSection}>
-        <Text style={styles.productsSectionTitle}>Products Sold:</Text>
-        {(item.products_sold || []).map((product, index) => (
-          <View key={index} style={styles.productItem}>
-            <Text style={styles.productName}>{product.name}</Text>
-            <Text style={styles.productDetails}>
-              {product.quantity} × {formatCurrency(product.price_at_sale)} ={" "}
-              {formatCurrency(product.subtotal)}
-            </Text>
-          </View>
-        ))}
-        {(!item.products_sold || item.products_sold.length === 0) && (
-          <Text style={styles.noProductsText}>
-            No product details available
-          </Text>
-        )}
-      </View>
-    </View>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <>
@@ -1280,5 +1412,95 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     textAlign: "center",
     marginTop: 8,
+  },
+
+  // Sales card styles (copied from My Sales page)
+  saleCard: {
+    backgroundColor: "#ffffff",
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#f3f4f6",
+  },
+  saleInfo: {
+    flex: 1,
+  },
+  amountContainer: {
+    alignItems: "flex-end",
+  },
+  amount: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#111827",
+    marginBottom: 4,
+  },
+  paymentStatus: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    minWidth: 60,
+    justifyContent: "center",
+  },
+  paymentStatusText: {
+    fontSize: 11,
+    color: "#ffffff",
+    fontWeight: "600",
+    marginLeft: 4,
+    textTransform: "uppercase",
+  },
+  customerName: {
+    fontSize: 14,
+    color: "#374151",
+    marginBottom: 2,
+  },
+  paymentMethod: {
+    fontSize: 14,
+    color: "#374151",
+    marginBottom: 2,
+  },
+  balance: {
+    fontSize: 14,
+    color: "#dc2626",
+    fontWeight: "500",
+  },
+  saleFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#f3f4f6",
+  },
+  itemCount: {
+    fontSize: 14,
+    color: "#6b7280",
+  },
+  saleFooterActions: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  markPaidButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#22c55e",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 12,
+  },
+  markPaidButtonText: {
+    color: "#ffffff",
+    fontSize: 12,
+    fontWeight: "600",
+    marginLeft: 4,
   },
 });
