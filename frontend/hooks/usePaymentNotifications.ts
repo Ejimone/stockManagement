@@ -69,18 +69,12 @@ export const usePaymentNotifications = (
   );
 
   useEffect(() => {
-    // Only start notifications for admin users
-    if (!enabled || !isAdminRef.current) {
-      return;
-    }
+    // NOTIFICATIONS DISABLED: Notification service is currently disabled to prevent 404 errors
+    console.log("� Payment notifications are currently disabled");
 
-    console.log("🔔 Starting payment notifications for admin");
-    notificationService.startPolling(handleNewPayment);
-
-    // Cleanup function to stop polling when component unmounts or user changes
+    // No-op cleanup function
     return () => {
-      console.log("🔕 Stopping payment notifications");
-      notificationService.stopPolling();
+      console.log("🔕 No notifications to stop (already disabled)");
     };
   }, [enabled, handleNewPayment]);
 
@@ -92,9 +86,11 @@ export const usePaymentNotifications = (
   }, [user]);
 
   return {
-    isPolling: notificationService.isCurrentlyPolling(),
-    startPolling: () => notificationService.startPolling(handleNewPayment),
-    stopPolling: () => notificationService.stopPolling(),
+    isPolling: false, // Always return false since polling is disabled
+    startPolling: () =>
+      console.log("🔕 Payment notifications are currently disabled"),
+    stopPolling: () =>
+      console.log("🔕 Payment notifications are currently disabled"),
   };
 };
 

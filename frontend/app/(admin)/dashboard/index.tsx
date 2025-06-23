@@ -57,14 +57,12 @@ export default function AdminDashboardScreen() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Enable real-time payment notifications for admin
+  // Real-time payment notifications are currently disabled
   const { isPolling } = usePaymentNotifications({
-    enabled: true,
-    showAlert: true,
-    onNewPayment: (payment: PaymentNotification) => {
-      console.log("💰 Admin received payment notification:", payment);
-      // Optionally refresh dashboard stats when new payment comes in
-      fetchStats();
+    enabled: false, // Explicitly disable
+    showAlert: false,
+    onNewPayment: () => {
+      // No-op since notifications are disabled
     },
   });
 
@@ -156,14 +154,12 @@ export default function AdminDashboardScreen() {
         />
       }
     >
-      <Text style={styles.welcomeMessage}>
-        Welcome, {user?.email || "Admin"}!
-      </Text>
+      <Text style={styles.welcomeMessage}>{user?.email || "Admin"}!</Text>
 
       {/* Real-time notification status */}
       <View style={styles.notificationStatus}>
         <Text style={styles.notificationText}>
-          🔔 Real-time Notifications: {isPolling ? "🟢 Active" : "🔴 Inactive"}
+          {/* 🔔 Real-time Notifications: 🔴 Disabled (temporarily) */}
         </Text>
       </View>
 

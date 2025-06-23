@@ -142,9 +142,7 @@ export default function SalespersonDashboardScreen() {
         />
       }
     >
-      <Text style={styles.welcomeMessage}>
-        Welcome back, {user?.email || "Salesperson"}!
-      </Text>
+      <Text style={styles.welcomeMessage}>{user?.email || "Salesperson"}!</Text>
       {error && (
         <Text style={[styles.errorText, { marginBottom: 10 }]}>
           Error: {error}
