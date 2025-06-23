@@ -11,6 +11,9 @@ import {
 import { useRouter } from "expo-router";
 import { useAuth } from "../../../contexts/AuthContext"; // Adjust path as needed
 import { getDashboardStats } from "../../../services/api"; // Adjust path
+import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // Define the expected structure of Salesperson dashboard stats
 interface SalespersonDashboardStats {
@@ -36,11 +39,7 @@ const MetricCard: React.FC<{
       <Text style={styles.cardValue}>{value}</Text>
       {context && <Text style={styles.cardContext}>{context}</Text>}
     </View>
-    {icon || (
-      <View style={styles.cardIconPlaceholder}>
-        <Text style={styles.iconText}>📊</Text>
-      </View>
-    )}
+    {icon ? <View style={styles.cardIcon}>{icon}</View> : null}
   </View>
 );
 
@@ -154,29 +153,47 @@ export default function SalespersonDashboardScreen() {
           <MetricCard
             label="My Revenue Today"
             value={formatCurrency(stats.my_revenue_today)}
+            icon={<MaterialIcons name="today" size={32} color="#2E7D32" />}
           />
           <MetricCard
             label="My Sales Today"
             value={stats.my_sales_today?.toString() || "0"}
+            icon={
+              <MaterialCommunityIcons name="basket" size={32} color="#1565C0" />
+            }
           />
           <MetricCard
             label="My Revenue This Month"
             value={formatCurrency(stats.my_revenue_this_month)}
+            icon={
+              <MaterialIcons name="attach-money" size={32} color="#2E7D32" />
+            }
           />
           <MetricCard
             label="My Sales This Month"
             value={stats.my_sales_this_month?.toString() || "0"}
+            icon={
+              <MaterialCommunityIcons name="cart" size={32} color="#1565C0" />
+            }
           />
           {stats.my_pending_sales !== undefined && (
             <MetricCard
               label="My Pending Sales (Count)"
               value={stats.my_pending_sales.toString()}
+              icon={
+                <MaterialIcons
+                  name="pending-actions"
+                  size={32}
+                  color="#FFA000"
+                />
+              }
             />
           )}
           {stats.my_pending_amount !== undefined && (
             <MetricCard
               label="My Pending Sales (Amount)"
               value={formatCurrency(stats.my_pending_amount)}
+              icon={<FontAwesome name="money" size={30} color="#F57C00" />}
             />
           )}
         </>
@@ -263,6 +280,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginLeft: 12,
+  },
+  cardIcon: {
+    width: 48,
+    height: 48,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 12,
+    borderRadius: 24,
   },
   iconText: {
     // Simple text as icon placeholder

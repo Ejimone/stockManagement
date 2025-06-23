@@ -14,6 +14,9 @@ import { useAuth } from "../../../contexts/AuthContext"; // Adjust path as neede
 import { getDashboardStats } from "../../../services/api"; // Adjust path
 import { usePaymentNotifications } from "../../../hooks/usePaymentNotifications";
 import { PaymentNotification } from "../../../services/notificationService";
+import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // Define the expected structure of dashboard stats
 interface DashboardStats {
@@ -40,11 +43,7 @@ const MetricCard: React.FC<{
       <Text style={styles.cardValue}>{value}</Text>
       {context && <Text style={styles.cardContext}>{context}</Text>}
     </View>
-    {icon || (
-      <View style={styles.cardIconPlaceholder}>
-        <Text>Icon</Text>
-      </View>
-    )}
+    {icon ? <View style={styles.cardIcon}>{icon}</View> : null}
   </View>
 );
 
@@ -175,31 +174,49 @@ export default function AdminDashboardScreen() {
             label="Revenue This Month"
             value={formatCurrency(stats.total_revenue_this_month)}
             context="Based on completed sales"
+            icon={
+              <MaterialIcons name="attach-money" size={32} color="#2E7D32" />
+            }
           />
           <MetricCard
             label="Sales This Month"
             value={stats.total_sales_this_month?.toString() || "0"}
             context="Total number of sales recorded"
+            icon={
+              <MaterialCommunityIcons
+                name="cart-outline"
+                size={32}
+                color="#1565C0"
+              />
+            }
           />
           <MetricCard
             label="Active Salespersons"
             value={stats.total_salespersons?.toString() || "0"}
+            icon={<MaterialIcons name="people" size={32} color="#6A1B9A" />}
           />
           <MetricCard
             label="Low Stock Items"
             value={stats.low_stock_products?.toString() || "0"}
             context="Products needing attention"
+            icon={<MaterialIcons name="warning" size={32} color="#FF8F00" />}
           />
           {stats.total_products !== undefined && (
             <MetricCard
               label="Total Products"
               value={stats.total_products.toString()}
+              icon={
+                <MaterialIcons name="inventory" size={32} color="#0277BD" />
+              }
             />
           )}
           {stats.out_of_stock_products !== undefined && (
             <MetricCard
               label="Out of Stock Products"
               value={stats.out_of_stock_products.toString()}
+              icon={
+                <MaterialIcons name="highlight-off" size={32} color="#D32F2F" />
+              }
             />
           )}
           {stats.pending_payments !== undefined && (
@@ -207,6 +224,9 @@ export default function AdminDashboardScreen() {
               label="Pending Payments Value"
               value={formatCurrency(stats.pending_payments)}
               context="Total from unpaid sales"
+              icon={
+                <FontAwesome name="credit-card" size={30} color="#F57C00" />
+              }
             />
           )}
         </>
@@ -310,6 +330,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginLeft: 12, // Added margin to separate from text
+    // This style will now be used only as a fallback
+  },
+  cardIcon: {
+    width: 48,
+    height: 48,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 12,
+    borderRadius: 24,
   },
   loadingContainer: {
     flex: 1,
