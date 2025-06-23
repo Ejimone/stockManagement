@@ -176,7 +176,7 @@ export default function SalespersonDashboardScreen() {
               <MaterialCommunityIcons name="cart" size={32} color="#1565C0" />
             }
           />
-          {stats.my_pending_sales !== undefined && (
+          {/* {stats.my_pending_sales !== undefined && (
             <MetricCard
               label="My Pending Sales (Count)"
               value={stats.my_pending_sales.toString()}
@@ -195,7 +195,7 @@ export default function SalespersonDashboardScreen() {
               value={formatCurrency(stats.my_pending_amount)}
               icon={<FontAwesome name="money" size={30} color="#F57C00" />}
             />
-          )}
+          )} */}
         </>
       ) : (
         !isLoading && (

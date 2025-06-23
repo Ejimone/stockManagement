@@ -222,7 +222,6 @@ export default function SalesProductListScreen() {
   if (isLoading && products.length === 0 && !refreshing) {
     return (
       <View style={styles.loadingContainer}>
-        <Stack.Screen options={{ title: "View Products" }} />
         <ActivityIndicator size="large" color="#007AFF" />
         <Text style={styles.loadingText}>Loading products...</Text>
       </View>
@@ -232,7 +231,6 @@ export default function SalesProductListScreen() {
   if (error && products.length === 0) {
     return (
       <View style={styles.errorContainer}>
-        <Stack.Screen options={{ title: "View Products" }} />
         <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity
           style={styles.retryButton}
@@ -246,7 +244,6 @@ export default function SalesProductListScreen() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: "View Products" }} />
 
       {/* Add Product Button */}
       <View style={styles.headerContainer}>
