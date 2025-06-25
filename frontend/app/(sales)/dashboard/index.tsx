@@ -372,6 +372,77 @@ export default function SalespersonDashboardScreen() {
     }
   };
 
+  // New function to fetch and display payment records (like Recent Activity)
+  const fetchDetailedPayments = async (type: "revenue") => {
+    setModalLoading(true);
+    try {
+      // Fetch all payments for the last 30 days (same period as revenue calculation)
+      const today = new Date();
+      const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+      let paymentData: any[] = [];
+
+      // Get recent activity payments (these are from the comprehensive reports API)
+      if (recentActivity.payments.length > 0) {
+        // Convert recent activity payments to our format
+        paymentData = recentActivity.payments.map(
+          (payment: any, index: number) => ({
+            id: payment.id,
+            uniqueKey: `payment-record-${payment.id}-${index}`,
+            type: "payment",
+            amount: payment.amount,
+            payment_method: payment.payment_method,
+            created_at: payment.created_at,
+            sale_id: payment.sale || payment.sale_id,
+            customer_name:
+              payment.sale__customer_name ||
+              payment.customer_name ||
+              "Unknown Customer",
+            payment_status: "completed",
+          })
+        );
+      }
+
+      // Also include sales with payments from the current month's data
+      // Deduplicate sales to avoid duplicate keys (today's sales are included in month's sales)
+      const allSalesMap = new Map();
+      [...todaySales, ...monthSales].forEach((sale) => {
+        allSalesMap.set(sale.id, sale);
+      });
+      const uniqueSales = Array.from(allSalesMap.values());
+
+      const salesWithPayments = uniqueSales
+        .filter((sale: APISale) => (sale.amount_paid || 0) > 0)
+        .map((sale: APISale, index: number) => ({
+          id: `sale-payment-${sale.id}-${index}`,
+          uniqueKey: `sale-payment-${sale.id}-${index}-${Date.now()}`,
+          type: "sale_payment",
+          amount: sale.amount_paid || 0,
+          payment_method: sale.payment_method || "Unknown",
+          created_at: sale.created_at,
+          sale_id: sale.id,
+          customer_name: sale.customer_name || "Unknown Customer",
+          payment_status: sale.payment_status,
+        }));
+
+      // Combine and sort by date (most recent first)
+      const combinedPayments = [...paymentData, ...salesWithPayments].sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+
+      setModalTitle("Payment Details (Last 30 Days)");
+      setModalData(combinedPayments as any);
+      setModalVisible(true);
+    } catch (error) {
+      console.error("Failed to fetch payment details:", error);
+      setModalData([]);
+      setModalVisible(true);
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
   useEffect(() => {
     setIsLoading(true);
     fetchComprehensiveData();
@@ -644,6 +715,59 @@ export default function SalespersonDashboardScreen() {
     );
   };
 
+  // Render payment item (like Recent Activity section)
+  const renderPaymentItem = ({ item }: { item: any }) => {
+    const isPaymentRecord = item.type === "payment" || !item.type;
+    const isSalePayment = item.type === "sale_payment";
+
+    return (
+      <TouchableOpacity
+        style={[styles.recentSaleCard, styles.recentPaymentCard]}
+        onPress={() => {
+          if (item.sale_id) {
+            router.push(`/(sales)/sales/${item.sale_id}` as any);
+          }
+        }}
+        activeOpacity={0.7}
+      >
+        <View style={styles.recentSaleHeader}>
+          <Text style={styles.recentSaleId}>
+            <MaterialIcons name="payment" size={16} color="#4CAF50" />{" "}
+            {isPaymentRecord
+              ? `Payment #${item.id}`
+              : `Sale Payment #${item.sale_id}`}
+          </Text>
+          <Text style={[styles.recentSaleAmount, { color: "#4CAF50" }]}>
+            {formatCurrency(item.amount)}
+          </Text>
+        </View>
+        <View style={styles.recentSaleDetails}>
+          <Text style={styles.recentSaleDate}>
+            {formatDate(item.created_at || "")}
+          </Text>
+          <View
+            style={[styles.recentSaleStatus, { backgroundColor: "#E8F5E8" }]}
+          >
+            <Text style={[styles.recentSaleStatusText, { color: "#4CAF50" }]}>
+              RECEIVED
+            </Text>
+          </View>
+        </View>
+        <View style={styles.recentSaleFooter}>
+          <Text style={styles.recentSaleCustomer}>
+            {item.customer_name || "Unknown Customer"} •{" "}
+            {item.payment_method || "Unknown Method"}
+          </Text>
+          {item.sale_id && (
+            <Text style={styles.recentSaleProducts}>
+              For Sale #{item.sale_id}
+            </Text>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <>
       <ScrollView
@@ -683,7 +807,7 @@ export default function SalespersonDashboardScreen() {
                   color="#4CAF50"
                 />
               }
-              onPress={() => fetchDetailedSales("month")}
+              onPress={() => fetchDetailedPayments("revenue")}
             />
 
             <MetricCard
@@ -937,6 +1061,34 @@ export default function SalespersonDashboardScreen() {
                   </Text>
                 </View>
               </View>
+            ) : modalTitle === "Payment Details (Last 30 Days)" ? (
+              <FlatList
+                data={modalData}
+                renderItem={renderPaymentItem}
+                keyExtractor={(item, index) => {
+                  const itemAny = item as any;
+                  // Use the uniqueKey if available, otherwise generate one
+                  if (itemAny.uniqueKey) {
+                    return itemAny.uniqueKey;
+                  } else if (itemAny.type === "payment") {
+                    return `payment-record-${itemAny.id}-${index}`;
+                  } else if (itemAny.type === "sale_payment") {
+                    return `sale-payment-${itemAny.sale_id}-${index}`;
+                  } else {
+                    return `payment-item-${index}-${Date.now()}`;
+                  }
+                }}
+                style={styles.modalList}
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+                  <View style={styles.emptyList}>
+                    <MaterialIcons name="payment" size={48} color="#CCCCCC" />
+                    <Text style={styles.emptyListText}>
+                      No payments found for this period
+                    </Text>
+                  </View>
+                }
+              />
             ) : (
               <FlatList
                 data={modalData}
