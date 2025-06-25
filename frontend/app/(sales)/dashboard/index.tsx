@@ -22,14 +22,50 @@ import {
   getPayments,
   getComprehensiveReports,
   updateSalePaymentStatus,
-  Sale as APISale,
 } from "../../../services/api";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 
-// Define the expected structure of Salesperson dashboard stats
+// Define interfaces for our data types
+interface SaleItem {
+  id: number;
+  quantity: number;
+  price: number;
+  product: {
+    name: string;
+    id: number;
+  };
+}
+
+interface APISale {
+  id: number;
+  created_at: string;
+  total_amount: number;
+  amount_paid: number;
+  balance: number;
+  payment_status: string;
+  payment_method: string;
+  customer_name: string;
+  items?: SaleItem[];
+  products_sold?: SaleItem[];
+}
+
+interface PaymentRecord {
+  id: number;
+  uniqueKey?: string;
+  type: "payment" | "sale_payment";
+  amount: number;
+  payment_method: string;
+  created_at: string;
+  sale_id: number;
+  customer_name: string;
+}
+
+type ModalItem = APISale | PaymentRecord;
+
+// Define the dashboard stats interface
 interface SalespersonDashboardStats {
   my_sales_today: number;
   my_revenue_today: number;
@@ -47,7 +83,8 @@ const MetricCard: React.FC<{
   icon?: React.ReactNode;
   onPress?: () => void;
   gradient?: string[];
-}> = ({ label, value, context, icon, onPress, gradient }) => {
+  isLoading?: boolean;
+}> = ({ label, value, context, icon, onPress, gradient, isLoading }) => {
   const scaleAnim = new Animated.Value(1);
 
   const handlePressIn = () => {
@@ -82,8 +119,14 @@ const MetricCard: React.FC<{
         {context && <Text style={styles.cardContext}>{context}</Text>}
         {onPress && (
           <View style={styles.tapHint}>
-            <Text style={styles.tapHintText}>Tap for details</Text>
-            <MaterialIcons name="touch-app" size={14} color="#007AFF" />
+            {isLoading ? (
+              <ActivityIndicator size="small" color="#007AFF" />
+            ) : (
+              <>
+                <Text style={styles.tapHintText}>Tap for details</Text>
+                <MaterialIcons name="touch-app" size={14} color="#007AFF" />
+              </>
+            )}
           </View>
         )}
       </View>
@@ -105,6 +148,20 @@ const MetricCard: React.FC<{
   );
 };
 
+// Helper function to convert API sale to our internal format
+const convertAPIToInternalSale = (sale: any): APISale => ({
+  id: Number(sale.id),
+  created_at: sale.created_at,
+  total_amount: Number(sale.total_amount || 0),
+  amount_paid: Number(sale.amount_paid || 0),
+  balance: Number(sale.balance || 0),
+  payment_status: sale.payment_status || "unknown",
+  payment_method: sale.payment_method || "",
+  customer_name: sale.customer_name || "",
+  items: sale.items || [],
+  products_sold: sale.products_sold || [],
+});
+
 export default function SalespersonDashboardScreen() {
   const { user, signOut } = useAuth();
   const router = useRouter();
@@ -117,7 +174,7 @@ export default function SalespersonDashboardScreen() {
   // Modal states
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
-  const [modalData, setModalData] = useState<APISale[]>([]);
+  const [modalData, setModalData] = useState<ModalItem[]>([]);
   const [modalLoading, setModalLoading] = useState(false);
 
   // Raw data states for calculations
@@ -206,10 +263,16 @@ export default function SalespersonDashboardScreen() {
         ]
       );
 
-      // Store raw data for modal display
-      const todaySalesData = todayResponse?.results || [];
-      const monthSalesData = monthResponse?.results || [];
-      const pendingSalesData = pendingResponse?.results || [];
+      // Convert API data to internal format
+      const todaySalesData = (todayResponse?.results || []).map(
+        convertAPIToInternalSale
+      );
+      const monthSalesData = (monthResponse?.results || []).map(
+        convertAPIToInternalSale
+      );
+      const pendingSalesData = (pendingResponse?.results || []).map(
+        convertAPIToInternalSale
+      );
 
       setTodaySales(todaySalesData);
       setMonthSales(monthSalesData);
@@ -338,9 +401,9 @@ export default function SalespersonDashboardScreen() {
         }
 
         const response = await getSales(params);
-        salesData = response.results || [];
+        salesData = (response.results || []).map(convertAPIToInternalSale);
 
-        // Update local state with fresh data
+        // Update local state with converted data
         switch (type) {
           case "today":
             setTodaySales(salesData);
@@ -358,15 +421,7 @@ export default function SalespersonDashboardScreen() {
       setModalVisible(true);
     } catch (error) {
       console.error("Failed to fetch detailed sales:", error);
-      // Still show modal with empty data or existing local data
-      setModalData(
-        type === "today"
-          ? todaySales
-          : type === "month"
-          ? monthSales
-          : pendingSales
-      );
-      setModalVisible(true);
+      setModalData([]);
     } finally {
       setModalLoading(false);
     }
@@ -380,7 +435,7 @@ export default function SalespersonDashboardScreen() {
       const today = new Date();
       const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-      let paymentData: any[] = [];
+      let paymentData: PaymentRecord[] = [];
 
       // Get recent activity payments (these are from the comprehensive reports API)
       if (recentActivity.payments.length > 0) {
@@ -621,6 +676,28 @@ export default function SalespersonDashboardScreen() {
     });
   };
 
+  // Replace the existing updateSaleInModalData function with this version
+  const updateSaleInModalData = (saleToUpdate: APISale) => {
+    setModalData((prevData) =>
+      prevData.map((item) => {
+        if ("type" in item) {
+          // This is a payment record, leave it unchanged
+          return item;
+        }
+        // This is a sale
+        if (item.id === saleToUpdate.id) {
+          return {
+            ...item,
+            payment_status: "paid",
+            amount_paid: item.total_amount,
+            balance: 0,
+          };
+        }
+        return item;
+      })
+    );
+  };
+
   // Render sale item exactly like My Sales page
   const renderSaleItem = ({ item }: { item: APISale }) => {
     const canMarkAsPaid =
@@ -716,7 +793,7 @@ export default function SalespersonDashboardScreen() {
   };
 
   // Render payment item (like Recent Activity section)
-  const renderPaymentItem = ({ item }: { item: any }) => {
+  const renderPaymentItem = ({ item }: { item: PaymentRecord }) => {
     const isPaymentRecord = item.type === "payment" || !item.type;
     const isSalePayment = item.type === "sale_payment";
 
@@ -765,6 +842,82 @@ export default function SalespersonDashboardScreen() {
           )}
         </View>
       </TouchableOpacity>
+    );
+  };
+
+  const renderDetailModal = () => {
+    const windowHeight = Dimensions.get("window").height;
+    const isPaymentList = modalTitle === "Total Revenue (Last 30 Days)";
+
+    const renderItem = ({ item }: { item: ModalItem }) => {
+      if ("type" in item) {
+        return renderPaymentItem({ item: item as PaymentRecord });
+      }
+      return renderSaleItem({ item: item as APISale });
+    };
+
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View
+          style={[styles.modalContainer, { maxHeight: windowHeight * 0.9 }]}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{modalTitle}</Text>
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                style={styles.closeButton}
+              >
+                <MaterialIcons name="close" size={24} color="#000" />
+              </TouchableOpacity>
+            </View>
+
+            {modalLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#007AFF" />
+                <Text style={styles.loadingText}>Loading details...</Text>
+              </View>
+            ) : modalData.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <MaterialIcons name="info-outline" size={48} color="#6B7280" />
+                <Text style={styles.emptyText}>
+                  No {isPaymentList ? "payments" : "sales"} found
+                </Text>
+              </View>
+            ) : (
+              <FlatList
+                data={modalData}
+                renderItem={renderItem}
+                keyExtractor={(item) => {
+                  if ("type" in item) {
+                    return item.uniqueKey || `payment-${item.id}`;
+                  }
+                  return `sale-${item.id}`;
+                }}
+                contentContainerStyle={styles.modalList}
+                showsVerticalScrollIndicator={true}
+                ItemSeparatorComponent={() => <View style={styles.separator} />}
+                ListHeaderComponent={() => (
+                  <Text style={styles.modalSubtitle}>
+                    {isPaymentList
+                      ? `${modalData.length} payment${
+                          modalData.length === 1 ? "" : "s"
+                        }`
+                      : `${modalData.length} sale${
+                          modalData.length === 1 ? "" : "s"
+                        }`}
+                  </Text>
+                )}
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
     );
   };
 
@@ -1012,107 +1165,7 @@ export default function SalespersonDashboardScreen() {
       </ScrollView>
 
       {/* Sales Details Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{modalTitle}</Text>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setModalVisible(false)}
-              >
-                <MaterialIcons name="close" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
-
-            {modalLoading ? (
-              <View style={styles.modalLoading}>
-                <ActivityIndicator size="large" color="#007AFF" />
-                <Text style={styles.modalLoadingText}>Loading details...</Text>
-              </View>
-            ) : modalTitle === "Total Revenue Breakdown" ? (
-              <View style={styles.revenueBreakdown}>
-                <View style={styles.breakdownItem}>
-                  <Text style={styles.breakdownLabel}>Today's Revenue:</Text>
-                  <Text style={styles.breakdownValue}>
-                    {formatCurrency(stats?.my_revenue_today)}
-                  </Text>
-                </View>
-                <View style={styles.breakdownItem}>
-                  <Text style={styles.breakdownLabel}>
-                    This Month's Revenue:
-                  </Text>
-                  <Text style={styles.breakdownValue}>
-                    {formatCurrency(stats?.my_revenue_this_month)}
-                  </Text>
-                </View>
-                <View style={[styles.breakdownItem, styles.totalBreakdown]}>
-                  <Text style={styles.totalLabel}>Total Revenue:</Text>
-                  <Text style={styles.totalValue}>
-                    {formatCurrency(
-                      (stats?.my_revenue_today || 0) +
-                        (stats?.my_revenue_this_month || 0)
-                    )}
-                  </Text>
-                </View>
-              </View>
-            ) : modalTitle === "Payment Details (Last 30 Days)" ? (
-              <FlatList
-                data={modalData}
-                renderItem={renderPaymentItem}
-                keyExtractor={(item, index) => {
-                  const itemAny = item as any;
-                  // Use the uniqueKey if available, otherwise generate one
-                  if (itemAny.uniqueKey) {
-                    return itemAny.uniqueKey;
-                  } else if (itemAny.type === "payment") {
-                    return `payment-record-${itemAny.id}-${index}`;
-                  } else if (itemAny.type === "sale_payment") {
-                    return `sale-payment-${itemAny.sale_id}-${index}`;
-                  } else {
-                    return `payment-item-${index}-${Date.now()}`;
-                  }
-                }}
-                style={styles.modalList}
-                showsVerticalScrollIndicator={false}
-                ListEmptyComponent={
-                  <View style={styles.emptyList}>
-                    <MaterialIcons name="payment" size={48} color="#CCCCCC" />
-                    <Text style={styles.emptyListText}>
-                      No payments found for this period
-                    </Text>
-                  </View>
-                }
-              />
-            ) : (
-              <FlatList
-                data={modalData}
-                renderItem={renderSaleItem}
-                keyExtractor={(item) => item.id.toString()}
-                style={styles.modalList}
-                showsVerticalScrollIndicator={false}
-                ListEmptyComponent={
-                  <View style={styles.emptyList}>
-                    <MaterialIcons
-                      name="receipt-long"
-                      size={48}
-                      color="#CCCCCC"
-                    />
-                    <Text style={styles.emptyListText}>
-                      No sales found for this period
-                    </Text>
-                  </View>
-                }
-              />
-            )}
-          </View>
-        </View>
-      </Modal>
+      {renderDetailModal()}
     </>
   );
 }
@@ -1121,7 +1174,7 @@ export default function SalespersonDashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
+    backgroundColor: "#F3F4F6",
   },
   loadingContainer: {
     flex: 1,
@@ -1164,62 +1217,62 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   header: {
+    padding: 16,
     backgroundColor: "#FFFFFF",
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 24,
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E5E5",
+    borderBottomColor: "#E5E7EB",
   },
   welcomeMessage: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#1A1A1A",
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#111827",
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: "#666",
-    fontWeight: "400",
+    color: "#6B7280",
   },
   metricsContainer: {
     padding: 16,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 16,
+    width: "48%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    borderWidth: 1,
-    borderColor: "#F0F0F0",
   },
   cardTextContainer: {
     flex: 1,
   },
   cardLabel: {
     fontSize: 14,
-    color: "#666",
+    color: "#6B7280",
     marginBottom: 4,
-    fontWeight: "500",
   },
   cardValue: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#1A1A1A",
-    marginBottom: 4,
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#111827",
+    marginBottom: 2,
   },
   cardContext: {
     fontSize: 12,
-    color: "#888",
-    fontStyle: "italic",
+    color: "#6B7280",
+  },
+  cardIcon: {
+    marginLeft: 12,
   },
   tapHint: {
     flexDirection: "row",
@@ -1230,366 +1283,106 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#007AFF",
     marginRight: 4,
-    fontWeight: "500",
   },
-  cardIcon: {
-    width: 56,
-    height: 56,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F8F9FA",
-    borderRadius: 28,
-    marginLeft: 16,
-  },
-  noDataContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 60,
-  },
-  noDataText: {
+  errorText: {
+    color: "#DC2626",
+    fontSize: 14,
     textAlign: "center",
-    marginTop: 16,
-    fontSize: 16,
-    color: "#666",
-    lineHeight: 24,
+    marginTop: 8,
   },
-  logoutButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#DC3545",
-    marginHorizontal: 20,
-    paddingVertical: 16,
-    borderRadius: 12,
-    marginTop: 20,
-    marginBottom: 40,
-  },
-  logoutButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-    marginLeft: 8,
-  },
-
-  // Modal Styles
-  modalOverlay: {
+  modalContainer: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "flex-end",
   },
-  modalContainer: {
-    backgroundColor: "#FFFFFF",
+  modalContent: {
+    backgroundColor: "white",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    paddingTop: 20,
+    paddingHorizontal: 16,
     maxHeight: "90%",
-    minHeight: "60%",
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E5E5E5",
+    marginBottom: 16,
+    paddingHorizontal: 4,
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: "700",
-    color: "#1A1A1A",
+    fontWeight: "600",
+    color: "#111827",
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: "#6B7280",
+    marginBottom: 12,
   },
   closeButton: {
-    padding: 4,
+    padding: 8,
   },
-  modalLoading: {
-    flex: 1,
-    justifyContent: "center",
+  loadingContainer: {
+    padding: 20,
     alignItems: "center",
-    paddingVertical: 60,
   },
-  modalLoadingText: {
-    marginTop: 16,
+  loadingText: {
+    marginTop: 12,
+    color: "#6B7280",
     fontSize: 16,
-    color: "#666",
+  },
+  emptyContainer: {
+    padding: 40,
+    alignItems: "center",
+  },
+  emptyText: {
+    marginTop: 12,
+    color: "#6B7280",
+    fontSize: 16,
   },
   modalList: {
-    flex: 1,
+    paddingBottom: 20,
   },
-
-  // Revenue Breakdown Styles
-  revenueBreakdown: {
-    padding: 20,
+  separator: {
+    height: 12,
   },
-  breakdownItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
-  },
-  breakdownLabel: {
-    fontSize: 16,
-    color: "#666",
-    fontWeight: "500",
-  },
-  breakdownValue: {
-    fontSize: 18,
-    color: "#1A1A1A",
-    fontWeight: "600",
-  },
-  totalBreakdown: {
-    borderBottomWidth: 0,
-    backgroundColor: "#F8F9FA",
-    marginHorizontal: -20,
-    paddingHorizontal: 20,
-    marginTop: 16,
-    borderRadius: 12,
-  },
-  totalLabel: {
-    fontSize: 18,
-    color: "#1A1A1A",
-    fontWeight: "700",
-  },
-  totalValue: {
-    fontSize: 24,
-    color: "#4CAF50",
-    fontWeight: "700",
-  },
-
-  // Sale Item Styles
-  saleItem: {
+  saleCard: {
     backgroundColor: "#FFFFFF",
-    marginHorizontal: 16,
-    marginVertical: 8,
     borderRadius: 12,
     padding: 16,
-    shadowColor: "#000000",
+    marginBottom: 12,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   saleHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     marginBottom: 12,
-  },
-  saleId: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#1A1A1A",
-  },
-  saleDate: {
-    fontSize: 12,
-    color: "#666",
-  },
-  saleDetails: {
-    marginBottom: 16,
-  },
-  saleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  saleLabel: {
-    fontSize: 14,
-    color: "#666",
-    fontWeight: "500",
-  },
-  saleValue: {
-    fontSize: 14,
-    color: "#1A1A1A",
-    fontWeight: "600",
-  },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusText: {
-    fontSize: 12,
-    color: "#FFFFFF",
-    fontWeight: "600",
-  },
-  productsSection: {
-    borderTopWidth: 1,
-    borderTopColor: "#F0F0F0",
-    paddingTop: 12,
-  },
-  productsSectionTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#1A1A1A",
-    marginBottom: 8,
-  },
-  productItem: {
-    marginBottom: 6,
-  },
-  productName: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#1A1A1A",
-  },
-  productDetails: {
-    fontSize: 12,
-    color: "#666",
-    marginTop: 2,
-  },
-  emptyList: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 60,
-  },
-  emptyListText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-  },
-
-  // Recent Activity Styles
-  recentActivityContainer: {
-    margin: 16,
-    marginTop: 8,
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#1A1A1A",
-  },
-  viewAllText: {
-    fontSize: 14,
-    color: "#007AFF",
-    fontWeight: "600",
-  },
-  recentSaleCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: "#F0F0F0",
-  },
-  recentSaleHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  recentSaleId: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1A1A1A",
-  },
-  recentSaleAmount: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#4CAF50",
-  },
-  recentSaleDetails: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  recentSaleDate: {
-    fontSize: 12,
-    color: "#666",
-  },
-  recentSaleStatus: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  recentSaleStatusText: {
-    fontSize: 10,
-    fontWeight: "600",
-  },
-  recentSaleProducts: {
-    fontSize: 12,
-    color: "#888",
-    fontStyle: "italic",
-  },
-  recentSaleFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 4,
-  },
-  recentSaleCustomer: {
-    fontSize: 12,
-    color: "#666",
-    flex: 1,
-  },
-  recentPaymentCard: {
-    borderLeftWidth: 3,
-    borderLeftColor: "#4CAF50",
-  },
-  // Customer section styles
-  customerSection: {
-    backgroundColor: "#F8F9FA",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  customerSectionTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 6,
-  },
-  customerInfo: {
-    fontSize: 13,
-    color: "#555",
-    marginBottom: 2,
-  },
-  noProductsText: {
-    fontSize: 12,
-    color: "#999",
-    fontStyle: "italic",
-    textAlign: "center",
-    marginTop: 8,
-  },
-
-  // Sales card styles (copied from My Sales page)
-  saleCard: {
-    backgroundColor: "#ffffff",
-    marginHorizontal: 16,
-    marginVertical: 8,
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: "#f3f4f6",
   },
   saleInfo: {
     flex: 1,
+  },
+  saleId: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#111827",
+    marginBottom: 4,
+  },
+  saleDate: {
+    fontSize: 14,
+    color: "#6B7280",
   },
   amountContainer: {
     alignItems: "flex-end",
   },
   amount: {
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "600",
     color: "#111827",
     marginBottom: 4,
   },
@@ -1597,32 +1390,33 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: 12,
-    minWidth: 60,
-    justifyContent: "center",
+    backgroundColor: "#10B981",
   },
   paymentStatusText: {
-    fontSize: 11,
-    color: "#ffffff",
-    fontWeight: "600",
+    color: "#FFFFFF",
+    fontSize: 12,
     marginLeft: 4,
-    textTransform: "uppercase",
+    textTransform: "capitalize",
+  },
+  saleDetails: {
+    marginBottom: 12,
   },
   customerName: {
     fontSize: 14,
     color: "#374151",
-    marginBottom: 2,
+    marginBottom: 4,
   },
   paymentMethod: {
     fontSize: 14,
     color: "#374151",
-    marginBottom: 2,
+    marginBottom: 4,
   },
   balance: {
     fontSize: 14,
-    color: "#dc2626",
     fontWeight: "500",
+    color: "#DC2626",
   },
   saleFooter: {
     flexDirection: "row",
@@ -1630,11 +1424,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: "#f3f4f6",
+    borderTopColor: "#E5E7EB",
   },
   itemCount: {
     fontSize: 14,
-    color: "#6b7280",
+    color: "#6B7280",
   },
   saleFooterActions: {
     flexDirection: "row",
@@ -1643,16 +1437,120 @@ const styles = StyleSheet.create({
   markPaidButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#22c55e",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 12,
+    backgroundColor: "#22C55E",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginRight: 8,
   },
   markPaidButtonText: {
-    color: "#ffffff",
-    fontSize: 12,
-    fontWeight: "600",
+    color: "#FFFFFF",
+    fontSize: 14,
     marginLeft: 4,
+  },
+
+  // Recent Activity styles
+  recentActivityContainer: {
+    padding: 16,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  viewAllText: {
+    fontSize: 14,
+    color: "#007AFF",
+  },
+  recentSaleCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  recentPaymentCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: "#4CAF50",
+  },
+  recentSaleHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 8,
+  },
+  recentSaleId: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#111827",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  recentSaleAmount: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  recentSaleDetails: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  recentSaleDate: {
+    fontSize: 14,
+    color: "#6B7280",
+  },
+  recentSaleStatus: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  recentSaleStatusText: {
+    fontSize: 12,
+    fontWeight: "500",
+  },
+  recentSaleFooter: {
+    marginTop: 8,
+  },
+  recentSaleCustomer: {
+    fontSize: 14,
+    color: "#6B7280",
+  },
+  recentSaleProducts: {
+    fontSize: 14,
+    color: "#6B7280",
+    marginTop: 4,
+  },
+  noDataContainer: {
+    padding: 24,
+    alignItems: "center",
+  },
+  noDataText: {
+    fontSize: 16,
+    color: "#6B7280",
+    textAlign: "center",
+  },
+  // Logout button styles
+  logoutButton: {
+    backgroundColor: "#EF4444",
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    alignItems: "center",
+  },
+  logoutButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
