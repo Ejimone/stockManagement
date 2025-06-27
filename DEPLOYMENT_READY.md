@@ -3,12 +3,14 @@
 ## ✅ What I've Prepared for You:
 
 ### 1. **Production-Ready Settings**
+
 - Environment variable configuration for security
 - PostgreSQL database support for production
 - Static files handling with WhiteNoise
 - Proper CORS configuration for your React Native app
 
 ### 2. **Deployment Files Created**
+
 - `backend/build.sh` - Build script for deployment platforms
 - `backend/requirements.txt` - Updated with all dependencies
 - `backend/runtime.txt` - Python version specification
@@ -16,6 +18,7 @@
 - `backend/deploy_helper.sh` - Automated deployment checker
 
 ### 3. **Deployment Guide**
+
 - Complete step-by-step instructions in `DEPLOYMENT_GUIDE.md`
 - Platform comparisons and recommendations
 - Troubleshooting tips
@@ -25,16 +28,19 @@
 ### Option 1: Render.com (RECOMMENDED - FREE)
 
 1. **Push to GitHub** (if not done already):
+
    ```bash
    git push origin main
    ```
 
 2. **Go to [render.com](https://render.com)**
+
    - Sign up/login with GitHub
    - Click "New +" → "Web Service"
    - Connect your GitHub repository
 
 3. **Configure the Service**:
+
    - **Name**: `jonkech-backend`
    - **Environment**: `Python 3`
    - **Root Directory**: `backend`
@@ -43,22 +49,23 @@
 
 4. **Add Environment Variables**:
    ```
-   SECRET_KEY=generate-a-new-secret-key-here
+   SECRET_KEY=qykplipj*h%)u54^xjf(m&k&t(@)op*dpi5*6xlle95v8s)n^m
    DEBUG=False
-   FIREBASE_API_KEY=AIzaSyDGCxd_wMYrQX3C3RLk59VvzgwIE0SOt1c
-   FIREBASE_AUTH_DOMAIN=classroom-d71b7.firebaseapp.com
-   FIREBASE_PROJECT_ID=classroom-d71b7
-   FIREBASE_STORAGE_BUCKET=classroom-d71b7.firebasestorage.app
-   FIREBASE_MESSAGING_SENDER_ID=1025622227795
-   FIREBASE_APP_ID=1:1025622227795:web:c96d4796e4db2fbd93bfa6
-   FIREBASE_MEASUREMENT_ID=G-3NQZWPJSCN
+   FIREBASE_API_KEY=AIzaSyBYTTmzpaeOf-IiNAze0GwHFmswHKbcKKw
+   FIREBASE_AUTH_DOMAIN=opecode-9e47b.firebaseapp.com
+   FIREBASE_PROJECT_ID=opecode-9e47b
+   FIREBASE_STORAGE_BUCKET=opecode-9e47b.firebasestorage.app
+   FIREBASE_MESSAGING_SENDER_ID=171791860064
+   FIREBASE_APP_ID=1:171791860064:web:4a08a49bb7df7d27ca5e05
+   FIREBASE_MEASUREMENT_ID=G-PP81X1N21M
    ```
 
 5. **Optional: Add PostgreSQL Database**
+
    - In Render, create a new PostgreSQL database
    - Add the `DATABASE_URL` environment variable
 
-6. **Deploy!** 
+6. **Deploy!**
    - Click "Create Web Service"
    - Wait 5-10 minutes for deployment
    - Your API will be live at: `https://your-app-name.onrender.com`
@@ -79,13 +86,14 @@ After deployment, update your frontend's API URL:
 
 ```javascript
 // In your React Native app configuration
-const API_BASE_URL = 'https://your-app-name.onrender.com';
+const API_BASE_URL = "https://your-app-name.onrender.com";
 // Replace with your actual deployment URL
 ```
 
 ## 🔍 Test Your Deployed API
 
 Once deployed, test it:
+
 ```bash
 curl https://your-app-name.onrender.com/api/auth/login/
 ```
