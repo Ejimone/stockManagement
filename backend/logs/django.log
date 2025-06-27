@@ -8414,3 +8414,8 @@ INFO 2025-06-25 08:27:52,134 basehttp 45746 6220820480 "GET /api/sales/?date_fro
 INFO 2025-06-25 08:27:52,234 basehttp 45746 6271299584 "GET /api/sales/?date_from=2025-06-25&date_to=2025-06-25&salesperson=17 HTTP/1.1" 200 517
 INFO 2025-06-25 08:27:52,239 basehttp 45746 6288125952 "GET /api/sales/?date_from=2025-05-26&salesperson=17 HTTP/1.1" 200 2845
 INFO 2025-06-25 08:27:52,288 basehttp 45746 6237646848 "GET /api/sales/?payment_status=unpaid&salesperson=17 HTTP/1.1" 200 52
+INFO 2025-06-25 08:28:05,605 basehttp 45746 6220820480 "GET /api/reports/comprehensive/?date_from=2025-05-26&date_to=2025-06-25 HTTP/1.1" 200 3389
+INFO 2025-06-25 08:28:06,039 basehttp 45746 6220820480 "GET /api/reports/comprehensive/?date_from=2025-06-25&date_to=2025-06-25 HTTP/1.1" 200 852
+INFO 2025-06-25 08:28:06,503 basehttp 45746 6220820480 "GET /api/sales/?date_from=2025-06-25&date_to=2025-06-25&salesperson=17 HTTP/1.1" 200 517
+INFO 2025-06-25 08:28:06,640 basehttp 45746 6304952320 "GET /api/sales/?date_from=2025-05-26&salesperson=17 HTTP/1.1" 200 2845
+INFO 2025-06-25 08:28:06,686 basehttp 45746 6220820480 "GET /api/sales/?payment_status=unpaid&salesperson=17 HTTP/1.1" 200 52
