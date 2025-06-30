@@ -48,6 +48,7 @@
    - **Start Command**: `gunicorn backend.wsgi:application`
 
 4. **Add Environment Variables**:
+
    ```
    SECRET_KEY=qykplipj*h%)u54^xjf(m&k&t(@)op*dpi5*6xlle95v8s)n^m
    DEBUG=False
