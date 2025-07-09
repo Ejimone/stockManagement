@@ -28,8 +28,12 @@ DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 # Production domain configuration
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+AZURE_WEBSITE_HOSTNAME = os.environ.get('WEBSITE_HOSTNAME')
+
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS = [RENDER_EXTERNAL_HOSTNAME, 'localhost', '127.0.0.1', '10.0.2.2']
+elif AZURE_WEBSITE_HOSTNAME:
+    ALLOWED_HOSTS = [AZURE_WEBSITE_HOSTNAME, 'localhost', '127.0.0.1', '10.0.2.2']
 else:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.2.2', '*']
 

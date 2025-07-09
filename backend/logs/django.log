@@ -8802,3 +8802,85 @@ INFO 2025-06-27 05:09:05,762 basehttp 52565 6148190208 "GET /admin/login/?next=/
 INFO 2025-06-27 05:09:08,813 basehttp 52565 6131363840 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4367
 INFO 2025-06-27 05:09:16,529 basehttp 52565 6198669312 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4367
 INFO 2025-06-27 05:09:18,947 basehttp 52565 6215495680 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4367
+INFO 2025-07-09 10:15:07,853 autoreload 19293 8576032512 Watching for file changes with StatReloader
+WARNING 2025-07-09 10:18:23,856 log 19293 6197276672 Not Found: /
+WARNING 2025-07-09 10:18:23,857 basehttp 19293 6197276672 "GET / HTTP/1.1" 404 2572
+WARNING 2025-07-09 10:18:23,942 log 19293 6197276672 Not Found: /favicon.ico
+WARNING 2025-07-09 10:18:23,942 basehttp 19293 6197276672 "GET /favicon.ico HTTP/1.1" 404 2623
+INFO 2025-07-09 10:18:38,601 autoreload 22364 8576032512 Watching for file changes with StatReloader
+INFO 2025-07-09 10:19:27,883 basehttp 22364 6221901824 "GET /api/ HTTP/1.1" 200 631
+INFO 2025-07-09 10:19:27,884 basehttp 22364 6205075456 "GET /api/ HTTP/1.1" 200 631
+INFO 2025-07-09 10:19:27,903 basehttp 22364 6238728192 "GET /api/ HTTP/1.1" 200 631
+INFO 2025-07-09 10:19:28,241 basehttp 22364 6205075456 "GET /api/ HTTP/1.1" 200 631
+INFO 2025-07-09 10:19:28,373 basehttp 22364 6221901824 "GET /api/ HTTP/1.1" 200 631
+INFO 2025-07-09 10:19:28,399 basehttp 22364 6205075456 "GET /api/ HTTP/1.1" 200 631
+WARNING 2025-07-09 10:19:28,669 log 22364 6221901824 Unauthorized: /api/dashboard/
+WARNING 2025-07-09 10:19:28,669 basehttp 22364 6221901824 "GET /api/dashboard/ HTTP/1.1" 401 183
+WARNING 2025-07-09 10:19:28,839 log 22364 6221901824 Unauthorized: /api/dashboard/
+WARNING 2025-07-09 10:19:28,842 log 22364 6238728192 Unauthorized: /api/dashboard/
+WARNING 2025-07-09 10:19:28,842 basehttp 22364 6221901824 "GET /api/dashboard/ HTTP/1.1" 401 183
+WARNING 2025-07-09 10:19:28,843 basehttp 22364 6238728192 "GET /api/dashboard/ HTTP/1.1" 401 183
+WARNING 2025-07-09 10:19:29,059 log 22364 6238728192 Unauthorized: /api/auth/refresh/
+WARNING 2025-07-09 10:19:29,059 basehttp 22364 6238728192 "POST /api/auth/refresh/ HTTP/1.1" 401 65
+WARNING 2025-07-09 10:19:30,592 log 22364 6238728192 Unauthorized: /api/dashboard/
+WARNING 2025-07-09 10:19:30,593 basehttp 22364 6238728192 "GET /api/dashboard/ HTTP/1.1" 401 183
+WARNING 2025-07-09 10:19:30,676 log 22364 6221901824 Unauthorized: /api/dashboard/
+WARNING 2025-07-09 10:19:30,677 basehttp 22364 6221901824 "GET /api/dashboard/ HTTP/1.1" 401 183
+WARNING 2025-07-09 10:19:30,882 log 22364 6238728192 Unauthorized: /api/dashboard/
+WARNING 2025-07-09 10:19:30,883 basehttp 22364 6238728192 "GET /api/dashboard/ HTTP/1.1" 401 183
+WARNING 2025-07-09 10:19:33,007 log 22364 6221901824 Unauthorized: /api/dashboard/
+WARNING 2025-07-09 10:19:33,008 basehttp 22364 6221901824 "GET /api/dashboard/ HTTP/1.1" 401 183
+WARNING 2025-07-09 10:19:33,164 log 22364 6205075456 Unauthorized: /api/dashboard/
+WARNING 2025-07-09 10:19:33,166 basehttp 22364 6205075456 "GET /api/dashboard/ HTTP/1.1" 401 183
+WARNING 2025-07-09 10:19:33,320 log 22364 6221901824 Unauthorized: /api/dashboard/
+WARNING 2025-07-09 10:19:33,321 basehttp 22364 6221901824 "GET /api/dashboard/ HTTP/1.1" 401 183
+WARNING 2025-07-09 10:19:46,050 log 22364 6238728192 Bad Request: /api/auth/login/
+WARNING 2025-07-09 10:19:46,050 basehttp 22364 6238728192 "POST /api/auth/login/ HTTP/1.1" 400 51
+INFO 2025-07-09 10:21:23,960 basehttp 22364 6221901824 "GET /api/ HTTP/1.1" 200 631
+INFO 2025-07-09 10:21:24,496 basehttp 22364 6221901824 "POST /api/auth/login/ HTTP/1.1" 200 596
+INFO 2025-07-09 10:21:25,179 basehttp 22364 6221901824 "GET /api/ HTTP/1.1" 200 631
+INFO 2025-07-09 10:21:25,343 basehttp 22364 6221901824 "GET /api/ HTTP/1.1" 200 631
+INFO 2025-07-09 10:21:25,644 basehttp 22364 6221901824 "GET /api/dashboard/ HTTP/1.1" 200 215
+INFO 2025-07-09 10:21:25,855 basehttp 22364 6221901824 "GET /api/dashboard/ HTTP/1.1" 200 215
+INFO 2025-07-09 10:21:31,279 basehttp 22364 6221901824 "GET /api/sales/ HTTP/1.1" 200 52
+INFO 2025-07-09 10:21:31,923 basehttp 22364 6221901824 "GET /api/users/?role=Salesperson HTTP/1.1" 200 52
+INFO 2025-07-09 10:21:33,277 basehttp 22364 6221901824 "GET /api/products/?search= HTTP/1.1" 200 52
+INFO 2025-07-09 10:21:33,749 basehttp 22364 6221901824 "GET /api/products/?search= HTTP/1.1" 200 52
+INFO 2025-07-09 10:21:35,403 basehttp 22364 6221901824 "GET /api/users/?role=Salesperson HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:11,762 basehttp 22364 6221901824 "POST /api/users/ HTTP/1.1" 201 188
+INFO 2025-07-09 10:22:13,710 basehttp 22364 6221901824 "GET /api/users/?role=Salesperson HTTP/1.1" 200 240
+INFO 2025-07-09 10:22:30,948 basehttp 22364 6205075456 "POST /api/auth/login/ HTTP/1.1" 200 594
+INFO 2025-07-09 10:22:31,743 basehttp 22364 6205075456 "GET /api/reports/comprehensive/?date_from=2025-06-09&date_to=2025-07-09 HTTP/1.1" 200 2233
+INFO 2025-07-09 10:22:31,945 basehttp 22364 6205075456 "GET /api/reports/comprehensive/?date_from=2025-06-09&date_to=2025-07-09 HTTP/1.1" 200 2233
+INFO 2025-07-09 10:22:32,171 basehttp 22364 6205075456 "GET /api/reports/comprehensive/?date_from=2025-07-09&date_to=2025-07-09 HTTP/1.1" 200 523
+INFO 2025-07-09 10:22:32,393 basehttp 22364 6205075456 "GET /api/reports/comprehensive/?date_from=2025-07-09&date_to=2025-07-09 HTTP/1.1" 200 523
+INFO 2025-07-09 10:22:32,664 basehttp 22364 6205075456 "GET /api/sales/?date_from=2025-07-09&date_to=2025-07-09&salesperson=23 HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:32,853 basehttp 22364 6205075456 "GET /api/sales/?date_from=2025-06-09&salesperson=23 HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:32,854 basehttp 22364 6238728192 "GET /api/sales/?payment_status=unpaid&salesperson=23 HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:33,027 basehttp 22364 6238728192 "GET /api/sales/?date_from=2025-06-09&salesperson=23 HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:33,039 basehttp 22364 6205075456 "GET /api/sales/?date_from=2025-07-09&date_to=2025-07-09&salesperson=23 HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:33,169 basehttp 22364 6289207296 "GET /api/sales/?payment_status=unpaid&salesperson=23 HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:36,899 basehttp 22364 6238728192 "GET /api/sales/?payment_status=unpaid&salesperson=23 HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:37,526 basehttp 22364 6238728192 "GET /api/sales/?payment_status=unpaid&salesperson=23 HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:39,624 basehttp 22364 6238728192 "GET /api/sales/?date_from=2025-07-09&date_to=2025-07-09&salesperson=23 HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:42,259 basehttp 22364 6238728192 "GET /api/products/?search= HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:42,406 basehttp 22364 6272380928 "GET /api/products/?search= HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:42,690 basehttp 22364 6272380928 "GET /api/products/?search= HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:44,394 basehttp 22364 6272380928 "GET /api/sales/?salesperson=23 HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:45,742 basehttp 22364 6272380928 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-07-09 10:22:45,897 basehttp 22364 6238728192 "GET /api/payments/summary/ HTTP/1.1" 200 236
+INFO 2025-07-09 10:22:48,592 basehttp 22364 6238728192 "GET /api/reports/comprehensive/?date_from=2025-06-09&date_to=2025-07-09 HTTP/1.1" 200 2233
+INFO 2025-07-09 10:23:05,519 basehttp 22364 6238728192 "GET /api/products/?search= HTTP/1.1" 200 52
+INFO 2025-07-09 10:23:05,667 basehttp 22364 6272380928 "GET /api/products/?search= HTTP/1.1" 200 52
+INFO 2025-07-09 10:23:08,472 basehttp 22364 6272380928 "GET /api/sales/?salesperson=23 HTTP/1.1" 200 52
+INFO 2025-07-09 10:23:08,647 basehttp 22364 6238728192 "GET /api/sales/?salesperson=23 HTTP/1.1" 200 52
+INFO 2025-07-09 10:23:09,939 basehttp 22364 6272380928 "GET /api/payments/ HTTP/1.1" 200 52
+INFO 2025-07-09 10:23:10,081 basehttp 22364 6238728192 "GET /api/payments/summary/ HTTP/1.1" 200 236
+INFO 2025-07-09 10:27:53,876 basehttp 22364 6205075456 "GET /admin/core/aifeedback/ HTTP/1.1" 302 0
+INFO 2025-07-09 10:27:53,893 basehttp 22364 6205075456 "GET /admin/login/?next=/admin/core/aifeedback/ HTTP/1.1" 200 4210
+WARNING 2025-07-09 10:27:53,946 log 22364 6205075456 Not Found: /favicon.ico
+WARNING 2025-07-09 10:27:53,946 basehttp 22364 6205075456 "GET /favicon.ico HTTP/1.1" 404 2610
+WARNING 2025-07-09 10:28:19,932 log 22364 6221901824 Not Found: /favicon.ico
+WARNING 2025-07-09 10:28:19,932 basehttp 22364 6221901824 "GET /favicon.ico HTTP/1.1" 404 2608
+INFO 2025-07-09 10:32:25,600 autoreload 22364 8576032512 /Users/evidenceejimone/daddy/backend/backend/settings.py changed, reloading.
+INFO 2025-07-09 10:32:25,946 autoreload 31898 8576032512 Watching for file changes with StatReloader
