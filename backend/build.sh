@@ -1,15 +1,13 @@
-#!/usr/bin/env bash
-# build.sh - Render build script
+#!/bin/bash
 
-set -o errexit  # exit on error
+# Exit on error
+set -o errexit
 
-echo "Installing Python dependencies..."
+# Install dependencies
 pip install -r requirements.txt
 
-echo "Collecting static files..."
-python manage.py collectstatic --noinput
+# Collect static files
+python manage.py collectstatic --no-input
 
-echo "Running database migrations..."
+# Apply database migrations
 python manage.py migrate
-
-echo "Build completed successfully!"

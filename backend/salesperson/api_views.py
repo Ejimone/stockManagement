@@ -111,6 +111,13 @@ class CurrentUserView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def health_check(request):
+    """A simple health check endpoint to confirm the API is running."""
+    return Response({"status": "ok", "message": "API is running."})
+
+
 class ProductListCreateView(generics.ListCreateAPIView):
     """List all products or create a new product"""
     queryset = Product.objects.all()

@@ -12,29 +12,28 @@ if (Platform.OS !== "web" && !FileSystem.downloadAsync) {
 
 // Dynamic API URL detection for different platforms and environments
 const getInitialApiBaseUrl = (): string => {
-  // ngrok URL - CURRENT ACTIVE TUNNEL (ngrok-only configuration)
-  // This works everywhere: emulator, physical devices, web, anywhere with internet!
-  const ngrokUrl = "https://894105ffe479.ngrok-free.app/api/";
+  // Vercel URL - PRODUCTION
+  const vercelUrl = "https://daddy-j98whwk05-ericos-projects-2c423ec5.vercel.app/api/";
 
-  console.log("🌐 Using ngrok-only configuration:", ngrokUrl);
-  return ngrokUrl;
+  console.log("🌐 Using Vercel production configuration:", vercelUrl);
+  return vercelUrl;
 };
 
 // Use a proper initial API URL
 const API_BASE_URL = getInitialApiBaseUrl();
 
-// Smart API URL detection - ngrok-only configuration
+// Smart API URL detection - Vercel-only configuration
 const detectWorkingApiUrl = async (): Promise<string> => {
-  // NGROK-ONLY: Use current active ngrok tunnel exclusively
-  const ngrokUrl = "https://894105ffe479.ngrok-free.app/api/";
+  // VERCEL-ONLY: Use current active Vercel deployment exclusively
+  const vercelUrl = "https://daddy-j98whwk05-ericos-projects-2c423ec5.vercel.app/api/";
 
-  console.log("🔍 Testing ngrok-only configuration...");
+  console.log("🔍 Testing Vercel-only configuration...");
   console.log("📱 Platform:", Platform.OS);
-  console.log(`🌐 ngrok URL: ${ngrokUrl}`);
+  console.log(`🌐 Vercel URL: ${vercelUrl}`);
 
   try {
-    console.log(`Testing API endpoint: ${ngrokUrl}`);
-    const response = await axios.get(ngrokUrl, {
+    console.log(`Testing API endpoint: ${vercelUrl}`);
+    const response = await axios.get(vercelUrl, {
       timeout: 10000, // Longer timeout for ngrok
       headers: {
         Accept: "application/json",
@@ -43,12 +42,12 @@ const detectWorkingApiUrl = async (): Promise<string> => {
     });
 
     if (response.status === 200 && response.data) {
-      console.log(`✅ ngrok connection successful: ${ngrokUrl}`);
+      console.log(`✅ Vercel connection successful: ${vercelUrl}`);
       console.log(`📊 API Response:`, response.data);
-      return ngrokUrl;
+      return vercelUrl;
     } else {
-      console.log(`⚠️ ngrok URL responded with status ${response.status}`);
-      throw new Error(`ngrok URL returned status ${response.status}`);
+      console.log(`⚠️ Vercel URL responded with status ${response.status}`);
+      throw new Error(`Vercel URL returned status ${response.status}`);
     }
   } catch (error: any) {
     let errorMsg = error.message;
@@ -61,11 +60,11 @@ const detectWorkingApiUrl = async (): Promise<string> => {
         errorMsg = "No response/Network Error";
       }
     }
-    console.log(`❌ ngrok connection failed: ${ngrokUrl} - ${errorMsg}`);
+    console.log(`❌ Vercel connection failed: ${vercelUrl} - ${errorMsg}`);
 
-    // Since we're ngrok-only, throw error instead of falling back
+    // Since we're Vercel-only, throw error instead of falling back
     throw new Error(
-      `ngrok connection failed: ${errorMsg}. Please check your ngrok tunnel is running.`
+      `Vercel connection failed: ${errorMsg}. Please check your Vercel deployment.`
     );
   }
 };

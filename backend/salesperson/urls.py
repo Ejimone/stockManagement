@@ -7,6 +7,9 @@ from . import api_views
 
 # API URL patterns
 api_urlpatterns = [
+    # Health check endpoint
+    path('', api_views.health_check, name='api_health_check'),
+
     # Authentication endpoints
     path('auth/login/', api_views.CustomTokenObtainPairView.as_view(), name='api_login'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='api_token_refresh'),

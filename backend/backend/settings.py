@@ -24,16 +24,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-rb8&zegm&af&d*s$9fd&-#k!+hy46xbs8ke!t%ai5mj9vm%z8*')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 # Production domain configuration
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 AZURE_WEBSITE_HOSTNAME = os.environ.get('WEBSITE_HOSTNAME')
+VERCEL_URL = os.environ.get('VERCEL_URL')
+
 
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS = [RENDER_EXTERNAL_HOSTNAME, 'localhost', '127.0.0.1', '10.0.2.2']
 elif AZURE_WEBSITE_HOSTNAME:
     ALLOWED_HOSTS = [AZURE_WEBSITE_HOSTNAME, 'localhost', '127.0.0.1', '10.0.2.2']
+elif VERCEL_URL:
+    ALLOWED_HOSTS = [VERCEL_URL, 'localhost', '127.0.0.1', '10.0.2.2']
 else:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.2.2', '*']
 
@@ -51,6 +55,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'salesperson',
+    'whitenoise',
 ]
 
 MIDDLEWARE = [
@@ -140,6 +145,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+
 
 # Static files configuration for production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -196,6 +205,11 @@ SIMPLE_JWT = {
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+# Vercel deployment settings
+if VERCEL_URL:
+    CORS_ALLOWED_ORIGINS = [f'https://{VERCEL_URL}']
+    CSRF_TRUSTED_ORIGINS = [f'https://{VERCEL_URL}']
 
 # Security Settings for Production
 SECURE_BROWSER_XSS_FILTER = True
