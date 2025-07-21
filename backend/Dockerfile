@@ -41,4 +41,4 @@ EXPOSE 8000
 RUN python manage.py migrate
 
 # Run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "backend.wsgi:application"]
+RUN python manage.py runserver
