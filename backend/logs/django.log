@@ -8997,3 +8997,4 @@ INFO 2025-07-21 12:50:54,847 basehttp 50121 6209744896 "GET /static/admin/js/can
 INFO 2025-07-21 12:50:55,913 basehttp 50121 6209744896 "POST /admin/salesperson/user/ HTTP/1.1" 302 0
 INFO 2025-07-21 12:50:55,920 basehttp 50121 6209744896 "GET /admin/salesperson/user/ HTTP/1.1" 200 15356
 INFO 2025-07-21 12:50:55,937 basehttp 50121 6209744896 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-07-21 13:06:31,573 autoreload 50121 8584109824 /Users/evidenceejimone/daddy/backend/manage.py changed, reloading.

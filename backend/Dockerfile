@@ -4,6 +4,7 @@ FROM python:3.11-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV DJANGO_SETTINGS_MODULE backend.settings_production
 
 # Set work directory
 WORKDIR /app
@@ -36,5 +37,8 @@ RUN chmod +x startup.sh
 # Expose port
 EXPOSE 8000
 
+# Run database migrations
+RUN python manage.py migrate
+
 # Run the application
-CMD ["./startup.sh"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "backend.wsgi:application"]
