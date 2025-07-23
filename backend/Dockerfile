@@ -28,8 +28,6 @@ COPY . .
 # Create logs directory
 RUN mkdir -p logs
 
-# Collect static files
-RUN python manage.py collectstatic --noinput
 
 # Make startup script executable
 RUN chmod +x startup.sh
@@ -37,8 +35,6 @@ RUN chmod +x startup.sh
 # Expose port
 EXPOSE 8000
 
-# Run database migrations
-RUN python manage.py migrate
 
-# Run the application
-RUN python manage.py runserver
+# Use gunicorn as the production server
+CMD ["gunicorn", "backend.wsgi:application", "--bind", "0.0.0.0:8000"]
